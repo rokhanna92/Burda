@@ -8,7 +8,9 @@ import 'screens/home_screen.dart';
 import 'screens/select_year_screen.dart';
 import 'screens/settings_screen.dart';
 import 'theme/app_theme.dart';
+import 'widgets/add_magazine_modal.dart';
 import 'widgets/bottom_navigation.dart';
+import 'widgets/year_browse_sheet.dart';
 
 void main() {
   runApp(const BurdaApp());
@@ -61,7 +63,14 @@ class _AppShellState extends State<AppShell> {
       setState(() => _current = destination);
       return;
     }
-    // TODO(next): the per-year sheet and the add-an-issue sheet.
+    switch (destination) {
+      case NavDestination.missingByYear:
+        showYearBrowseSheet(context);
+      case NavDestination.addIssue:
+        showAddMagazineModal(context);
+      case _:
+        break;
+    }
   }
 
   @override
