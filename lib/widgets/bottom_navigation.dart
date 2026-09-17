@@ -32,7 +32,7 @@ class BottomNavigation extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
         child: SizedBox(
           height: 66,
           child: Stack(

@@ -10,7 +10,8 @@ class CollectionStats extends StatelessWidget {
 
   final int daysVisited;
 
-  static final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
+  /// The original prints the month and year of the newest addition, e.g. 9/2026.
+  static final DateFormat _dateFormat = DateFormat('M/yyyy');
 
   @override
   Widget build(BuildContext context) {

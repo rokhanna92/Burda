@@ -113,7 +113,7 @@ class DriftingIconCluster extends StatefulWidget {
     this.onTourTap,
     this.onCoffeeTap,
     this.onComingSoonTap,
-    this.height = 150,
+    this.height = 128,
   });
 
   final VoidCallback? onSearchTap;
@@ -202,7 +202,7 @@ class _DriftingIconClusterState extends State<DriftingIconCluster>
                 widget.onCoffeeTap,
               ),
               _icon(
-                const _Drifter('assets/icon/searching.png', 0.74, 0.42, 44, 2.9),
+                const _Drifter('assets/icon/searching.png', 0.74, 0.34, 44, 2.9),
                 area,
                 widget.onSearchTap,
               ),
