@@ -38,7 +38,8 @@ class Note {
   /// The original app stored `date` as TEXT in one schema and INTEGER in
   /// another, so both are accepted here.
   static DateTime _parseDate(Object? value) => switch (value) {
-    String value => DateTime.tryParse(value) ?? DateTime.fromMillisecondsSinceEpoch(0),
+    String value =>
+      DateTime.tryParse(value) ?? DateTime.fromMillisecondsSinceEpoch(0),
     int value => DateTime.fromMillisecondsSinceEpoch(value),
     _ => DateTime.fromMillisecondsSinceEpoch(0),
   };

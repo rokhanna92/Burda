@@ -87,9 +87,8 @@ class _StatRow extends StatelessWidget {
               '$label$value',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 15,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(fontSize: 15),
             ),
           ),
         ],

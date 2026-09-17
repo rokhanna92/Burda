@@ -101,9 +101,7 @@ class _YearBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Stack(
           children: [
-            Positioned.fill(
-              child: ColoredBox(color: const Color(0xFFE2E2E2)),
-            ),
+            Positioned.fill(child: ColoredBox(color: const Color(0xFFE2E2E2))),
             Positioned.fill(
               child: Align(
                 alignment: Alignment.centerLeft,

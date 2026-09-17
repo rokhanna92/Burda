@@ -30,7 +30,11 @@ class InfoBlocks extends StatelessWidget {
     final wear = magazines.averageCondition;
 
     final tiles = [
-      _Tile(label: 'OWNED', value: '${magazines.ownedCount}', onTap: onOwnedTap),
+      _Tile(
+        label: 'OWNED',
+        value: '${magazines.ownedCount}',
+        onTap: onOwnedTap,
+      ),
       _Tile(
         label: 'MISSING',
         value: '${magazines.missingCount}',
@@ -38,7 +42,11 @@ class InfoBlocks extends StatelessWidget {
       ),
       _Tile(label: 'NOTES', value: '$noteCount', onTap: onNotesTap),
       _Tile(label: 'RANK', value: magazines.rank.name, onTap: onRankTap),
-      _Tile(label: 'VAULT', value: '${magazines.vaultCount}', onTap: onVaultTap),
+      _Tile(
+        label: 'VAULT',
+        value: '${magazines.vaultCount}',
+        onTap: onVaultTap,
+      ),
       _Tile(
         label: 'WEAR',
         value: wear == null ? 'N/A' : wear.toStringAsFixed(1),

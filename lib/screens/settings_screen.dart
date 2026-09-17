@@ -121,9 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
         children: [
-          Center(
-            child: Text('Settings', style: theme.textTheme.displayLarge),
-          ),
+          Center(child: Text('Settings', style: theme.textTheme.displayLarge)),
           const SizedBox(height: 14),
           Text(
             'The settings are intuitively designed\n'
@@ -357,10 +355,7 @@ class _DataButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 13),
       ),
       onPressed: onPressed,
-      child: Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
     );
   }
 }

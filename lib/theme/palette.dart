@@ -101,8 +101,6 @@ class Palette {
     light: Color(0xFFEF5350),
   );
 
-  static Palette byName(String? name) => all.firstWhere(
-    (palette) => palette.name == name,
-    orElse: () => pink,
-  );
+  static Palette byName(String? name) =>
+      all.firstWhere((palette) => palette.name == name, orElse: () => pink);
 }

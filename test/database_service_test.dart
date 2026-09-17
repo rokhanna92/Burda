@@ -142,7 +142,10 @@ void main() {
       await service.addUploadedImage('1-2010', '/photos/a.jpg');
       await service.addUploadedImage('1-2010', '/photos/a.jpg');
 
-      expect((await service.getMagazine('1-2010'))!.uploadedImages, hasLength(1));
+      expect(
+        (await service.getMagazine('1-2010'))!.uploadedImages,
+        hasLength(1),
+      );
     });
 
     test('removing a path leaves the others', () async {
@@ -220,20 +223,10 @@ void main() {
   group('notes', () {
     test('notes come back newest first', () async {
       await service.addNote(
-        Note(
-          id: 'a',
-          title: 'Older',
-          content: 'x',
-          date: DateTime(2026, 1, 1),
-        ),
+        Note(id: 'a', title: 'Older', content: 'x', date: DateTime(2026, 1, 1)),
       );
       await service.addNote(
-        Note(
-          id: 'b',
-          title: 'Newer',
-          content: 'y',
-          date: DateTime(2026, 6, 1),
-        ),
+        Note(id: 'b', title: 'Newer', content: 'y', date: DateTime(2026, 6, 1)),
       );
 
       expect((await service.getNotes()).map((n) => n.title), [
@@ -292,12 +285,16 @@ void main() {
         ['/a.jpg'],
       );
       expect(
-        Magazine.fromJson({...row, 'uploadedImages': ['/a.jpg']})
-            .uploadedImages,
+        Magazine.fromJson({
+          ...row,
+          'uploadedImages': ['/a.jpg'],
+        }).uploadedImages,
         ['/a.jpg'],
       );
-      expect(Magazine.fromMap({...row, 'uploadedImages': ''}).uploadedImages,
-          isEmpty);
+      expect(
+        Magazine.fromMap({...row, 'uploadedImages': ''}).uploadedImages,
+        isEmpty,
+      );
     });
 
     test('the issue number comes from the id', () {

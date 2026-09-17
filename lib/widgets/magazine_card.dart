@@ -65,10 +65,7 @@ class MagazineCard extends StatelessWidget {
                     child: Text(
                       magazine.title,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                   ),
                   if (magazine.isOwned)

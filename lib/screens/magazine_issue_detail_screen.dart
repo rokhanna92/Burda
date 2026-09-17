@@ -26,9 +26,7 @@ class _MagazineIssueDetailScreenState extends State<MagazineIssueDetailScreen> {
     if (_picking) return;
     setState(() => _picking = true);
     try {
-      final picked = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-      );
+      final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (picked == null) {
         if (mounted) _notify('No file selected.');
         return;
@@ -176,7 +174,9 @@ class _MagazineIssueDetailScreenState extends State<MagazineIssueDetailScreen> {
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stack) => ColoredBox(
                               color: theme.colorScheme.secondary,
-                              child: const Center(child: Text('Image not found')),
+                              child: const Center(
+                                child: Text('Image not found'),
+                              ),
                             ),
                           ),
                         ),

@@ -86,10 +86,7 @@ class MagazineCollectionView extends StatelessWidget {
     onOwnedChanged?.call(magazine, isOwned);
   }
 
-  Future<void> _rateCondition(
-    BuildContext context,
-    Magazine magazine,
-  ) async {
+  Future<void> _rateCondition(BuildContext context, Magazine magazine) async {
     final provider = context.read<MagazineProvider>();
     final messenger = ScaffoldMessenger.of(context);
     final score = await showConditionDialog(context, magazine: magazine);

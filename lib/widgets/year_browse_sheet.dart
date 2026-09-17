@@ -89,8 +89,7 @@ class _YearRow extends StatelessWidget {
     final total = owned + missing;
     await SharePlus.instance.share(
       ShareParams(
-        text:
-            'I have $owned out of $total in my Burda Style collection!',
+        text: 'I have $owned out of $total in my Burda Style collection!',
         subject: 'My Burda Style Collection for $year',
       ),
     );

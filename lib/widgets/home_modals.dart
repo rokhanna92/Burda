@@ -14,10 +14,7 @@ const List<String?> _rankAssets = [
 ];
 
 /// The rank ladder, opened from the RANK tile.
-Future<void> showRankModal(
-  BuildContext context, {
-  required int ownedCount,
-}) {
+Future<void> showRankModal(BuildContext context, {required int ownedCount}) {
   final theme = Theme.of(context);
   final rank = CollectorRank.forOwnedCount(ownedCount);
 

@@ -40,8 +40,7 @@ class MagazineProvider extends ChangeNotifier {
   List<Magazine> get missing => _magazines.where((m) => !m.isOwned).toList();
 
   /// Years present in the collection, oldest first.
-  List<int> get years =>
-      _magazines.map((m) => m.year).toSet().toList()..sort();
+  List<int> get years => _magazines.map((m) => m.year).toSet().toList()..sort();
 
   List<Magazine> magazinesForYear(int year) =>
       _magazines.where((m) => m.year == year).toList();
@@ -67,10 +66,7 @@ class MagazineProvider extends ChangeNotifier {
 
   /// Most recent moment an issue was marked owned.
   DateTime? get latestAddition {
-    final dates = owned
-        .map((m) => m.dateAdded)
-        .whereType<DateTime>()
-        .toList();
+    final dates = owned.map((m) => m.dateAdded).whereType<DateTime>().toList();
     if (dates.isEmpty) return null;
     return dates.reduce((a, b) => a.isAfter(b) ? a : b);
   }
@@ -84,18 +80,14 @@ class MagazineProvider extends ChangeNotifier {
 
   /// Average condition of the issues that have been rated, or null if none are.
   double? get averageCondition {
-    final scores = owned
-        .map((m) => m.conditionScore)
-        .whereType<int>()
-        .toList();
+    final scores = owned.map((m) => m.conditionScore).whereType<int>().toList();
     if (scores.isEmpty) return null;
     return scores.reduce((a, b) => a + b) / scores.length;
   }
 
   CollectorRank get rank => CollectorRank.forOwnedCount(ownedCount);
 
-  Magazine? byId(String id) =>
-      _magazines.firstWhereOrNull((m) => m.id == id);
+  Magazine? byId(String id) => _magazines.firstWhereOrNull((m) => m.id == id);
 
   // Mutations
 

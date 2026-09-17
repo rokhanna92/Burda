@@ -40,9 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _open(Widget screen) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => screen),
-    );
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => screen));
   }
 
   @override
