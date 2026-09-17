@@ -25,7 +25,7 @@ class GalleryScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Vault')),
+      appBar: AppBar(title: const Text('VAULT')),
       body: entries.isEmpty
           ? Center(
               child: Text(
@@ -60,14 +60,28 @@ class GalleryScreen extends StatelessWidget {
                           bottom: 0,
                           child: Container(
                             color: Colors.black.withValues(alpha: 0.35),
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Text(
-                              title,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                              ),
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'Delete photo',
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Color(0xFFF44336),
+                                  ),
+                                  onPressed: () =>
+                                      _confirmDelete(context, id, path),
+                                ),
+                              ],
                             ),
                           ),
                         ),

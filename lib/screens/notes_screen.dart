@@ -17,23 +17,41 @@ class NotesScreen extends StatelessWidget {
     final notes = context.watch<NoteProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Notes')),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: Colors.white,
-        onPressed: () => _showAddNoteModal(context),
-        icon: const Icon(Icons.edit),
-        label: const Text('Add Note'),
+      appBar: AppBar(title: const Icon(Icons.edit, color: Colors.white)),
+      // A Row, not an Align: a bottom bar child gets loose height
+      // constraints, and Align would expand to fill the whole screen.
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.secondary,
+                foregroundColor: theme.colorScheme.primary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 14,
+                ),
+              ),
+              onPressed: () => _showAddNoteModal(context),
+              child: const Text(
+                'Add Note',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
       ),
       body: notes.notes.isEmpty
           ? Center(
               child: Text(
                 'Add a new note!',
-                style: theme.textTheme.bodyLarge,
+                style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey),
               ),
             )
           : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               itemCount: notes.notes.length,
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
@@ -130,10 +148,8 @@ class _AddNoteDialogState extends State<_AddNoteDialog> {
   }
 
   void _save() {
-    Navigator.of(context).pop((
-      title: _title.text.trim(),
-      content: _content.text.trim(),
-    ));
+    Navigator.of(context)
+        .pop((title: _title.text.trim(), content: _content.text.trim()));
   }
 
   @override
