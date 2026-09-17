@@ -10,7 +10,12 @@ import '../widgets/floating_background.dart';
 import '../widgets/home_modals.dart';
 import '../widgets/info_blocks.dart';
 import '../widgets/quote_display.dart';
+import '../widgets/search_modal.dart';
 import '../widgets/title_text.dart';
+import 'gallery_screen.dart';
+import 'missing_magazines_screen.dart';
+import 'notes_screen.dart';
+import 'owned_magazines_screen.dart';
 
 /// The landing screen: logo, rotating fact, stats, progress and the six tiles.
 class HomeScreen extends StatefulWidget {
@@ -32,6 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _recordVisit() async {
     final days = await VisitService.recordVisit();
     if (mounted) setState(() => _daysVisited = days);
+  }
+
+  void _open(Widget screen) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => screen),
+    );
   }
 
   @override
@@ -64,12 +75,17 @@ class _HomeScreenState extends State<HomeScreen> {
               const CollectionProgress(),
               const SizedBox(height: 18),
               InfoBlocks(
+                onOwnedTap: () => _open(const OwnedMagazinesScreen()),
+                onMissingTap: () => _open(const MissingMagazinesScreen()),
+                onNotesTap: () => _open(const NotesScreen()),
+                onVaultTap: () => _open(const GalleryScreen()),
                 onRankTap: () => showRankModal(
                   context,
                   ownedCount: context.read<MagazineProvider>().ownedCount,
                 ),
               ),
               DriftingIconCluster(
+                onSearchTap: () => showSearchModal(context),
                 onTourTap: () => showTourModal(context),
                 onComingSoonTap: () => showComingSoonModal(context),
                 onCoffeeTap: () => showCoffeeModal(context),
