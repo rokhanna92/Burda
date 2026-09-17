@@ -57,3 +57,5 @@ app.*.map.json
 
 # Claude Code local overrides
 .claude/settings.local.json
+/recovery/screens/new-*
+/recovery/screens/tmp-*
