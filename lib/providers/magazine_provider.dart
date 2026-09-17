@@ -52,6 +52,13 @@ class MagazineProvider extends ChangeNotifier {
   int missingCountForYear(int year) =>
       _magazines.where((m) => m.year == year && !m.isOwned).length;
 
+  /// Share of [year]'s issues that are owned, between 0 and 1.
+  double completionForYear(int year) {
+    final issues = magazinesForYear(year);
+    if (issues.isEmpty) return 0;
+    return issues.where((m) => m.isOwned).length / issues.length;
+  }
+
   /// True when every issue of [year] is owned.
   bool isYearComplete(int year) {
     final issues = magazinesForYear(year);
