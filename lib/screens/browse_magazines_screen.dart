@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,9 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/magazine.dart';
 import '../providers/magazine_provider.dart';
-import '../widgets/magazine_card.dart';
-import '../widgets/magazine_dialogs.dart';
-import 'magazine_issue_detail_screen.dart';
+import '../widgets/magazine_collection_view.dart';
 
 /// Every issue of one year, as a cover carousel or a two column grid.
 class BrowseMagazinesScreen extends StatefulWidget {
@@ -53,43 +50,12 @@ class _BrowseMagazinesScreenState extends State<BrowseMagazinesScreen> {
     await prefs.setBool(_viewKey, _isGrid);
   }
 
-  Future<void> _toggleOwned(Magazine magazine) async {
-    final provider = context.read<MagazineProvider>();
-    final wasComplete = provider.isYearComplete(widget.year);
-    await provider.toggleOwnership(magazine.id);
-    if (!wasComplete && provider.isYearComplete(widget.year)) {
+  /// Completing a year is worth confetti.
+  void _onOwnedChanged(Magazine magazine, bool isOwned) {
+    if (isOwned &&
+        context.read<MagazineProvider>().isYearComplete(widget.year)) {
       _confetti.play();
     }
-  }
-
-  Future<void> _rateCondition(Magazine magazine) async {
-    final provider = context.read<MagazineProvider>();
-    final score = await showConditionDialog(context, magazine: magazine);
-    if (score == null) return;
-    await provider.setCondition(magazine.id, score);
-    if (mounted) _notify('Condition set to $score');
-  }
-
-  Future<void> _delete(Magazine magazine) async {
-    final provider = context.read<MagazineProvider>();
-    if (!await showDeleteIssueDialog(context)) return;
-    await provider.deleteMagazine(magazine.id);
-    if (mounted) _notify('Magazine removed!');
-  }
-
-  void _openDetail(Magazine magazine) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) =>
-            MagazineIssueDetailScreen(magazineId: magazine.id),
-      ),
-    );
-  }
-
-  void _notify(String message) {
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -128,16 +94,12 @@ class _BrowseMagazinesScreenState extends State<BrowseMagazinesScreen> {
               ),
               const SizedBox(height: 22),
               Expanded(
-                child: issues.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No magazines for ${widget.year}',
-                          style: theme.textTheme.bodyLarge,
-                        ),
-                      )
-                    : _isGrid
-                    ? _grid(issues)
-                    : _carousel(issues),
+                child: MagazineCollectionView(
+                  magazines: issues,
+                  carousel: !_isGrid,
+                  emptyMessage: 'No magazines for ${widget.year}',
+                  onOwnedChanged: _onOwnedChanged,
+                ),
               ),
             ],
           ),
@@ -154,43 +116,4 @@ class _BrowseMagazinesScreenState extends State<BrowseMagazinesScreen> {
       ),
     );
   }
-
-  Widget _grid(List<Magazine> issues) {
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childAspectRatio: 0.72,
-      ),
-      itemCount: issues.length,
-      itemBuilder: (context, index) => _card(issues[index]),
-    );
-  }
-
-  Widget _carousel(List<Magazine> issues) {
-    return CarouselSlider.builder(
-      itemCount: issues.length,
-      options: CarouselOptions(
-        viewportFraction: 0.78,
-        enlargeCenterPage: true,
-        enlargeFactor: 0.2,
-        enableInfiniteScroll: false,
-        height: double.infinity,
-      ),
-      itemBuilder: (context, index, realIndex) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: _card(issues[index]),
-      ),
-    );
-  }
-
-  Widget _card(Magazine magazine) => MagazineCard(
-    magazine: magazine,
-    onTap: () => _openDetail(magazine),
-    onToggleOwned: () => _toggleOwned(magazine),
-    onRateCondition: () => _rateCondition(magazine),
-    onDelete: () => _delete(magazine),
-  );
 }
