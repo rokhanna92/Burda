@@ -11,6 +11,9 @@ import 'browse_magazines_screen.dart';
 class SelectYearScreen extends StatelessWidget {
   const SelectYearScreen({super.key});
 
+  /// Height one year bar needs, including the gap around it.
+  static const double _minBarExtent = 34;
+
   /// Bars are widest in the middle of the list and narrow towards both ends.
   static double _widthFactorFor(int index, int count) {
     if (count < 2) return 1;
@@ -50,11 +53,9 @@ class SelectYearScreen extends StatelessWidget {
                       style: theme.textTheme.bodyLarge,
                     ),
                   )
-                : Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      final bars = [
                         for (final (index, year) in years.indexed)
                           FractionallySizedBox(
                             widthFactor: _widthFactorFor(index, years.length),
@@ -69,8 +70,21 @@ class SelectYearScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                      ],
-                    ),
+                      ];
+                      // Every year fits at once on a normal phone. On a short
+                      // screen the list scrolls rather than overflowing.
+                      final fits =
+                          constraints.maxHeight >= years.length * _minBarExtent;
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                        child: fits
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: bars,
+                              )
+                            : ListView(children: bars),
+                      );
+                    },
                   ),
           ),
         ],
