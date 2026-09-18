@@ -7,6 +7,7 @@ import '../providers/magazine_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/data_transfer_service.dart';
 import '../theme/palette.dart';
+import '../widgets/raining_hearts.dart';
 import '../widgets/settings_modals.dart';
 
 /// Five expandable sections: quotes, theme, data, privacy, about.
@@ -77,8 +78,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _notify('No file selected.');
         return;
       }
-      final count = await context.read<MagazineProvider>().import(entries);
-      if (mounted) _notify('Imported successfully! $count issues.');
+      final provider = context.read<MagazineProvider>();
+      final count = await provider.import(entries);
+      if (!mounted) return;
+      _notify('Imported successfully! $count issues.');
+      // An import that completes the collection is worth celebrating too.
+      if (provider.completion == 1) showRainingHearts(context);
     } catch (error) {
       if (mounted) _notify('Error importing: $error');
     } finally {

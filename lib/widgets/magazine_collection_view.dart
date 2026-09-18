@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import '../providers/magazine_provider.dart';
 import '../screens/magazine_issue_detail_screen.dart';
 import 'magazine_card.dart';
 import 'magazine_dialogs.dart';
+import 'raining_hearts.dart';
 
 /// A set of issues as covers, either a two column grid or a swipeable
 /// carousel, with the own, rate and delete actions wired up.
@@ -48,7 +50,15 @@ class MagazineCollectionView extends StatelessWidget {
       childAspectRatio: 0.72,
     ),
     itemCount: magazines.length,
-    itemBuilder: (context, index) => _card(context, magazines[index]),
+    // The first covers fade in one after another, then the rest appear at
+    // once so scrolling never waits on an animation.
+    itemBuilder: (context, index) => index < 8
+        ? FadeIn(
+            duration: const Duration(milliseconds: 350),
+            delay: Duration(milliseconds: 60 * index),
+            child: _card(context, magazines[index]),
+          )
+        : _card(context, magazines[index]),
   );
 
   Widget _carousel(BuildContext context) => CarouselSlider.builder(
@@ -80,10 +90,13 @@ class MagazineCollectionView extends StatelessWidget {
   );
 
   Future<void> _toggleOwned(BuildContext context, Magazine magazine) async {
-    final isOwned = await context.read<MagazineProvider>().toggleOwnership(
-      magazine.id,
-    );
+    final provider = context.read<MagazineProvider>();
+    final isOwned = await provider.toggleOwnership(magazine.id);
     onOwnedChanged?.call(magazine, isOwned);
+    // Owning the last missing issue finishes the whole collection.
+    if (isOwned && provider.completion == 1 && context.mounted) {
+      showRainingHearts(context);
+    }
   }
 
   Future<void> _rateCondition(BuildContext context, Magazine magazine) async {
