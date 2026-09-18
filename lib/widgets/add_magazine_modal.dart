@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../models/magazine.dart';
 import '../providers/magazine_provider.dart';
+import '../services/image_storage_service.dart';
 import 'search_modal.dart' show maxSearchYear, minSearchYear;
 
 /// Highest year a whole year can be added at once. Beyond this the issue
@@ -28,10 +32,21 @@ class _AddMagazineDialogState extends State<_AddMagazineDialog> {
   );
   int _issue = 1;
 
+  /// Where the chosen cover currently sits. It is copied into the app only
+  /// once the issue is actually added.
+  String? _pickedCover;
+
   @override
   void dispose() {
     _year.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickCover() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked != null && mounted) {
+      setState(() => _pickedCover = picked.path);
+    }
   }
 
   void _fail(String message) {
@@ -64,11 +79,11 @@ class _AddMagazineDialogState extends State<_AddMagazineDialog> {
     return year;
   }
 
-  Magazine _buildIssue(int issue, int year) => Magazine(
+  Magazine _buildIssue(int issue, int year, {String? coverPath}) => Magazine(
     id: '$issue-$year',
     title: '$issue/$year',
     year: year,
-    image: 'covers/$issue-$year.jpg',
+    image: coverPath ?? 'covers/$issue-$year.jpg',
   );
 
   Future<void> _addIssue() async {
@@ -83,7 +98,13 @@ class _AddMagazineDialogState extends State<_AddMagazineDialog> {
       _fail('This year already has 12 issues!');
       return;
     }
-    await provider.addMagazine(_buildIssue(_issue, year));
+    final cover = _pickedCover == null
+        ? null
+        : await ImageStorageService.saveCover(
+            magazineId: '$_issue-$year',
+            sourcePath: _pickedCover!,
+          );
+    await provider.addMagazine(_buildIssue(_issue, year, coverPath: cover));
     if (mounted) _done('Added $_issue/$year to your collection!');
   }
 
@@ -149,6 +170,35 @@ class _AddMagazineDialogState extends State<_AddMagazineDialog> {
             controller: _year,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(labelText: 'Year'),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              if (_pickedCover != null) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.file(
+                    File(_pickedCover!),
+                    width: 42,
+                    height: 56,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: theme.colorScheme.onSurface,
+                  ),
+                  onPressed: _pickCover,
+                  icon: const Icon(Icons.add_a_photo, size: 18),
+                  label: Text(
+                    _pickedCover == null ? 'Choose cover' : 'Change cover',
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

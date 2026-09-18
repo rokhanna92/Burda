@@ -8,6 +8,9 @@ import 'package:path_provider/path_provider.dart';
 abstract final class ImageStorageService {
   static const String folder = 'magazine_images';
 
+  /// Covers the user picked for issues that ship no artwork.
+  static const String coverFolder = 'magazine_covers';
+
   static Future<Directory> _directoryFor(String magazineId) async {
     final documents = await getApplicationDocumentsDirectory();
     final directory = Directory(p.join(documents.path, folder, magazineId));
@@ -29,6 +32,24 @@ abstract final class ImageStorageService {
         ? '.jpg'
         : p.extension(sourcePath);
     final target = p.join(directory.path, '$stamp$extension');
+    await File(sourcePath).copy(target);
+    return target;
+  }
+
+  /// Copies [sourcePath] in as the cover for [magazineId] and returns its path.
+  static Future<String> saveCover({
+    required String magazineId,
+    required String sourcePath,
+  }) async {
+    final documents = await getApplicationDocumentsDirectory();
+    final directory = Directory(p.join(documents.path, coverFolder));
+    if (!directory.existsSync()) {
+      await directory.create(recursive: true);
+    }
+    final extension = p.extension(sourcePath).isEmpty
+        ? '.jpg'
+        : p.extension(sourcePath);
+    final target = p.join(directory.path, '$magazineId$extension');
     await File(sourcePath).copy(target);
     return target;
   }
