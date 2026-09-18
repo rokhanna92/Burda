@@ -22,41 +22,47 @@ class CollectionStats extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _StatRow(
-                    icon: 'assets/icon/magazine.png',
-                    label: 'Total Magazines: ',
-                    value: '${magazines.totalCount}',
-                  ),
-                  _StatRow(
-                    icon: 'assets/icon/after.png',
-                    label: 'Latest Addition: ',
-                    value: latest == null ? 'N/A' : _dateFormat.format(latest),
-                  ),
-                  _StatRow(
-                    icon: 'assets/icon/yes.png',
-                    label: 'Oldest Issue: ',
-                    value: oldest == null ? 'N/A' : '$oldest',
-                  ),
-                  _StatRow(
-                    icon: 'assets/icon/fire.png',
-                    label: 'Days Visited: ',
-                    value: '$daysVisited',
-                  ),
-                ],
+        child: LayoutBuilder(
+          builder: (context, constraints) => Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _StatRow(
+                      icon: 'assets/icon/magazine.png',
+                      label: 'Total Magazines: ',
+                      value: '${magazines.totalCount}',
+                    ),
+                    _StatRow(
+                      icon: 'assets/icon/after.png',
+                      label: 'Latest Addition: ',
+                      value: latest == null
+                          ? 'N/A'
+                          : _dateFormat.format(latest),
+                    ),
+                    _StatRow(
+                      icon: 'assets/icon/yes.png',
+                      label: 'Oldest Issue: ',
+                      value: oldest == null ? 'N/A' : '$oldest',
+                    ),
+                    _StatRow(
+                      icon: 'assets/icon/fire.png',
+                      label: 'Days Visited: ',
+                      value: '$daysVisited',
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Image.asset(
-              'assets/icon/lipstick.png',
-              width: 104,
-              fit: BoxFit.contain,
-            ),
-          ],
+              // The lipstick gives up width on a narrow screen so the stats
+              // keep their full text.
+              Image.asset(
+                'assets/icon/lipstick.png',
+                width: (constraints.maxWidth * 0.3).clamp(62.0, 104.0),
+                fit: BoxFit.contain,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -83,12 +89,17 @@ class _StatRow extends StatelessWidget {
           Image.asset(icon, width: 27, height: 27),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              '$label$value',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(fontSize: 15),
+            // Scales down rather than cutting the value off on a narrow
+            // screen, so a date is never shown half written.
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '$label$value',
+                maxLines: 1,
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(fontSize: 15),
+              ),
             ),
           ),
         ],
