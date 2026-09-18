@@ -64,3 +64,8 @@ app.*.map.json
 !/recovery/screens/theme-*
 !/recovery/screens/[0-9]*
 !/recovery/screens/icons-montage.png
+
+# Release signing details and the keystore itself stay out of git
+/android/key.properties
+*.jks
+*.keystore
