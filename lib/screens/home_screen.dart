@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,7 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           child: Column(
             children: [
-              const TitleText(),
+              const FadeInDown(
+                duration: Duration(milliseconds: 700),
+                child: TitleText(),
+              ),
               const SizedBox(height: 18),
               if (quotesEnabled)
                 const Padding(
@@ -68,18 +72,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               const SizedBox(height: 28),
-              CollectionStats(daysVisited: _daysVisited),
+              FadeIn(
+                delay: const Duration(milliseconds: 250),
+                child: CollectionStats(daysVisited: _daysVisited),
+              ),
               const SizedBox(height: 26),
-              const CollectionProgress(),
+              const FadeIn(
+                delay: Duration(milliseconds: 400),
+                child: CollectionProgress(),
+              ),
               const SizedBox(height: 18),
-              InfoBlocks(
-                onOwnedTap: () => _open(const OwnedMagazinesScreen()),
-                onMissingTap: () => _open(const MissingMagazinesScreen()),
-                onNotesTap: () => _open(const NotesScreen()),
-                onVaultTap: () => _open(const GalleryScreen()),
-                onRankTap: () => showRankModal(
-                  context,
-                  ownedCount: context.read<MagazineProvider>().ownedCount,
+              ZoomIn(
+                delay: const Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 400),
+                child: InfoBlocks(
+                  onOwnedTap: () => _open(const OwnedMagazinesScreen()),
+                  onMissingTap: () => _open(const MissingMagazinesScreen()),
+                  onNotesTap: () => _open(const NotesScreen()),
+                  onVaultTap: () => _open(const GalleryScreen()),
+                  onRankTap: () => showRankModal(
+                    context,
+                    ownedCount: context.read<MagazineProvider>().ownedCount,
+                  ),
                 ),
               ),
               DriftingIconCluster(
