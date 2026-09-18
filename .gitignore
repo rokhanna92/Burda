@@ -57,5 +57,10 @@ app.*.map.json
 
 # Claude Code local overrides
 .claude/settings.local.json
-/recovery/screens/new-*
-/recovery/screens/tmp-*
+# Captures of our own build are throwaway; only the references to the
+# original app are kept (orig-*, theme-*, and the numbered screen tour).
+/recovery/screens/*
+!/recovery/screens/orig-*
+!/recovery/screens/theme-*
+!/recovery/screens/[0-9]*
+!/recovery/screens/icons-montage.png
