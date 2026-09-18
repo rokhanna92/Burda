@@ -99,16 +99,40 @@ class _NavIcon extends StatelessWidget {
   }
 }
 
-class _AddIssueButton extends StatelessWidget {
+/// The raised centre button. The original calls it the dancing dress, so it
+/// sways rather than sitting still.
+class _AddIssueButton extends StatefulWidget {
   const _AddIssueButton({required this.onTap});
 
   final VoidCallback onTap;
 
   @override
+  State<_AddIssueButton> createState() => _AddIssueButtonState();
+}
+
+class _AddIssueButtonState extends State<_AddIssueButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _dance = AnimationController(
+    duration: const Duration(milliseconds: 2600),
+    vsync: this,
+  )..repeat(reverse: true);
+
+  late final Animation<double> _sway = Tween<double>(
+    begin: -0.07,
+    end: 0.07,
+  ).animate(CurvedAnimation(parent: _dance, curve: Curves.easeInOut));
+
+  @override
+  void dispose() {
+    _dance.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         width: 66,
         height: 66,
@@ -117,10 +141,19 @@ class _AddIssueButton extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         padding: const EdgeInsets.all(12),
-        child: Image.asset(
-          'assets/icon/dress.png',
-          color: scheme.primary,
-          colorBlendMode: BlendMode.srcIn,
+        child: AnimatedBuilder(
+          animation: _sway,
+          builder: (context, child) => Transform.rotate(
+            angle: _sway.value,
+            // Turning about the hanger, not the middle of the skirt.
+            alignment: Alignment.topCenter,
+            child: child,
+          ),
+          child: Image.asset(
+            'assets/icon/dress.png',
+            color: scheme.primary,
+            colorBlendMode: BlendMode.srcIn,
+          ),
         ),
       ),
     );
