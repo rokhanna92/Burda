@@ -297,6 +297,39 @@ void main() {
       );
     });
 
+    test('a cover is a file only when the path is absolute', () {
+      Magazine withImage(String image) => Magazine(
+        id: '5-2026',
+        title: '5/2026',
+        year: 2026,
+        image: image,
+      );
+
+      expect(withImage('covers/5-2026.jpg').hasFileCover, isFalse);
+      expect(
+        withImage('/data/user/0/app/files/magazine_covers/5-2026.jpg')
+            .hasFileCover,
+        isTrue,
+      );
+    });
+
+    test('a chosen cover survives a database round trip', () async {
+      const path = '/data/user/0/app/files/magazine_covers/5-2026.jpg';
+      await service.addMagazine(
+        const Magazine(
+          id: '5-2026',
+          title: '5/2026',
+          year: 2026,
+          image: path,
+        ),
+      );
+
+      final stored = await service.getMagazine('5-2026');
+
+      expect(stored!.image, path);
+      expect(stored.hasFileCover, isTrue);
+    });
+
     test('the issue number comes from the id', () {
       expect(
         const Magazine(

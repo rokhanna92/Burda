@@ -38,6 +38,10 @@ class Magazine {
   /// Issue number within the year, e.g. `1` for `"1-2010"`.
   int get issue => int.parse(id.split('-').first);
 
+  /// True when [image] points at a file the user chose, rather than one of the
+  /// covers bundled with the app.
+  bool get hasFileCover => image.startsWith('/');
+
   /// Legacy wording for [conditionScore], matching the original app's labels.
   String? get conditionLabel => switch (conditionScore) {
     null => null,

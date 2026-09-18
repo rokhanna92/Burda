@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/magazine.dart';
+import 'cover_image.dart';
 
 /// A cover with the action bar across its lower third: own or disown, rate the
 /// condition once owned, and delete.
@@ -27,21 +28,7 @@ class MagazineCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            'assets/${magazine.image}',
-            fit: BoxFit.cover,
-            // The original shipped no placeholder, so a missing cover crashed
-            // the tile. This shows the issue number instead.
-            errorBuilder: (context, error, stack) => ColoredBox(
-              color: Theme.of(context).colorScheme.secondary,
-              child: Center(
-                child: Text(
-                  magazine.title,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-            ),
-          ),
+          CoverImage(magazine: magazine),
           Positioned(
             left: 0,
             right: 0,
