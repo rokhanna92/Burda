@@ -36,15 +36,13 @@ class _FloatingBackgroundState extends State<FloatingBackground>
     vsync: this,
   )..repeat();
 
+  // The icons around the logo belong to TitleText, which orbits them. These
+  // are the ones drifting further down the page.
   static const List<_Drifter> _decorative = [
-    _Drifter('assets/icon/thread.png', 0.36, 0.005, 46, 0.0),
-    _Drifter('assets/icon/sewing-machine.png', 0.60, 0.010, 46, 0.6),
-    _Drifter('assets/icon/dress.png', 0.49, 0.055, 38, 1.2),
-    _Drifter('assets/icon/yarn.png', 0.55, 0.135, 34, 1.8),
-    _Drifter('assets/icon/flame.png', 0.20, 0.060, 40, 2.4),
     _Drifter('assets/icon/knitting.png', 0.80, 0.300, 40, 3.0),
     _Drifter('assets/icon/button.png', 0.12, 0.430, 34, 3.6),
     _Drifter('assets/icon/tape.png', 0.86, 0.560, 38, 4.2),
+    _Drifter('assets/icon/bulb.png', 0.08, 0.680, 34, 4.8),
   ];
 
   @override
