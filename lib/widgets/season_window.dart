@@ -13,10 +13,22 @@ import 'season_particles.dart';
 /// cycle, and a ground haze over the bottom third. Inset shadows at the top
 /// and bottom give it the depth of a window rather than a sticker.
 class SeasonWindow extends StatefulWidget {
-  const SeasonWindow({super.key, required this.edition, this.size = 60});
+  const SeasonWindow({
+    super.key,
+    required this.edition,
+    this.size = 60,
+    this.season,
+  });
 
   final Edition edition;
   final double size;
+
+  /// The weather to draw, when it is not the édition's own.
+  ///
+  /// The month page draws the month's season, so May carries petals whatever
+  /// the app happens to be printed in. The sky and the ground stay the
+  /// édition's, so no new colour enters the app.
+  final Season? season;
 
   /// How long the highlight takes to drift from one side to the other.
   static const Duration sweep = Duration(seconds: 9);
@@ -41,6 +53,7 @@ class _SeasonWindowState extends State<SeasonWindow>
   @override
   Widget build(BuildContext context) {
     final scene = SeasonScene.of(widget.edition);
+    final season = widget.season ?? scene.season;
     // The highlight is drawn oversized and allowed to wander, so its soft
     // edge never shows inside the window.
     final overscan = widget.size * 0.4;
@@ -97,10 +110,7 @@ class _SeasonWindowState extends State<SeasonWindow>
                 ),
               ),
             ),
-            SeasonParticles(
-              season: scene.season,
-              accent: widget.edition.accent,
-            ),
+            SeasonParticles(season: season, accent: widget.edition.accent),
             // Stands in for the CSS inset shadows, which Flutter has no direct
             // equivalent for: dark from the top edge, light from the bottom.
             const DecoratedBox(

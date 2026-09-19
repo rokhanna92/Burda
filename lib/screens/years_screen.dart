@@ -110,7 +110,37 @@ class YearsScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 18),
+          // A cross-reference, the way a printed index carries one.
+          HairlineRow(
+            edition: edition,
+            onTap: () => nav.push(const MonthsPage()),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Seasons',
+                  style: AppType.serif(size: 26, color: edition.ink),
+                ),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    'the same month, every year →',
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppType.serif(
+                      size: 15,
+                      italic: true,
+                      color: edition.accent,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 22),
           if (volumes.isEmpty)
             Text(
               'The shelf is bare.\nFile a year to put something on it.',

@@ -40,6 +40,10 @@ class IndexScreen extends StatelessWidget {
     );
     final nav = BurdaNav.of(context);
     final now = today ?? DateTime.now();
+    final thisMonth = [
+      for (final magazine in magazines.magazinesForMonth(now.month))
+        if (magazine.isOwned) magazine,
+    ];
 
     final line = magazines.mainLine;
     final finish = magazines.endgame;
@@ -244,6 +248,38 @@ class IndexScreen extends StatelessWidget {
             issues: magazines.recentlyAdded,
             onOpen: (id) => nav.push(IssuePage(id)),
           ),
+          // What this month has looked like over the years. Only when there is
+          // something of it on the shelf: an empty rail is not a section.
+          if (thisMonth.isNotEmpty) ...[
+            _Gutter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: SectionHeader(
+                  kMonths[now.month - 1],
+                  edition: edition,
+                  trailing: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => nav.push(MonthPage(now.month)),
+                    child: Text(
+                      'every year →',
+                      textAlign: TextAlign.end,
+                      style: AppType.serif(
+                        size: 15,
+                        italic: true,
+                        color: edition.accent,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            _Rail(
+              edition: edition,
+              issues: thisMonth,
+              caption: _Rail.year,
+              onOpen: (id) => nav.push(IssuePage(id)),
+            ),
+          ],
           _Gutter(
             child: Padding(
               padding: const EdgeInsets.only(top: 22),
@@ -700,11 +736,23 @@ class _Rail extends StatelessWidget {
     required this.edition,
     required this.issues,
     required this.onOpen,
+    this.caption = _address,
   });
 
   final Edition edition;
   final List<Magazine> issues;
   final ValueChanged<String> onOpen;
+
+  /// What is printed under each cover.
+  final String Function(Magazine) caption;
+
+  /// "No. 9 · 2019", the address the rest of the app prints.
+  static String _address(Magazine magazine) =>
+      '${magazine.mark} · ${magazine.year}';
+
+  /// The year alone, for the month rail, where every cover carries the same
+  /// number and only the year tells them apart.
+  static String year(Magazine magazine) => '${magazine.year}';
 
   @override
   Widget build(BuildContext context) {
@@ -755,7 +803,7 @@ class _Rail extends StatelessWidget {
                   const SizedBox(height: 8),
                   Flexible(
                     child: Text(
-                      'No. ${magazine.issue} · ${magazine.year}',
+                      caption(magazine),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppType.smallCaps(

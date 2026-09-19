@@ -41,6 +41,17 @@ class QueuePage extends BurdaPage {
   const QueuePage();
 }
 
+class MonthsPage extends BurdaPage {
+  const MonthsPage();
+}
+
+class MonthPage extends BurdaPage {
+  const MonthPage(this.month);
+
+  /// 1 to 12.
+  final int month;
+}
+
 class MeasurePage extends BurdaPage {
   const MeasurePage();
 }

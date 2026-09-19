@@ -14,6 +14,8 @@ import '../screens/issue_screen.dart';
 import '../screens/make_screen.dart';
 import '../screens/makes_screen.dart';
 import '../screens/measure_screen.dart';
+import '../screens/month_screen.dart';
+import '../screens/months_screen.dart';
 import '../screens/notes_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/queue_screen.dart';
@@ -157,6 +159,8 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     MakesPage() => 'makes',
     QueuePage() => 'queue',
     MeasurePage() => 'measure',
+    MonthsPage() => 'months',
+    MonthPage(:final month) => 'month:$month',
     MakePage(:final id) => 'make:$id',
   };
 
@@ -238,6 +242,8 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     MakesPage() => MakesScreen(edition: edition),
     QueuePage() => QueueScreen(edition: edition),
     MeasurePage() => MeasureScreen(edition: edition),
+    MonthsPage() => MonthsScreen(edition: edition),
+    MonthPage(:final month) => MonthScreen(edition: edition, month: month),
     MakePage(:final id) => MakeScreen(edition: edition, id: id),
     YearPage(:final year, :final series) => YearScreen(
       edition: edition,

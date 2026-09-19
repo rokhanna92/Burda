@@ -2,8 +2,52 @@ import 'package:flutter/material.dart';
 
 import 'edition.dart';
 
-/// The kind of particle drifting in the nav bar's window.
-enum Season { petals, sun, leaves, snow, dust, stars, embers }
+/// The kind of particle drifting in the nav bar's window, and the weather a
+/// calendar month is sewn for.
+///
+/// Four of the seven run the year. The other three, dust, stars and embers, are
+/// indoor weather an édition is printed under, and no month is filed there. One
+/// idea of a season, asked about two things.
+enum Season {
+  petals('Petals'),
+  sun('Sun'),
+  leaves('Leaves'),
+  snow('Snow'),
+  dust('Dust'),
+  stars('Stars'),
+  embers('Embers');
+
+  const Season(this.label);
+
+  /// How the season prints its own name, for a heading over its months.
+  final String label;
+
+  /// The months this season covers, in the order the year prints them.
+  ///
+  /// Empty for the three that belong to an édition rather than the calendar.
+  List<int> get months => switch (this) {
+    petals => const [3, 4, 5],
+    sun => const [6, 7, 8],
+    leaves => const [9, 10, 11],
+    snow => const [12, 1, 2],
+    _ => const [],
+  };
+
+  /// The weather [month] is sewn for. [month] is 1 to 12.
+  static Season ofMonth(int month) => switch (month) {
+    3 || 4 || 5 => petals,
+    6 || 7 || 8 => sun,
+    9 || 10 || 11 => leaves,
+    _ => snow,
+  };
+
+  /// The four that run the calendar, spring first, the way a pattern magazine
+  /// leads with its spring collection.
+  ///
+  /// A getter rather than a static const field so nothing depends on how an
+  /// enum initialises its own values.
+  static List<Season> get calendar => const [petals, sun, leaves, snow];
+}
 
 /// The little weather scene behind the add button, one per édition.
 ///

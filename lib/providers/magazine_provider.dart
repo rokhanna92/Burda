@@ -140,6 +140,32 @@ class MagazineProvider extends ChangeNotifier {
 
   int get lentCount => _magazines.where((m) => m.isLent).length;
 
+  /// Every issue printed in [month], oldest year first.
+  ///
+  /// The issue number is the month on a shelf that runs twelve to a year, so
+  /// "every May" costs a filter rather than a query. A shelf that does not run
+  /// twelve to a year has no months to speak of and never appears here: a
+  /// Special's third issue is not March.
+  List<Magazine> magazinesForMonth(int month) =>
+      [
+        for (final magazine in _magazines)
+          if (magazine.series.perYear == 12 && magazine.issue == month)
+            magazine,
+      ]..sort((a, b) {
+        final byYear = a.year.compareTo(b.year);
+        return byYear != 0 ? byYear : a.series.index.compareTo(b.series.index);
+      });
+
+  int ownedCountForMonth(int month) =>
+      magazinesForMonth(month).where((m) => m.isOwned).length;
+
+  /// Share of [month]'s issues that are owned, between 0 and 1.
+  double completionForMonth(int month) {
+    final issues = magazinesForMonth(month);
+    if (issues.isEmpty) return 0;
+    return issues.where((m) => m.isOwned).length / issues.length;
+  }
+
   /// Years present on the main line, oldest first.
   List<int> get years => mainLine.years;
 
