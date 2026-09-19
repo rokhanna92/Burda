@@ -79,7 +79,8 @@ class SelectYearScreen extends StatelessWidget {
                         padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
                         child: fits
                             ? Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: bars,
                               )
                             : ListView(children: bars),

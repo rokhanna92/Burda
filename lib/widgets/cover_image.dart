@@ -10,7 +10,11 @@ import '../models/magazine.dart';
 /// to an asset it never shipped, so the tile broke. This falls back to the
 /// issue number on a plain card instead.
 class CoverImage extends StatelessWidget {
-  const CoverImage({super.key, required this.magazine, this.fit = BoxFit.cover});
+  const CoverImage({
+    super.key,
+    required this.magazine,
+    this.fit = BoxFit.cover,
+  });
 
   final Magazine magazine;
   final BoxFit fit;
@@ -21,11 +25,7 @@ class CoverImage extends StatelessWidget {
         _MissingCover(title: magazine.title);
 
     if (magazine.hasFileCover) {
-      return Image.file(
-        File(magazine.image),
-        fit: fit,
-        errorBuilder: fallback,
-      );
+      return Image.file(File(magazine.image), fit: fit, errorBuilder: fallback);
     }
     return Image.asset(
       'assets/${magazine.image}',

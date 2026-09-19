@@ -14,7 +14,10 @@ void main() {
 
     test('converts the design tracking from em to logical pixels', () {
       // The design writes `font-size:13px; letter-spacing:.24em`.
-      expect(AppType.serif(size: 13, trackingEm: 0.24).letterSpacing, 13 * 0.24);
+      expect(
+        AppType.serif(size: 13, trackingEm: 0.24).letterSpacing,
+        13 * 0.24,
+      );
     });
 
     test('leaves tracking unset when the design gives none', () {

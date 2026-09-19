@@ -40,9 +40,7 @@ class _RainingHeartsState extends State<RainingHearts>
   void initState() {
     super.initState();
     final random = Random(7);
-    _xPositions = [
-      for (var i = 0; i < widget.count; i++) random.nextDouble(),
-    ];
+    _xPositions = [for (var i = 0; i < widget.count; i++) random.nextDouble()];
     _speeds = [
       for (var i = 0; i < widget.count; i++) 0.7 + random.nextDouble() * 0.6,
     ];
@@ -89,8 +87,8 @@ class _RainingHeartsState extends State<RainingHearts>
 
   Widget _heart(int index, Size area, List<Color> colors) {
     // Each heart starts a little later and falls at its own speed.
-    final progress =
-        ((_controller.value - _starts[index]) * _speeds[index]).clamp(0.0, 1.0);
+    final progress = ((_controller.value - _starts[index]) * _speeds[index])
+        .clamp(0.0, 1.0);
     if (progress <= 0) return const SizedBox.shrink();
 
     final sway = sin(progress * pi * 3 + _swayOffsets[index]) * 22;
@@ -118,9 +116,8 @@ void showRainingHearts(BuildContext context) {
 
   late final OverlayEntry entry;
   entry = OverlayEntry(
-    builder: (context) => Positioned.fill(
-      child: RainingHearts(onFinished: () => entry.remove()),
-    ),
+    builder: (context) =>
+        Positioned.fill(child: RainingHearts(onFinished: () => entry.remove())),
   );
   overlay.insert(entry);
 }
