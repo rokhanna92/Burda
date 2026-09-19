@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../models/issue_address.dart';
 import '../models/magazine.dart';
 import '../providers/magazine_provider.dart';
 import '../shell/burda_nav.dart';
@@ -71,10 +72,8 @@ class _SearchSheetState extends State<SearchSheet> {
           autofocus: true,
           textAlign: TextAlign.center,
           keyboardType: TextInputType.number,
-          // The address is digits and one slash, nothing else.
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp('[0-9/]')),
-          ],
+          // Type the digits; the slash is put in for you.
+          inputFormatters: const [_AddressFormatter()],
           onChanged: (_) => setState(() {}),
           style: AppType.serif(
             size: 40,
@@ -106,7 +105,7 @@ class _SearchSheetState extends State<SearchSheet> {
         ),
         const SizedBox(height: 8),
         Text(
-          'issue number, a slash, the year',
+          'the issue number, then the year',
           textAlign: TextAlign.center,
           style: AppType.serif(
             size: 14,
@@ -133,6 +132,25 @@ class _SearchSheetState extends State<SearchSheet> {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// Keeps the field reading as an address while it is typed.
+class _AddressFormatter extends TextInputFormatter {
+  const _AddressFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final formatted = IssueAddress.format(newValue.text);
+    return TextEditingValue(
+      text: formatted,
+      // An address is short and typed left to right, so the caret belongs at
+      // the end: it cannot be left stranded before a slash that just appeared.
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

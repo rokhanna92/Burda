@@ -215,7 +215,7 @@ void main() {
       await openSheet(tester, BurdaSheet.search);
 
       expect(find.text('Find an issue'), findsOneWidget);
-      expect(find.text('issue number, a slash, the year'), findsOneWidget);
+      expect(find.text('the issue number, then the year'), findsOneWidget);
       // Nothing is claimed until an address is typed.
       expect(find.text('Nothing filed at that address yet.'), findsNothing);
     });
@@ -228,6 +228,60 @@ void main() {
 
       expect(find.text('Nothing filed at that address yet.'), findsNothing);
       expect(inSheet(SearchSheet, find.textContaining('No. ')), findsNothing);
+    });
+
+    testWidgets('puts the slash in so it need not be hunted for', (
+      tester,
+    ) async {
+      await openSheet(tester, BurdaSheet.search);
+      final field = find.byType(TextField);
+
+      // Digits only, the way a thumb types them.
+      await tester.enterText(field, '5');
+      await settle(tester);
+      expect(tester.widget<TextField>(field).controller!.text, '5');
+
+      await tester.enterText(field, '52');
+      await settle(tester);
+      expect(tester.widget<TextField>(field).controller!.text, '5/2');
+
+      await tester.enterText(field, '5/2024');
+      await settle(tester);
+      expect(find.text('No. 5 · 2024'), findsOneWidget);
+    });
+
+    testWidgets('waits on a 1, which could still be October or December', (
+      tester,
+    ) async {
+      await openSheet(tester, BurdaSheet.search);
+      final field = find.byType(TextField);
+      String shown() => tester.widget<TextField>(field).controller!.text;
+
+      await tester.enterText(field, '1');
+      await settle(tester);
+      expect(shown(), '1', reason: 'could still become 10, 11 or 12');
+
+      await tester.enterText(field, '12');
+      await settle(tester);
+      expect(shown(), '12', reason: 'December, or issue 1 of a 2xxx year');
+
+      // A 0 next means the year has begun, so the issue was 1.
+      await tester.enterText(field, '120');
+      await settle(tester);
+      expect(shown(), '1/20');
+    });
+
+    testWidgets('reads December as December', (tester) async {
+      await openSheet(tester, BurdaSheet.search);
+      final field = find.byType(TextField);
+
+      await tester.enterText(field, '122');
+      await settle(tester);
+      expect(tester.widget<TextField>(field).controller!.text, '12/2');
+
+      await tester.enterText(field, '122024');
+      await settle(tester);
+      expect(find.text('No. 12 · 2024'), findsOneWidget);
     });
 
     testWidgets('finds an issue that is held', (tester) async {
