@@ -34,7 +34,7 @@ class VaultScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ScreenTitle('Vault', edition: edition),
+              Flexible(child: ScreenTitle('Vault', edition: edition)),
               const SizedBox(width: 10),
               Flexible(
                 child: Padding(

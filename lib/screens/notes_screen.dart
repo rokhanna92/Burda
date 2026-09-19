@@ -34,7 +34,7 @@ class NotesScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ScreenTitle('Notes', edition: edition),
+              Flexible(child: ScreenTitle('Notes', edition: edition)),
               BurdaButton(
                 edition: edition,
                 label: '+ New note',

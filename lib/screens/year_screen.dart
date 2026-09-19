@@ -6,7 +6,6 @@ import '../providers/magazine_provider.dart';
 import '../shell/burda_nav.dart';
 import '../shell/collection_actions.dart';
 import '../theme/edition.dart';
-import '../theme/motion.dart';
 import '../theme/typography.dart';
 import '../widgets/cover_tile.dart';
 import '../widgets/page_furniture.dart';
@@ -109,9 +108,10 @@ class _YearScreenState extends State<YearScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          _ProgressRule(
+          ProgressRule(
             edition: edition,
             fraction: issues.isEmpty ? 0 : owned / issues.length,
+            duration: const Duration(milliseconds: 700),
           ),
           const SizedBox(height: 26),
           GridView.count(
@@ -147,32 +147,6 @@ class _YearScreenState extends State<YearScreen> {
       ),
     );
   }
-}
-
-/// The thin rule under the year, filling to the share that is owned.
-class _ProgressRule extends StatelessWidget {
-  const _ProgressRule({required this.edition, required this.fraction});
-
-  final Edition edition;
-  final double fraction;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 2,
-    child: Stack(
-      children: [
-        Positioned.fill(child: ColoredBox(color: edition.inkAt(14))),
-        LayoutBuilder(
-          builder: (context, constraints) => AnimatedContainer(
-            duration: const Duration(milliseconds: 700),
-            curve: AppMotion.standard,
-            width: constraints.maxWidth * fraction,
-            color: edition.accent,
-          ),
-        ),
-      ],
-    ),
-  );
 }
 
 class _YearCover extends StatelessWidget {

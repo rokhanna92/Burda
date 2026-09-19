@@ -71,7 +71,7 @@ class YearsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ScreenTitle('Years', edition: edition),
+              Flexible(child: ScreenTitle('Years', edition: edition)),
               const SizedBox(width: 10),
               Flexible(
                 child: Padding(

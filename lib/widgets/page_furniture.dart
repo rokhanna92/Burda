@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/edition.dart';
+import '../theme/motion.dart';
 import '../theme/typography.dart';
 
 /// The gutter every screen is set in.
@@ -41,6 +42,8 @@ class ScreenTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     text,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
     style: AppType.serif(
       size: 46,
       weight: 500,
@@ -264,6 +267,41 @@ class BurdaButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The hairline that fills to the share of a collection that is held.
+class ProgressRule extends StatelessWidget {
+  const ProgressRule({
+    super.key,
+    required this.edition,
+    required this.fraction,
+    this.duration = const Duration(milliseconds: 900),
+  });
+
+  final Edition edition;
+
+  /// Between 0 and 1.
+  final double fraction;
+
+  final Duration duration;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 2,
+    child: Stack(
+      children: [
+        Positioned.fill(child: ColoredBox(color: edition.inkAt(14))),
+        LayoutBuilder(
+          builder: (context, constraints) => AnimatedContainer(
+            duration: duration,
+            curve: AppMotion.standard,
+            width: constraints.maxWidth * fraction.clamp(0.0, 1.0),
+            color: edition.accent,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// A row on a hairline-ruled list that slides right a touch as it is pressed.
