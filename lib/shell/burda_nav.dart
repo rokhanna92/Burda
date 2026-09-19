@@ -35,6 +35,10 @@ class MakesPage extends BurdaPage {
   const MakesPage();
 }
 
+class QueuePage extends BurdaPage {
+  const QueuePage();
+}
+
 class MakePage extends BurdaPage {
   const MakePage(this.id);
 

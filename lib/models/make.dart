@@ -194,6 +194,10 @@ class Make {
   Map<String, Object?> toJson() => {...toMap(), 'photos': photos};
 
   Make copyWith({
+    /// Settable because the queue is ordered by it: moving one up the list is
+    /// a re-stamp rather than a position column every other write would have
+    /// to maintain.
+    DateTime? queuedOn,
     String? magazineId,
     bool clearMagazineId = false,
     String? patternNo,
@@ -210,7 +214,7 @@ class Make {
     bool clearFinishedOn = false,
   }) => Make(
     id: id,
-    queuedOn: queuedOn,
+    queuedOn: queuedOn ?? this.queuedOn,
     magazineId: clearMagazineId ? null : (magazineId ?? this.magazineId),
     patternNo: patternNo ?? this.patternNo,
     garment: clearGarment ? null : (garment ?? this.garment),

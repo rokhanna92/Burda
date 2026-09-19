@@ -15,6 +15,7 @@ import '../screens/make_screen.dart';
 import '../screens/makes_screen.dart';
 import '../screens/notes_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/queue_screen.dart';
 import '../screens/vault_screen.dart';
 import '../screens/year_screen.dart';
 import '../screens/years_screen.dart';
@@ -151,6 +152,7 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     NotesPage() => 'notes',
     VaultPage() => 'vault',
     MakesPage() => 'makes',
+    QueuePage() => 'queue',
     MakePage(:final id) => 'make:$id',
   };
 
@@ -217,6 +219,7 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     NotesPage() => NotesScreen(edition: edition),
     VaultPage() => VaultScreen(edition: edition),
     MakesPage() => MakesScreen(edition: edition),
+    QueuePage() => QueueScreen(edition: edition),
     MakePage(:final id) => MakeScreen(edition: edition, id: id),
     YearPage(:final year) => YearScreen(edition: edition, year: year),
   };

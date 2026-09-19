@@ -36,6 +36,9 @@ class _IssueScreenState extends State<IssueScreen> {
   /// a vault photo cannot grey each other's block out.
   bool _shooting = false;
 
+  /// And the queue has its own, so a slow write cannot be started twice.
+  bool _queuing = false;
+
   Future<void> _addPhoto() async {
     if (_picking) return;
     setState(() => _picking = true);
@@ -91,6 +94,20 @@ class _IssueScreenState extends State<IssueScreen> {
     }
   }
 
+  Future<void> _queue(Magazine magazine) async {
+    if (_queuing) return;
+    setState(() => _queuing = true);
+    final nav = BurdaNav.of(context);
+    try {
+      await context.read<MakeProvider>().queueIssue(magazine.id);
+      nav.showToast(
+        'No. ${magazine.issue} / ${magazine.year} is in the sew queue',
+      );
+    } finally {
+      if (mounted) setState(() => _queuing = false);
+    }
+  }
+
   Future<void> _setCondition(int score) async {
     final nav = BurdaNav.of(context);
     await context.read<MagazineProvider>().setCondition(widget.id, score);
@@ -115,6 +132,9 @@ class _IssueScreenState extends State<IssueScreen> {
     // select would compare two unequal lists and rebuild anyway.
     final pages = context.watch<ContentsProvider>().forIssue(widget.id);
     final made = context.watch<MakeProvider>().forIssue(widget.id);
+    final queued = context.select<MakeProvider, bool>(
+      (makes) => makes.isQueued(widget.id),
+    );
 
     // Deleted out from under us, which the shell will pop past in a moment.
     if (magazine == null) return const SizedBox.shrink();
@@ -166,6 +186,21 @@ class _IssueScreenState extends State<IssueScreen> {
             onTap: () => toggleIssueOwned(context, magazine),
           ),
           if (magazine.isOwned) ...[
+            const SizedBox(height: 10),
+            // Never filled: the ownership button above it is the ink block
+            // when the issue is held, and two stacked would fight. Once it is
+            // in the queue the button becomes the way through to it.
+            BurdaButton(
+              edition: edition,
+              label: queued ? 'In the sew queue' : 'Put in the sew queue',
+              glyph: queued ? null : '+',
+              size: 17,
+              trackingEm: 0.16,
+              pressScale: 0.98,
+              onTap: queued
+                  ? () => nav.push(const QueuePage())
+                  : () => _queue(magazine),
+            ),
             const SizedBox(height: 30),
             SectionHeader(
               'Condition',

@@ -7,6 +7,7 @@ import 'package:burda/screens/issue_screen.dart';
 import 'package:burda/screens/makes_screen.dart';
 import 'package:burda/screens/notes_screen.dart';
 import 'package:burda/screens/profile_screen.dart';
+import 'package:burda/screens/queue_screen.dart';
 import 'package:burda/screens/vault_screen.dart';
 import 'package:burda/screens/years_screen.dart';
 import 'package:burda/services/database_service.dart';
@@ -142,16 +143,39 @@ void main() {
       expect(find.textContaining('Threadling'), findsWidgets);
     });
 
-    testWidgets('owned and missing lines open the right side', (tester) async {
+    testWidgets('the owned line opens the collection, missing is a tab away', (
+      tester,
+    ) async {
+      await open(tester);
+
+      await tester.tap(find.text('01'));
+      await settle(tester);
+      expect(find.byType(CollectionScreen), findsOneWidget);
+
+      // Missing left the index when the queue took line 02, but it is still
+      // the second tab here.
+      await tester.tap(find.textContaining('Missing'));
+      await settle(tester);
+
+      // The missing side: 2010 is complete so it is not printed.
+      expect(find.text('2010'), findsNothing);
+      expect(find.text('2011'), findsOneWidget);
+    });
+
+    testWidgets('the queue line opens the sew queue', (tester) async {
       await open(tester);
 
       await tester.tap(find.text('02'));
       await settle(tester);
 
-      expect(find.byType(CollectionScreen), findsOneWidget);
-      // The missing side: 2010 is complete so it is not printed.
-      expect(find.text('2010'), findsNothing);
-      expect(find.text('2011'), findsOneWidget);
+      expect(find.byType(QueueScreen), findsOneWidget);
+      expect(
+        find.text(
+          'Nothing waiting.\n'
+          'Open an issue and put it in the sew queue.',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('years, notes and makes lines go where they say', (
@@ -229,7 +253,7 @@ void main() {
       final finder = find.byWidgetPredicate(
         (widget) =>
             widget is RichText &&
-            widget.text.toPlainText().contains('still to find'),
+            widget.text.toPlainText().contains('what to make next'),
       );
       expect(finder, findsOneWidget);
       final title = tester.getSize(finder);

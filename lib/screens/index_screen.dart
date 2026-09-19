@@ -188,12 +188,15 @@ class IndexScreen extends StatelessWidget {
       value: '${magazines.ownedCount}',
       go: () => nav.showCollection(owned: true),
     ),
+    // Missing has not gone: it is the Collection screen's second tab and the
+    // Years shelf's "still missing" list. At 199 of 201 it had stopped being a
+    // number that moves, and the queue is one again.
     _Line(
       no: '02',
-      title: 'Missing',
-      sub: 'still to find',
-      value: '${magazines.missingCount}',
-      go: () => nav.showCollection(owned: false),
+      title: 'Queue',
+      sub: 'what to make next',
+      value: '${makes.queuedCount}',
+      go: () => nav.push(const QueuePage()),
     ),
     _Line(
       no: '03',

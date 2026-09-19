@@ -33,8 +33,15 @@ class MakeProvider extends ChangeNotifier {
   List<Make> get onTheGo =>
       _makes.where((make) => make.status.isUnderway).toList();
 
+  /// What she means to make next, in her order: most recently stamped first,
+  /// which is what [moveUp] re-stamps to rearrange.
   List<Make> get queued =>
       _makes.where((make) => make.status.isQueued).toList();
+
+  /// True when this issue is already waiting to be sewn from.
+  bool isQueued(String magazineId) => _makes.any(
+    (make) => make.magazineId == magazineId && make.status.isQueued,
+  );
 
   List<Make> get made => _makes.where((make) => make.status.isDone).toList();
 
@@ -95,6 +102,38 @@ class MakeProvider extends ChangeNotifier {
   Future<void> updateMake(Make make) async {
     await _database.updateMake(make);
     _replace(make);
+  }
+
+  /// Puts an issue in the sew queue, as a make with nothing written down yet.
+  Future<Make> queueIssue(String magazineId, {DateTime? now}) =>
+      addMake(magazineId: magazineId, queuedOn: now);
+
+  /// Takes one out of the queue altogether.
+  ///
+  /// Only ever a queued make: once something has been cut it is a garment in
+  /// progress, and that is removed from its own page where she can see what she
+  /// is giving up.
+  Future<void> unqueue(String id) async {
+    final make = byId(id);
+    if (make == null || !make.status.isQueued) return;
+    await deleteMake(id);
+  }
+
+  /// Moves one up the queue by a hair.
+  ///
+  /// The order is the stamp, so passing the row above means taking a
+  /// microsecond off its stamp rather than keeping a position column that every
+  /// other write would have to maintain.
+  Future<void> moveUp(String id) async {
+    final order = queued;
+    final at = order.indexWhere((make) => make.id == id);
+    if (at <= 0) return;
+    final above = order[at - 1];
+    await updateMake(
+      order[at].copyWith(
+        queuedOn: above.queuedOn.add(const Duration(microseconds: 1)),
+      ),
+    );
   }
 
   /// Moves a make along, with the dates that move implies.
