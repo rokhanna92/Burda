@@ -11,6 +11,8 @@ import '../screens/index_screen.dart';
 import '../screens/issue_screen.dart';
 import '../screens/notes_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/vault_screen.dart';
+import '../screens/year_screen.dart';
 import '../screens/years_screen.dart';
 import '../sheets/about_sheet.dart';
 import '../sheets/confirm_sheet.dart';
@@ -146,8 +148,8 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     },
     IssuePage(:final id) => IssueScreen(edition: edition, id: id),
     NotesPage() => NotesScreen(edition: edition),
-    // Filled in as each pushed page is built.
-    _ => const SizedBox.shrink(),
+    VaultPage() => VaultScreen(edition: edition),
+    YearPage(:final year) => YearScreen(edition: edition, year: year),
   };
 
   @override

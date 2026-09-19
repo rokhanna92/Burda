@@ -97,6 +97,13 @@ class MagazineProvider extends ChangeNotifier {
   int get vaultCount =>
       _magazines.fold(0, (sum, m) => sum + m.uploadedImages.length);
 
+  /// Every photo in the collection, each with the issue it belongs to.
+  List<({Magazine magazine, String path})> get vaultPhotos => [
+    for (final magazine in _magazines)
+      for (final path in magazine.uploadedImages)
+        (magazine: magazine, path: path),
+  ];
+
   /// Average condition of the issues that have been rated, or null if none are.
   double? get averageCondition {
     final scores = owned.map((m) => m.conditionScore).whereType<int>().toList();
