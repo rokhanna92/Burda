@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../models/endgame.dart';
 import '../models/magazine.dart';
 import '../providers/magazine_provider.dart';
 import 'burda_nav.dart';
@@ -31,8 +32,13 @@ Future<void> toggleIssueOwned(BuildContext context, Magazine magazine) async {
   // complete.
   nav.rain();
 
-  if (magazines.ownedCount == magazines.totalCount) {
-    nav.celebrate('The whole collection. Every issue.');
+  // The first time it is finished is not the same sentence as every time
+  // after: markComplete returns true only for the call that wrote the date.
+  if (magazines.endgame is Finished) {
+    final first = await magazines.markComplete();
+    nav.celebrate(
+      first ? 'The whole collection. Every issue.' : 'Every issue again ♥',
+    );
   } else if (magazines.isYearComplete(magazine.year)) {
     nav.celebrate('Volume ${magazine.year} complete ♥');
   } else {

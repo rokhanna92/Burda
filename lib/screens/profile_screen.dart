@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 
 import '../app_version.dart';
 import '../models/collector_rank.dart';
+import '../models/date_label.dart';
+import '../models/endgame.dart';
 import '../models/note_provider.dart';
 import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
@@ -167,8 +169,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       await _restorePhotos(magazines, contents, makes, nav);
 
-      if (magazines.completion == 1) {
-        nav.celebrate('The whole collection. Every issue.');
+      if (magazines.endgame is Finished) {
+        final first = await magazines.markComplete();
+        nav.celebrate(
+          first ? 'The whole collection. Every issue.' : 'Every issue again ♥',
+        );
       }
     } catch (error) {
       nav.showToast('Could not read that file');
@@ -280,6 +285,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   hint: CollectorRank.hintFor(owned),
                   onTap: () => nav.openSheet(BurdaSheet.rank),
                 ),
+                if (context.watch<MagazineProvider>().endgame case Finished(
+                  :final completedOn,
+                )) ...[
+                  const SizedBox(height: 14),
+                  _FinishedCard(
+                    edition: edition,
+                    line: context.read<MagazineProvider>().mainLine,
+                    completedOn: completedOn,
+                  ),
+                ],
                 const SizedBox(height: 30),
                 SectionHeader(
                   'Measurements',
@@ -465,6 +480,72 @@ class _RankCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The record of a finished collection, set like the rank card above it.
+///
+/// It is the one thing on this screen that cannot be undone by a tap: giving an
+/// issue up takes the card away, and taking it back brings it back carrying the
+/// original date.
+class _FinishedCard extends StatelessWidget {
+  const _FinishedCard({
+    required this.edition,
+    required this.line,
+    required this.completedOn,
+  });
+
+  final Edition edition;
+  final MainLine line;
+  final DateTime? completedOn;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+    decoration: BoxDecoration(border: Border.all(color: edition.ink)),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'The collection',
+          style: AppType.smallCaps(
+            size: 13,
+            trackingEm: 0.2,
+            color: edition.accent,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Complete',
+          style: AppType.serif(
+            size: 34,
+            weight: 500,
+            height: 1.05,
+            color: edition.ink,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '${line.owned} issues, ${line.years.first} to ${line.years.last}',
+          style: AppType.serif(
+            size: 15,
+            italic: true,
+            color: edition.inkAt(65),
+          ),
+        ),
+        if (completedOn case final day?) ...[
+          const SizedBox(height: 10),
+          Text(
+            'Finished ${dayMonthYear(day)}',
+            style: AppType.smallCaps(
+              size: 12,
+              trackingEm: 0.18,
+              color: edition.inkAt(55),
+            ),
+          ),
+        ],
+      ],
+    ),
+  );
 }
 
 /// A scrolling row of édition cards, each printed in its own colours.

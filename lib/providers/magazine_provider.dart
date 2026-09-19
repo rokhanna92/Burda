@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/collector_rank.dart';
+import '../models/endgame.dart';
 import '../models/magazine.dart';
 import '../services/database_service.dart';
 import '../services/photo_relink_service.dart';
@@ -18,14 +19,67 @@ class MagazineProvider extends ChangeNotifier {
 
   List<Magazine> _magazines = const [];
   bool _isLoading = true;
+  DateTime? _completedOn;
 
   List<Magazine> get magazines => _magazines;
   bool get isLoading => _isLoading;
 
-  Future<void> load() async {
+  /// The day the main line was first finished, or null while it never has been.
+  DateTime? get completedOn => _completedOn;
+
+  Future<void> load({DateTime? now}) async {
     _magazines = await _database.getAllMagazines();
+    final stored = await _database.getSetting(Endgame.completedOnKey);
+    _completedOn = stored == null ? null : DateTime.tryParse(stored);
     _isLoading = false;
+    // A collection that arrives finished, from an import or from the first load
+    // after this shipped, is stamped with the day the app first saw it whole. A
+    // date a little late beats a finished collection with no date at all.
+    await markComplete(now: now);
     notifyListeners();
+  }
+
+  /// Where the main line stands: the only shelf whose end the app knows.
+  ///
+  /// The whole endgame reads this one getter, so when other shelves land it is
+  /// the only line that moves. A shelf she fills by hand holds only issues she
+  /// has, so it is complete the day she starts it and can never be what
+  /// "complete" means. [totalCount], [ownedCount] and [completion] keep meaning
+  /// the whole library, which is what the rank ladder wants.
+  MainLine get mainLine => (
+    owned: _magazines.where((m) => m.isOwned).length,
+    total: _magazines.length,
+    missing: _magazines.where((m) => !m.isOwned).toList(growable: false),
+    years: _magazines.map((m) => m.year).toSet().toList()..sort(),
+  );
+
+  /// How close the main line is to finished.
+  Endgame get endgame {
+    final line = mainLine;
+    return Endgame.of(
+      total: line.total,
+      missing: line.missing,
+      completedOn: _completedOn,
+    );
+  }
+
+  /// Records the day the main line was finished, the first time it is.
+  ///
+  /// Returns true when this call is the one that wrote it, which is how the
+  /// celebration knows whether to say it for the first time or say it again.
+  /// Giving an issue up afterwards does not clear the date and finishing again
+  /// does not move it: it is when it was done, not when it was last true.
+  Future<bool> markComplete({DateTime? now}) async {
+    if (_completedOn != null) return false;
+    final line = mainLine;
+    if (line.total == 0 || line.missing.isNotEmpty) return false;
+    _completedOn = now ?? DateTime.now();
+    await _database.setSetting(
+      Endgame.completedOnKey,
+      _completedOn!.toIso8601String(),
+    );
+    notifyListeners();
+    return true;
   }
 
   // Derived collection stats

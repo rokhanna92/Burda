@@ -170,9 +170,11 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
       case BurdaSheet.search:
         return SearchSheet(edition: edition);
       case BurdaSheet.rank:
+        final magazines = context.read<MagazineProvider>();
         return RankSheet(
           edition: edition,
-          ownedCount: context.read<MagazineProvider>().ownedCount,
+          ownedCount: magazines.ownedCount,
+          remaining: magazines.mainLine.missing.length,
         );
       case BurdaSheet.about:
         return AboutSheet(edition: edition);

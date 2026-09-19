@@ -7,10 +7,19 @@ import '../widgets/sheet_scaffold.dart';
 
 /// The ladder, with the rung you are on picked out in the accent.
 class RankSheet extends StatelessWidget {
-  const RankSheet({super.key, required this.edition, required this.ownedCount});
+  const RankSheet({
+    super.key,
+    required this.edition,
+    required this.ownedCount,
+    this.remaining,
+  });
 
   final Edition edition;
   final int ownedCount;
+
+  /// How many of the main line are still out there, which is what the top rung
+  /// says instead of a line that has not moved in fourteen issues.
+  final int? remaining;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +35,8 @@ class RankSheet extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          '$ownedCount issues owned · ${CollectorRank.hintFor(ownedCount)}',
+          '$ownedCount issues owned · '
+          '${CollectorRank.hintFor(ownedCount, remaining: remaining)}',
           style: AppType.serif(
             size: 17,
             italic: true,

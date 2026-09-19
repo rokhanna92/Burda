@@ -72,9 +72,22 @@ class CollectorRank {
   }
 
   /// How far there is left to climb, e.g. `"6 more to Measure Twice"`.
-  static String hintFor(int ownedCount) {
+  ///
+  /// The top rung has nowhere left to point, and once other shelves push the
+  /// count permanently past it that would be a dead line for good. So it says
+  /// how much of the main line is still out there instead, which is the only
+  /// thing left that can still change: [remaining] is how many of it are
+  /// missing.
+  static String hintFor(int ownedCount, {int? remaining}) {
     final next = above(forOwnedCount(ownedCount));
-    if (next == null) return 'the top of the ladder';
-    return '${next.minimum - ownedCount} more to ${next.name}';
+    if (next != null) {
+      return '${next.minimum - ownedCount} more to ${next.name}';
+    }
+    return switch (remaining) {
+      null => 'the top of the ladder',
+      0 => 'the top of the ladder, and the whole shelf',
+      1 => 'the top of the ladder, one issue to go',
+      final left => 'the top of the ladder, $left issues to go',
+    };
   }
 }

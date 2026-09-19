@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/collector_rank.dart';
 import '../models/date_label.dart';
+import '../models/endgame.dart';
 import '../models/magazine.dart';
 import '../models/note_provider.dart';
 import '../providers/magazine_provider.dart';
@@ -40,9 +41,25 @@ class IndexScreen extends StatelessWidget {
     final nav = BurdaNav.of(context);
     final now = today ?? DateTime.now();
 
-    final owned = magazines.ownedCount;
-    final total = magazines.totalCount;
-    final percent = total == 0 ? 0 : (owned / total * 100).round();
+    final line = magazines.mainLine;
+    final finish = magazines.endgame;
+    final percent = line.total == 0
+        ? 0
+        : (line.owned / line.total * 100).round();
+
+    // Only the two strings change between climbing and finished, never the
+    // shape, so the page cannot reflow underneath her as the last issue lands.
+    final headline = switch (finish) {
+      Finished() => '${line.owned}',
+      _ => '$percent%',
+    };
+    final standfirst = switch (finish) {
+      // Endgame.of only returns Finished for a shelf with rows on it, so there
+      // is always at least one year to name.
+      Finished() =>
+        'the complete run\n${line.years.first} to ${line.years.last}',
+      _ => 'of the collection\n${line.owned} of ${line.total} issues',
+    };
 
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 30),
@@ -98,7 +115,7 @@ class IndexScreen extends StatelessWidget {
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          '$percent%',
+                          headline,
                           style: AppType.serif(
                             size: 104,
                             weight: 300,
@@ -115,7 +132,7 @@ class IndexScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 6),
                         child: Text(
-                          'of the collection\n$owned of $total issues',
+                          standfirst,
                           style: AppType.serif(
                             size: 19,
                             italic: true,
@@ -130,8 +147,40 @@ class IndexScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 ProgressRule(
                   edition: edition,
-                  fraction: total == 0 ? 0 : owned / total,
+                  fraction: line.total == 0 ? 0 : line.owned / line.total,
                 ),
+                // The one moment the rule is entirely the accent. Taking it
+                // away would throw out the picture of the thing being finished.
+                if (finish case Finished(:final completedOn?)) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Completed ${dayMonthYear(completedOn)}',
+                    style: AppType.smallCaps(
+                      size: 13,
+                      trackingEm: 0.2,
+                      color: edition.accent,
+                    ),
+                  ),
+                ],
+                if (finish case LastFew(:final issues)) ...[
+                  const SizedBox(height: 30),
+                  SectionHeader(
+                    switch (issues.length) {
+                      1 => 'The last issue',
+                      2 => 'The last two',
+                      _ => 'The last three',
+                    },
+                    edition: edition,
+                    note: 'then it is finished',
+                  ),
+                  const SizedBox(height: 4),
+                  for (final magazine in issues)
+                    _LastFewRow(
+                      edition: edition,
+                      magazine: magazine,
+                      onOpen: () => nav.push(IssuePage(magazine.id)),
+                    ),
+                ],
                 const SizedBox(height: 30),
                 // Above the contents table, because the percentage has been 99
                 // for weeks and the six numbered lines do not move: this is the
@@ -142,8 +191,14 @@ class IndexScreen extends StatelessWidget {
                 const SizedBox(height: 30),
                 SectionHeader('Contents', edition: edition, note: 'tap a line'),
                 const SizedBox(height: 4),
-                for (final line in _lines(magazines, makes, noteCount, nav))
-                  _ContentsLine(edition: edition, line: line),
+                for (final entry in _lines(
+                  magazines,
+                  makes,
+                  noteCount,
+                  line.missing.length,
+                  nav,
+                ))
+                  _ContentsLine(edition: edition, line: entry),
                 // No seventh numbered line: a contents line reading "Lent 0"
                 // for months at a time is dead weight. The section answers its
                 // question by being here at all, and an index with nothing out
@@ -207,6 +262,7 @@ class IndexScreen extends StatelessWidget {
     MagazineProvider magazines,
     MakeProvider makes,
     int noteCount,
+    int remaining,
     BurdaNav nav,
   ) => [
     _Line(
@@ -250,7 +306,7 @@ class IndexScreen extends StatelessWidget {
     _Line(
       no: '06',
       title: 'Rank',
-      sub: CollectorRank.hintFor(magazines.ownedCount),
+      sub: CollectorRank.hintFor(magazines.ownedCount, remaining: remaining),
       value: magazines.rank.name,
       go: () => nav.openSheet(BurdaSheet.rank),
     ),
@@ -405,6 +461,64 @@ class _Tonight extends StatelessWidget {
       context.watch<MakeProvider>().madeCountFor(id) > 0
       ? 'You have sewn from this one before.'
       : 'An evening with nothing planned. Take this one down.';
+}
+
+/// One of the last few, named by address so she can read it off a spine.
+class _LastFewRow extends StatelessWidget {
+  const _LastFewRow({
+    required this.edition,
+    required this.magazine,
+    required this.onOpen,
+  });
+
+  final Edition edition;
+  final Magazine magazine;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final issue = magazine.issue;
+
+    return HairlineRow(
+      edition: edition,
+      onTap: onOpen,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                text: 'No. $issue / ${magazine.year} ',
+                style: AppType.serif(
+                  size: 24,
+                  tabular: true,
+                  color: edition.ink,
+                ),
+                children: [
+                  // The main line runs a month to an issue, and the month is
+                  // what she will read off a spine in a shop.
+                  if (issue >= 1 && issue <= kMonths.length)
+                    TextSpan(
+                      text: kMonths[issue - 1],
+                      style: AppType.serif(
+                        size: 15,
+                        italic: true,
+                        color: edition.inkAt(60),
+                      ),
+                    ),
+                ],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text('→', style: AppType.serif(size: 22, color: edition.ink)),
+        ],
+      ),
+    );
+  }
 }
 
 /// One issue that is not on the shelf, and who has it.
