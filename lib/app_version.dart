@@ -3,4 +3,4 @@
 /// Kept in step with the `version:` line in `pubspec.yaml` by a test, so
 /// changing one without the other fails the suite rather than shipping an app
 /// that cannot tell whether it is out of date.
-const String kAppVersion = '1.1.0';
+const String kAppVersion = '1.1.1';
