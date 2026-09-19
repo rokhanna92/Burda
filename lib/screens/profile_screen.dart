@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../app_version.dart';
 import '../models/collector_rank.dart';
+import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/data_transfer_service.dart';
@@ -101,7 +102,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final nav = BurdaNav.of(context);
     try {
       final bytes = DataTransferService.encode(
-        context.read<MagazineProvider>().toExportJson(),
+        DataTransferService.bundle(
+          magazines: context.read<MagazineProvider>().toExportJson(),
+          contents: context.read<ContentsProvider>().toExportJson(),
+        ),
       );
       final location = await DataTransferService.saveExport(bytes);
       nav.showToast(
@@ -119,17 +123,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() => _busy = true);
     final nav = BurdaNav.of(context);
     try {
-      final entries = await DataTransferService.pickImport();
-      if (entries == null) {
+      final decoded = await DataTransferService.pickImport();
+      if (decoded == null) {
         nav.showToast('No file chosen');
         return;
       }
       if (!mounted) return;
+      final file = DataTransferService.read(decoded);
       final magazines = context.read<MagazineProvider>();
-      final count = await magazines.import(entries);
-      nav.showToast('$count issues restored');
+      final contents = context.read<ContentsProvider>();
 
-      await _restorePhotos(magazines, nav);
+      final count = await magazines.import(file.magazines);
+      final pages = await contents.import(file.contents);
+      nav.showToast(
+        pages == 0
+            ? '$count issues restored'
+            : '$count issues and $pages pages restored',
+      );
+
+      await _restorePhotos(magazines, contents, nav);
 
       if (magazines.completion == 1) {
         nav.celebrate('The whole collection. Every issue.');
@@ -144,14 +156,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// Points the imported photo paths at files that exist on this phone.
   ///
   /// An export carries absolute paths belonging to the phone and the package
-  /// name it was written on, and the photos are not in the file. So: repair
-  /// what can be repaired silently, then, only if something is still missing,
-  /// ask where the photos were put and copy them in.
-  Future<void> _restorePhotos(MagazineProvider magazines, BurdaNav nav) async {
-    var (changes, report) = await PhotoRelinkService.repair(
-      magazines.magazines,
-    );
-    await magazines.applyRelink(changes);
+  /// name it was written on, and the photos themselves are not in the file. So:
+  /// repair what can be repaired silently, then, only if something is still
+  /// missing, ask where the photos were put and copy them in.
+  ///
+  /// The vault photos, the chosen covers and the photographed pages are all
+  /// repaired in one pass and counted together, because she is answering one
+  /// question, "where are the pictures", and being asked it twice would be
+  /// being asked it twice about the same folder.
+  Future<void> _restorePhotos(
+    MagazineProvider magazines,
+    ContentsProvider contents,
+    BurdaNav nav,
+  ) async {
+    var report = await _repairAll(magazines, contents);
 
     if (!report.anyLost) {
       if (report.recovered > 0) {
@@ -168,17 +186,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    (changes, report) = await PhotoRelinkService.repair(
-      magazines.magazines,
+    report = await _repairAll(
+      magazines,
+      contents,
       sourceFolder: Directory(folder),
     );
-    await magazines.applyRelink(changes);
 
     nav.showToast(
       report.anyLost
           ? '${report.recovered} photos restored, ${report.lost} still missing'
           : '${report.recovered} photos restored',
     );
+  }
+
+  /// One pass over everything with a path in it.
+  Future<RelinkReport> _repairAll(
+    MagazineProvider magazines,
+    ContentsProvider contents, {
+    Directory? sourceFolder,
+  }) async {
+    final (issueChanges, issueReport) = await PhotoRelinkService.repair(
+      magazines.magazines,
+      sourceFolder: sourceFolder,
+    );
+    await magazines.applyRelink(issueChanges);
+
+    final (pageChanges, pageReport) = await PhotoRelinkService.repairPages(
+      contents.entries,
+      sourceFolder: sourceFolder,
+    );
+    await contents.applyRelink(pageChanges);
+
+    return issueReport + pageReport;
   }
 
   @override
@@ -242,7 +281,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _ArchiveRow(
                   edition: edition,
                   title: 'Export collection',
-                  sub: 'a .json you can keep anywhere',
+                  // Says plainly that the pictures are not in the file: she
+                  // will have photographed two hundred contents pages by then,
+                  // and a backup that looks complete and is not is worse than
+                  // one that tells the truth.
+                  sub:
+                      'a .json you can keep anywhere, photos stay on the phone',
                   glyph: '↓',
                   onTap: _busy ? null : _export,
                 ),

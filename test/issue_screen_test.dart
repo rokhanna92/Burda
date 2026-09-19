@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:burda/models/note_provider.dart';
 import 'package:burda/providers/magazine_provider.dart';
-import 'package:burda/providers/theme_provider.dart';
 import 'package:burda/screens/index_screen.dart';
 import 'package:burda/screens/issue_screen.dart';
 import 'package:burda/services/database_service.dart';
@@ -17,6 +15,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import 'app_providers.dart';
 
 /// Two issues in one year, so finishing the second finishes the volume.
 const _seed = [
@@ -58,18 +58,17 @@ void main() {
   SharedPreferences.setMockInitialValues({});
 
   late DatabaseService service;
+  late TestApp app;
   late MagazineProvider magazines;
-  late NoteProvider notes;
 
   setUp(() async {
     service = DatabaseService(
       loadSeed: () async => jsonEncode(_seed),
       databaseName: inMemoryDatabasePath,
     );
-    magazines = MagazineProvider(database: service);
-    notes = NoteProvider(database: service);
-    await magazines.load();
-    await notes.load();
+    app = TestApp(service);
+    await app.load();
+    magazines = app.magazines;
   });
 
   tearDown(() => service.close());
@@ -102,11 +101,7 @@ void main() {
 
     await tester.pumpWidget(
       MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: magazines),
-          ChangeNotifierProvider.value(value: notes),
-          ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ],
+        providers: app.providers,
         child: MaterialApp(
           theme: buildAppTheme(Edition.rose),
           home: const BurdaShell(),

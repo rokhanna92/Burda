@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/magazine.dart';
+import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
 import '../services/image_storage_service.dart';
 import '../shell/burda_nav.dart';
@@ -23,12 +24,17 @@ class ConfirmSheet extends StatelessWidget {
   Future<void> _remove(BuildContext context) async {
     final nav = BurdaNav.of(context);
     final magazines = context.read<MagazineProvider>();
+    final contents = context.read<ContentsProvider>();
 
     // The photos go with it, rather than being orphaned on disk.
     for (final path in magazine.uploadedImages) {
       await ImageStorageService.delete(path);
     }
     if (magazine.hasFileCover) await ImageStorageService.delete(magazine.image);
+
+    // As do the photographs of its own pages, which is the other half of what
+    // "its photos go with it" promises below.
+    await contents.removeIssue(magazine.id);
 
     await magazines.deleteMagazine(magazine.id);
 

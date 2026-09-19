@@ -56,7 +56,7 @@ class Magazine {
     title: json['title'] as String,
     year: json['year'] as int,
     image: json['image'] as String,
-    isOwned: json['isOwned'] == true || json['isOwned'] == 1,
+    isOwned: _parseBool(json['isOwned']),
     dateAdded: _parseDate(json['dateAdded']),
     conditionScore: (json['conditionScore'] as num?)?.toInt(),
     uploadedImages: _parseImages(json['uploadedImages']),
@@ -68,7 +68,7 @@ class Magazine {
     title: map['title'] as String,
     year: (map['year'] as num).toInt(),
     image: map['image'] as String,
-    isOwned: (map['isOwned'] as num?) == 1,
+    isOwned: _parseBool(map['isOwned']),
     dateAdded: _parseDate(map['dateAdded']),
     conditionScore: (map['conditionScore'] as num?)?.toInt(),
     uploadedImages: _parseImages(map['uploadedImages']),
@@ -117,6 +117,12 @@ class Magazine {
         : (conditionScore ?? this.conditionScore),
     uploadedImages: uploadedImages ?? this.uploadedImages,
   );
+
+  /// SQLite stores a flag as 0 or 1, JSON writes true or false, and an export
+  /// from the original app wrote the string "1". All three mean the same thing,
+  /// and every flag added from here on reads through this in both factories.
+  static bool _parseBool(Object? value) =>
+      value == true || value == 1 || value == '1';
 
   static DateTime? _parseDate(Object? value) => switch (value) {
     String value => DateTime.tryParse(value),

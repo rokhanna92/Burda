@@ -174,6 +174,22 @@ void main() {
       expect(kept.uploadedImages, ['/tmp/a.jpg']);
     });
 
+    test('an install at version 2 gains the contents table', () async {
+      final service = DatabaseService(
+        loadSeed: () async => jsonEncode([_entry(1, 2025)]),
+        databaseName: path,
+      );
+      addTearDown(service.close);
+
+      final pages = await service.getContents();
+
+      expect(pages, isEmpty, reason: 'the table is there and empty');
+      final kept = await service.getMagazine('1-2025');
+      expect(kept!.isOwned, isTrue);
+      expect(kept.conditionScore, 8);
+      expect(kept.uploadedImages, ['/tmp/a.jpg']);
+    });
+
     test('does not duplicate an issue it already has', () async {
       final service = DatabaseService(
         loadSeed: () async => jsonEncode([
@@ -187,6 +203,85 @@ void main() {
 
       expect(all.map((m) => m.id).toSet(), hasLength(all.length));
       expect(all.where((m) => m.id == '1-2025'), hasLength(1));
+    });
+  });
+
+  // The one guard that a rung was never quietly edited after it shipped. Her
+  // phone climbed the ladder; a fresh install replays it from nothing. If the
+  // two ever disagree, a rung has been changed under a database that already
+  // ran it, and only the phone that upgraded would ever show it.
+  group('a fresh install and one that upgraded', () {
+    late Directory home;
+
+    /// The schema as version 2 left it, which is the version her phone is on:
+    /// version 1's tables, its index, and a longer bundled list.
+    Future<String> upgradedFromV2() async {
+      final path = p.join(home.path, 'upgraded.db');
+      final old = await databaseFactory.openDatabase(
+        path,
+        options: OpenDatabaseOptions(
+          version: 2,
+          onCreate: (db, version) async {
+            await db.execute(_v1Magazines);
+            await db.execute(_v1Notes);
+            await db.execute(
+              'CREATE INDEX idx_magazines_year ON magazines (year)',
+            );
+          },
+        ),
+      );
+      await old.close();
+      return path;
+    }
+
+    setUp(() async {
+      home = await Directory.systemTemp.createTemp('burda-ladder');
+    });
+
+    tearDown(() async {
+      if (home.existsSync()) await home.delete(recursive: true);
+    });
+
+    test('hold the very same schema', () async {
+      final fresh = DatabaseService(
+        loadSeed: () async => jsonEncode([_entry(1, 2025)]),
+        databaseName: p.join(home.path, 'fresh.db'),
+      );
+      final upgraded = DatabaseService(
+        loadSeed: () async => jsonEncode([_entry(1, 2025)]),
+        databaseName: await upgradedFromV2(),
+      );
+      addTearDown(fresh.close);
+      addTearDown(upgraded.close);
+
+      Future<Map<String, Object?>> shapeOf(DatabaseService service) async {
+        final db = await service.database;
+        final objects = await db.query(
+          'sqlite_master',
+          columns: ['type', 'name'],
+          where: "name NOT LIKE 'sqlite_%' AND name NOT LIKE 'android_%'",
+          orderBy: 'type, name',
+        );
+        final shape = <String, Object?>{};
+        for (final object in objects) {
+          final name = object['name'] as String;
+          shape['${object['type']} $name'] = object['type'] == 'table'
+              ? await db.rawQuery('PRAGMA table_info($name)')
+              : true;
+        }
+        return shape;
+      }
+
+      final one = await shapeOf(fresh);
+      final other = await shapeOf(upgraded);
+
+      expect(one.keys, isNotEmpty);
+      expect(one.keys, contains('table contents'));
+      expect(one.keys, contains('index idx_magazines_year'));
+      expect(other.keys.toList(), one.keys.toList());
+      for (final key in one.keys) {
+        expect(other[key], one[key], reason: key);
+      }
     });
   });
 }

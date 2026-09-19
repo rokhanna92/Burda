@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../models/magazine.dart';
+import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
 import '../services/image_storage_service.dart';
 import '../shell/burda_nav.dart';
@@ -28,6 +29,10 @@ class IssueScreen extends StatefulWidget {
 
 class _IssueScreenState extends State<IssueScreen> {
   bool _picking = false;
+
+  /// The contents picker has a flag of its own, so shooting a page and adding
+  /// a vault photo cannot grey each other's block out.
+  bool _shooting = false;
 
   Future<void> _addPhoto() async {
     if (_picking) return;
@@ -59,11 +64,43 @@ class _IssueScreenState extends State<IssueScreen> {
     nav.showToast('Photo removed from the vault');
   }
 
+  Future<void> _addPage() async {
+    if (_shooting) return;
+    setState(() => _shooting = true);
+    final nav = BurdaNav.of(context);
+    try {
+      final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (picked == null) {
+        nav.showToast('No photo chosen');
+        return;
+      }
+      final path = await ImageStorageService.saveContentsPage(
+        magazineId: widget.id,
+        sourcePath: picked.path,
+      );
+      if (!mounted) return;
+      await context.read<ContentsProvider>().addPage(
+        magazineId: widget.id,
+        path: path,
+      );
+      nav.showToast('Page added to the contents');
+    } finally {
+      if (mounted) setState(() => _shooting = false);
+    }
+  }
+
   Future<void> _setCondition(int score) async {
     final nav = BurdaNav.of(context);
     await context.read<MagazineProvider>().setCondition(widget.id, score);
     nav.showToast('Condition set to $score');
   }
+
+  /// What the Contents header says on the right.
+  static String _pageNote(int pages) => switch (pages) {
+    0 => 'nothing photographed yet',
+    1 => '1 page photographed',
+    _ => '$pages pages photographed',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +109,9 @@ class _IssueScreenState extends State<IssueScreen> {
     final magazine = context.select<MagazineProvider, Magazine?>(
       (magazines) => magazines.byId(widget.id),
     );
+    // Watched rather than selected: forIssue builds a fresh list every call, so
+    // select would compare two unequal lists and rebuild anyway.
+    final pages = context.watch<ContentsProvider>().forIssue(widget.id);
 
     // Deleted out from under us, which the shell will pop past in a moment.
     if (magazine == null) return const SizedBox.shrink();
@@ -163,6 +203,59 @@ class _IssueScreenState extends State<IssueScreen> {
           ],
           const SizedBox(height: 30),
           SectionHeader(
+            'Contents',
+            edition: edition,
+            note: _pageNote(pages.length),
+          ),
+          const SizedBox(height: 12),
+          if (pages.isEmpty) ...[
+            Text(
+              'Photograph the contents page and you can read it without '
+              'getting up.',
+              style: AppType.serif(
+                size: 15,
+                italic: true,
+                height: 1.35,
+                color: edition.inkAt(60),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          GridView.count(
+            // Two up rather than the vault's three, and taller than wide: a
+            // page of a magazine is A4, and a thumbnail you cannot almost read
+            // is not worth tapping.
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 0.74,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              for (final (index, entry) in pages.indexed)
+                CoverIn(
+                  key: ValueKey(entry.id),
+                  order: index,
+                  duration: const Duration(milliseconds: 350),
+                  child: PressScale(
+                    scale: 0.96,
+                    onTap: () => nav.openReader(widget.id, startAt: index),
+                    child: PhotoTile(
+                      edition: edition,
+                      path: entry.path,
+                      placeholder: 'page ${index + 1}',
+                    ),
+                  ),
+                ),
+              AddPhotoTile(
+                edition: edition,
+                label: 'Add a page',
+                onTap: _shooting ? null : _addPage,
+              ),
+            ],
+          ),
+          const SizedBox(height: 30),
+          SectionHeader(
             'Vault',
             edition: edition,
             note: '${magazine.uploadedImages.length} photos of this issue',
@@ -187,7 +280,7 @@ class _IssueScreenState extends State<IssueScreen> {
                     onRemove: () => _removePhoto(path),
                   ),
                 ),
-              _AddPhotoTile(
+              AddPhotoTile(
                 edition: edition,
                 onTap: _picking ? null : _addPhoto,
               ),
@@ -305,47 +398,6 @@ class _ConditionTicks extends StatelessWidget {
           ),
         ],
       ],
-    );
-  }
-}
-
-class _AddPhotoTile extends StatelessWidget {
-  const _AddPhotoTile({required this.edition, required this.onTap});
-
-  final Edition edition;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: CustomPaint(
-        painter: DashedBorder(colour: edition.inkAt(45)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '+',
-              style: AppType.serif(
-                size: 30,
-                weight: 300,
-                height: 1,
-                color: edition.ink,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Add photo',
-              style: AppType.smallCaps(
-                size: 12,
-                trackingEm: 0.14,
-                color: edition.ink,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

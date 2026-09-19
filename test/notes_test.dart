@@ -16,6 +16,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import 'app_providers.dart';
+
 void main() {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
@@ -23,6 +25,7 @@ void main() {
   SharedPreferences.setMockInitialValues({});
 
   late DatabaseService service;
+  late TestApp app;
   late NoteProvider notes;
   late MagazineProvider magazines;
 
@@ -31,10 +34,10 @@ void main() {
       loadSeed: () async => jsonEncode(const []),
       databaseName: inMemoryDatabasePath,
     );
-    notes = NoteProvider(database: service);
-    magazines = MagazineProvider(database: service);
-    await notes.load();
-    await magazines.load();
+    app = TestApp(service);
+    await app.load();
+    notes = app.notes;
+    magazines = app.magazines;
   });
 
   tearDown(() => service.close());

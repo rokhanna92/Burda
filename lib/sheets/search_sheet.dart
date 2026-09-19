@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../models/garment_tag.dart';
 import '../models/issue_address.dart';
 import '../models/magazine.dart';
+import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
@@ -11,6 +13,7 @@ import '../theme/typography.dart';
 import '../widgets/cover_tile.dart';
 import '../widgets/page_furniture.dart';
 import '../widgets/sheet_scaffold.dart';
+import '../widgets/tag_chips.dart';
 
 /// Looking an issue up by its address: number, slash, year.
 class SearchSheet extends StatefulWidget {
@@ -25,6 +28,9 @@ class SearchSheet extends StatefulWidget {
 class _SearchSheetState extends State<SearchSheet> {
   final TextEditingController _query = TextEditingController();
 
+  /// The garment word picked underneath, or null while none is.
+  GarmentTag? _tag;
+
   @override
   void dispose() {
     _query.dispose();
@@ -32,31 +38,30 @@ class _SearchSheetState extends State<SearchSheet> {
   }
 
   /// The issue the query points at, once it is a whole address.
-  ///
-  /// Nothing is looked up until the year is four digits long, so the result
-  /// does not flicker between volumes as the year is typed.
   Magazine? _found(MagazineProvider magazines) {
-    final parts = _query.text.split('/');
-    if (parts.length < 2 || parts[1].length != 4) return null;
-    final issue = int.tryParse(parts[0]);
-    final year = int.tryParse(parts[1]);
-    if (issue == null || year == null) return null;
-    return magazines.byId('$issue-$year');
+    final address = IssueAddress.parse(_query.text);
+    if (address == null) return null;
+    return magazines.byId('${address.issue}-${address.year}');
   }
 
-  bool get _addressComplete {
-    final parts = _query.text.split('/');
-    return parts.length >= 2 &&
-        parts[1].length == 4 &&
-        int.tryParse(parts[0]) != null &&
-        int.tryParse(parts[1]) != null;
-  }
+  bool get _addressComplete => IssueAddress.parse(_query.text) != null;
+
+  /// Typing an address puts the word down, and picking a word clears the
+  /// field: one question at a time, so the answer below is never ambiguous.
+  void _typed() => setState(() => _tag = null);
+
+  void _pick(GarmentTag tag) => setState(() {
+    _tag = _tag == tag ? null : tag;
+    _query.clear();
+  });
 
   @override
   Widget build(BuildContext context) {
     final edition = widget.edition;
     final magazines = context.watch<MagazineProvider>();
+    final contents = context.watch<ContentsProvider>();
     final found = _found(magazines);
+    final counts = contents.issueCountsByTag;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -74,7 +79,7 @@ class _SearchSheetState extends State<SearchSheet> {
           keyboardType: TextInputType.number,
           // Type the digits; the slash is put in for you.
           inputFormatters: const [_AddressFormatter()],
-          onChanged: (_) => setState(() {}),
+          onChanged: (_) => _typed(),
           style: AppType.serif(
             size: 40,
             weight: 300,
@@ -131,6 +136,107 @@ class _SearchSheetState extends State<SearchSheet> {
             ),
           ),
         ],
+        const SizedBox(height: 26),
+        SectionHeader('What is inside', edition: edition, note: 'tap a word'),
+        const SizedBox(height: 12),
+        if (counts.isEmpty)
+          Text(
+            'Nothing is tagged yet. Mark what is on a contents page and it '
+            'shows up here.',
+            style: AppType.serif(
+              size: 16,
+              italic: true,
+              height: 1.35,
+              color: edition.inkAt(65),
+            ),
+          )
+        else
+          TagChips(
+            edition: edition,
+            tags: counts.keys.toList(),
+            picked: {?_tag},
+            counts: counts,
+            onToggle: _pick,
+          ),
+        if (_tag case final tag?) ...[
+          const SizedBox(height: 18),
+          _Tagged(
+            edition: edition,
+            // Newest volume first: the collection is held year then issue, so
+            // reading it backwards puts this year at the top.
+            issues: [
+              for (final magazine in magazines.magazines.reversed)
+                if (contents.issuesTagged(tag).contains(magazine.id)) magazine,
+            ],
+            pagesFor: contents.countFor,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// The issues carrying one garment word, each with how many of its pages
+/// were photographed.
+class _Tagged extends StatelessWidget {
+  const _Tagged({
+    required this.edition,
+    required this.issues,
+    required this.pagesFor,
+  });
+
+  final Edition edition;
+  final List<Magazine> issues;
+  final int Function(String) pagesFor;
+
+  static String _pages(int count) => count == 1 ? '1 page' : '$count pages';
+
+  @override
+  Widget build(BuildContext context) {
+    final nav = BurdaNav.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          issues.length == 1 ? 'One issue' : '${issues.length} issues',
+          style: AppType.serif(
+            size: 15,
+            italic: true,
+            color: edition.inkAt(60),
+          ),
+        ),
+        for (final magazine in issues)
+          HairlineRow(
+            edition: edition,
+            onTap: () {
+              nav.closeSheet();
+              nav.push(IssuePage(magazine.id));
+            },
+            verticalPadding: 12,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Expanded(
+                  child: Text(
+                    'No. ${magazine.issue} · ${magazine.year}',
+                    overflow: TextOverflow.ellipsis,
+                    style: AppType.serif(size: 20, color: edition.ink),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  _pages(pagesFor(magazine.id)),
+                  style: AppType.serif(
+                    size: 14,
+                    italic: true,
+                    color: edition.inkAt(60),
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

@@ -34,6 +34,13 @@ class VaultPage extends BurdaPage {
 /// The six things the one bottom sheet can hold.
 enum BurdaSheet { add, search, rank, about, note, confirm }
 
+/// What the contents reader is showing.
+///
+/// Not a [BurdaPage]: the reader covers the nav bar rather than sliding in
+/// under it, so it lives beside the sheet in the shell rather than on the
+/// stack.
+typedef ReaderView = ({String magazineId, int startAt});
+
 /// What a screen can ask the shell to do.
 ///
 /// Screens reach this with `BurdaNav.of(context)` instead of taking a callback
@@ -56,6 +63,13 @@ abstract interface class BurdaNav {
   void openSheet(BurdaSheet sheet);
 
   void closeSheet();
+
+  /// Opens the contents reader over everything, nav bar included, at the
+  /// [startAt]th photographed page of [magazineId].
+  void openReader(String magazineId, {int startAt = 0});
+
+  /// Closes the reader. The pages themselves are not touched.
+  void closeReader();
 
   /// Floats a line over the nav bar for a moment.
   void showToast(String message);

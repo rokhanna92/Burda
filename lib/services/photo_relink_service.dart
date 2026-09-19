@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import '../models/contents_entry.dart';
 import '../models/magazine.dart';
 import 'image_storage_service.dart';
 
@@ -40,6 +41,13 @@ class RelinkReport {
 /// One issue's repaired paths.
 typedef RelinkedIssue = ({String id, List<String> photos, String? cover});
 
+/// One photographed page's repaired path. Null means the photograph is gone.
+typedef RelinkedPage = ({String id, String? path});
+
+/// Which of the app's folders a file belongs in, which decides where a copy
+/// goes back to.
+enum _Kind { photo, cover, page, make }
+
 /// Re-points photo paths at files that actually exist on this device.
 ///
 /// An export carries absolute paths, and those paths belong to the phone and
@@ -74,7 +82,7 @@ abstract final class PhotoRelinkService {
           path: path,
           magazineId: magazine.id,
           byName: byName,
-          asCover: false,
+          kind: _Kind.photo,
         );
         report += outcome;
         if (resolved != null) photos.add(resolved);
@@ -87,7 +95,7 @@ abstract final class PhotoRelinkService {
           path: magazine.image,
           magazineId: magazine.id,
           byName: byName,
-          asCover: true,
+          kind: _Kind.cover,
         );
         report += outcome;
         // A lost cover of her own falls back to the artwork the app ships for
@@ -104,12 +112,45 @@ abstract final class PhotoRelinkService {
     return (changed, report);
   }
 
+  /// Repairs the photographs of [pages], optionally drawing on [sourceFolder].
+  ///
+  /// Returns the pages whose path changed. A page whose photograph cannot be
+  /// found anywhere comes back with a null path and keeps its row: the marks on
+  /// it are hers and outlive the file, and the reader says the photograph is
+  /// missing rather than pretending the page never was.
+  static Future<(List<RelinkedPage>, RelinkReport)> repairPages(
+    List<ContentsEntry> pages, {
+    Directory? sourceFolder,
+  }) async {
+    final byName = sourceFolder == null
+        ? const <String, File>{}
+        : await _indexByName(sourceFolder);
+
+    final changed = <RelinkedPage>[];
+    var report = const RelinkReport();
+
+    for (final page in pages) {
+      final (resolved, outcome) = await _resolve(
+        path: page.path,
+        magazineId: page.magazineId,
+        byName: byName,
+        kind: _Kind.page,
+      );
+      report += outcome;
+      if (resolved != page.path) {
+        changed.add((id: page.id, path: resolved));
+      }
+    }
+
+    return (changed, report);
+  }
+
   /// Finds one file, wherever it may now be.
   static Future<(String?, RelinkReport)> _resolve({
     required String path,
     required String magazineId,
     required Map<String, File> byName,
-    required bool asCover,
+    required _Kind kind,
   }) async {
     if (File(path).existsSync()) {
       return (path, const RelinkReport(alreadyThere: 1));
@@ -124,15 +165,20 @@ abstract final class PhotoRelinkService {
 
     final found = byName[name];
     if (found != null) {
-      final target = asCover
-          ? await ImageStorageService.saveCover(
-              magazineId: magazineId,
-              sourcePath: found.path,
-            )
-          : await ImageStorageService.save(
-              magazineId: magazineId,
-              sourcePath: found.path,
-            );
+      final target = switch (kind) {
+        _Kind.cover => await ImageStorageService.saveCover(
+          magazineId: magazineId,
+          sourcePath: found.path,
+        ),
+        _Kind.page => await ImageStorageService.saveContentsPage(
+          magazineId: magazineId,
+          sourcePath: found.path,
+        ),
+        _Kind.photo || _Kind.make => await ImageStorageService.save(
+          magazineId: magazineId,
+          sourcePath: found.path,
+        ),
+      };
       return (target, const RelinkReport(copied: 1));
     }
 
@@ -140,12 +186,20 @@ abstract final class PhotoRelinkService {
   }
 
   /// Looks for [name] in the folders this app keeps for [magazineId].
+  ///
+  /// Not told which kind it is after: names are millisecond stamps, so a hit in
+  /// a neighbouring folder is the same file, and looking in all of them costs
+  /// three stat calls.
   static Future<String?> _ownCopy({
     required String name,
     required String magazineId,
   }) async {
     for (final candidate in [
       await ImageStorageService.photoPathFor(
+        magazineId: magazineId,
+        name: name,
+      ),
+      await ImageStorageService.contentsPathFor(
         magazineId: magazineId,
         name: name,
       ),

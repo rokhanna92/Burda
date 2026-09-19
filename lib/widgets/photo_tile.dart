@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/edition.dart';
+import '../theme/typography.dart';
+import 'page_furniture.dart';
 
 /// A photo from the vault, on the diagonal hatch the design puts behind it.
 ///
@@ -96,6 +98,64 @@ class PhotoTile extends StatelessWidget {
                   ),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The dashed block at the end of a grid of photos, which asks for one more.
+///
+/// Lives here rather than on the issue screen because three grids now end with
+/// it and they do not all mean the same thing by it: the vault takes a photo of
+/// something she made, the contents take a photograph of a page.
+class AddPhotoTile extends StatelessWidget {
+  const AddPhotoTile({
+    super.key,
+    required this.edition,
+    required this.onTap,
+    this.glyph = '+',
+    this.label = 'Add photo',
+  });
+
+  final Edition edition;
+
+  /// Null while a picker is already open, which greys the block out.
+  final VoidCallback? onTap;
+
+  final String glyph;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: CustomPaint(
+        painter: DashedBorder(colour: edition.inkAt(45)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              glyph,
+              style: AppType.serif(
+                size: 30,
+                weight: 300,
+                height: 1,
+                color: edition.ink,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AppType.smallCaps(
+                size: 12,
+                trackingEm: 0.14,
+                color: edition.ink,
+              ),
+            ),
           ],
         ),
       ),

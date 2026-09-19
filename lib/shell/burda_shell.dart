@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../providers/magazine_provider.dart';
 import '../providers/theme_provider.dart';
 import '../screens/collection_screen.dart';
+import '../screens/contents_reader.dart';
 import '../screens/index_screen.dart';
 import '../screens/issue_screen.dart';
 import '../screens/notes_screen.dart';
@@ -49,6 +50,9 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
   bool _showOwned = true;
   final List<BurdaPage> _stack = [];
   BurdaSheet? _sheet;
+
+  /// The contents reader, which covers the nav bar and everything else.
+  ReaderView? _reader;
   String? _toast;
   bool _hearts = false;
 
@@ -71,6 +75,7 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     _tab = tab;
     _stack.clear();
     _sheet = null;
+    _reader = null;
   });
 
   @override
@@ -79,12 +84,14 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     _showOwned = owned;
     _stack.clear();
     _sheet = null;
+    _reader = null;
   });
 
   @override
   void push(BurdaPage page) => setState(() {
     _stack.add(page);
     _sheet = null;
+    _reader = null;
   });
 
   @override
@@ -98,6 +105,15 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
 
   @override
   void closeSheet() => setState(() => _sheet = null);
+
+  @override
+  void openReader(String magazineId, {int startAt = 0}) => setState(() {
+    _reader = (magazineId: magazineId, startAt: startAt);
+    _sheet = null;
+  });
+
+  @override
+  void closeReader() => setState(() => _reader = null);
 
   @override
   void showToast(String message) {
@@ -186,9 +202,15 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     return BurdaNavScope(
       nav: this,
       child: PopScope(
-        canPop: _sheet == null && _stack.isEmpty && _tab == NavTab.home,
+        canPop:
+            _reader == null &&
+            _sheet == null &&
+            _stack.isEmpty &&
+            _tab == NavTab.home,
         onPopInvokedWithResult: (didPop, _) {
           if (didPop) return;
+          // The reader is on top of everything, so it closes first.
+          if (_reader != null) return closeReader();
           if (_sheet != null) return closeSheet();
           if (_stack.isNotEmpty) return back();
           if (_tab != NavTab.home) goTab(NavTab.home);
@@ -237,6 +259,17 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
                         edition: edition,
                         onClose: closeSheet,
                         child: sheet,
+                      ),
+                    ),
+                  if (_reader case final reader?)
+                    Positioned.fill(
+                      child: ContentsReader(
+                        // Reopening at another page builds a fresh controller,
+                        // rather than animating across from where it was left.
+                        key: ValueKey('${reader.magazineId}:${reader.startAt}'),
+                        edition: edition,
+                        magazineId: reader.magazineId,
+                        startAt: reader.startAt,
                       ),
                     ),
                   if (_raining case final shower?)
