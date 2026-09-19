@@ -4,13 +4,8 @@ import 'package:provider/provider.dart';
 import 'models/note_provider.dart';
 import 'providers/magazine_provider.dart';
 import 'providers/theme_provider.dart';
-import 'screens/home_screen.dart';
-import 'screens/select_year_screen.dart';
-import 'screens/settings_screen.dart';
+import 'shell/burda_shell.dart';
 import 'theme/app_theme.dart';
-import 'widgets/add_magazine_modal.dart';
-import 'widgets/bottom_navigation.dart';
-import 'widgets/year_browse_sheet.dart';
 
 void main() {
   runApp(const BurdaApp());
@@ -32,57 +27,8 @@ class BurdaApp extends StatelessWidget {
           title: 'Burda Style',
           debugShowCheckedModeBanner: false,
           theme: buildAppTheme(theme.edition),
-          home: const AppShell(),
+          home: const BurdaShell(),
         ),
-      ),
-    );
-  }
-}
-
-/// Holds the bottom navigation and the three destinations that are pages.
-/// The dress opens the add-an-issue sheet and the arrows open the per-year
-/// sheet, so neither of those replaces the current page.
-class AppShell extends StatefulWidget {
-  const AppShell({super.key});
-
-  @override
-  State<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends State<AppShell> {
-  static const List<NavDestination> _pages = [
-    NavDestination.home,
-    NavDestination.years,
-    NavDestination.settings,
-  ];
-
-  NavDestination _current = NavDestination.home;
-
-  void _onSelected(NavDestination destination) {
-    if (_pages.contains(destination)) {
-      setState(() => _current = destination);
-      return;
-    }
-    switch (destination) {
-      case NavDestination.missingByYear:
-        showYearBrowseSheet(context);
-      case NavDestination.addIssue:
-        showAddMagazineModal(context);
-      case _:
-        break;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _pages.indexOf(_current),
-        children: const [HomeScreen(), SelectYearScreen(), SettingsScreen()],
-      ),
-      bottomNavigationBar: BottomNavigation(
-        current: _current,
-        onSelected: _onSelected,
       ),
     );
   }

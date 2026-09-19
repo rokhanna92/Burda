@@ -64,6 +64,25 @@ class MagazineProvider extends ChangeNotifier {
     return issues.isNotEmpty && issues.every((m) => m.isOwned);
   }
 
+  /// The eight issues added most recently, for the index's rail.
+  ///
+  /// An owned issue with no date, which is how an import from the original app
+  /// arrives, sorts to the back rather than the front.
+  List<Magazine> get recentlyAdded {
+    final sorted = owned
+      ..sort((a, b) {
+        final left = a.dateAdded, right = b.dateAdded;
+        if (left == null && right == null) return 0;
+        if (left == null) return 1;
+        if (right == null) return -1;
+        return right.compareTo(left);
+      });
+    return sorted.take(8).toList(growable: false);
+  }
+
+  /// How many years are owned end to end.
+  int get completeYearCount => years.where(isYearComplete).length;
+
   /// Most recent moment an issue was marked owned.
   DateTime? get latestAddition {
     final dates = owned.map((m) => m.dateAdded).whereType<DateTime>().toList();
