@@ -76,6 +76,14 @@ flutter:
     - assets/fonts/
 
   fonts:
+    # The redesign sets everything in Cormorant Garamond. These are the
+    # variable cuts on purpose: the static ones ship without the `smcp`
+    # table, and the design asks for real small caps on 49 labels.
+    - family: CormorantGaramond
+      fonts:
+        - asset: assets/fonts/CormorantGaramond-VariableFont_wght.ttf
+        - asset: assets/fonts/CormorantGaramond-Italic-VariableFont_wght.ttf
+          style: italic
     - family: FleurDeLeah
       fonts:
         - asset: assets/fonts/FleurDeLeah.ttf
