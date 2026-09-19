@@ -176,12 +176,16 @@ class _IssueScreenState extends State<IssueScreen> {
             physics: const NeverScrollableScrollPhysics(),
             children: [
               for (final (index, path) in magazine.uploadedImages.indexed)
-                PhotoTile(
+                CoverIn(
                   key: ValueKey(path),
-                  edition: edition,
-                  path: path,
-                  placeholder: 'photo ${index + 1}',
-                  onRemove: () => _removePhoto(path),
+                  order: index,
+                  duration: const Duration(milliseconds: 350),
+                  child: PhotoTile(
+                    edition: edition,
+                    path: path,
+                    placeholder: 'photo ${index + 1}',
+                    onRemove: () => _removePhoto(path),
+                  ),
                 ),
               _AddPhotoTile(
                 edition: edition,

@@ -211,17 +211,20 @@ class _YearGroup extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            for (final magazine in issues)
-              PressScale(
+            for (final (index, magazine) in issues.indexed)
+              CoverIn(
                 key: ValueKey(magazine.id),
-                scale: 0.95,
-                onTap: () => onOpenIssue(magazine.id),
-                child: CoverTile(
-                  magazine: magazine,
-                  edition: edition,
-                  numeralSize: 30,
-                  desaturate: !magazine.isOwned,
-                  imageOpacity: magazine.isOwned ? 1 : 0.7,
+                order: index,
+                child: PressScale(
+                  scale: 0.95,
+                  onTap: () => onOpenIssue(magazine.id),
+                  child: CoverTile(
+                    magazine: magazine,
+                    edition: edition,
+                    numeralSize: 30,
+                    desaturate: !magazine.isOwned,
+                    imageOpacity: magazine.isOwned ? 1 : 0.7,
+                  ),
                 ),
               ),
           ],

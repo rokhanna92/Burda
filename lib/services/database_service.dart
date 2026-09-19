@@ -168,9 +168,15 @@ class DatabaseService {
     final magazine = await getMagazine(id);
     if (magazine == null) return null;
     final owned = !magazine.isOwned;
+    // Setting an issue aside clears its condition along with its date, as the
+    // design does: the score describes a copy that is no longer held.
     final updated = owned
         ? magazine.copyWith(isOwned: true, dateAdded: now ?? DateTime.now())
-        : magazine.copyWith(isOwned: false, clearDateAdded: true);
+        : magazine.copyWith(
+            isOwned: false,
+            clearDateAdded: true,
+            clearConditionScore: true,
+          );
     await updateMagazine(updated);
     return updated;
   }

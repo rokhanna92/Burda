@@ -108,6 +108,18 @@ void main() {
       expect(updated.dateAdded, isNull);
     });
 
+    test('giving an issue up clears its condition too', () async {
+      await service.toggleOwnership('1-2010');
+      await service.setCondition('1-2010', 9);
+
+      final updated = await service.toggleOwnership('1-2010');
+
+      // The score described a copy that is no longer held.
+      expect(updated!.isOwned, isFalse);
+      expect(updated.conditionScore, isNull);
+      expect((await service.getMagazine('1-2010'))!.conditionScore, isNull);
+    });
+
     test('an unknown id is a no-op', () async {
       expect(await service.toggleOwnership('9-1999'), isNull);
     });

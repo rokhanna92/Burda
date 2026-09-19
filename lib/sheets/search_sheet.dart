@@ -8,6 +8,7 @@ import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
 import '../theme/typography.dart';
 import '../widgets/cover_tile.dart';
+import '../widgets/page_furniture.dart';
 import '../widgets/sheet_scaffold.dart';
 
 /// Looking an issue up by its address: number, slash, year.
@@ -115,7 +116,10 @@ class _SearchSheetState extends State<SearchSheet> {
         ),
         if (found != null) ...[
           const SizedBox(height: 22),
-          _Result(edition: edition, magazine: found),
+          CoverIn(
+            duration: const Duration(milliseconds: 300),
+            child: _Result(edition: edition, magazine: found),
+          ),
         ] else if (_addressComplete) ...[
           const SizedBox(height: 24),
           Text(

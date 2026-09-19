@@ -304,6 +304,53 @@ class ProgressRule extends StatelessWidget {
   );
 }
 
+/// The design's `coverIn`: a tile fading up and settling from slightly small.
+///
+/// Played wherever a grid of covers or photos first appears, staggered by
+/// [order] so a grid arrives as a wave rather than all at once. The stagger is
+/// capped, as the design caps it, so the twelfth tile does not wait three times
+/// as long as the fourth.
+class CoverIn extends StatelessWidget {
+  const CoverIn({
+    super.key,
+    required this.child,
+    this.order = 0,
+    this.stagger = AppMotion.coverStagger,
+    this.duration = AppMotion.coverIn,
+  });
+
+  final Widget child;
+  final int order;
+  final Duration stagger;
+  final Duration duration;
+
+  /// Past this many tiles the delay stops growing.
+  static const int lastStaggered = 12;
+
+  @override
+  Widget build(BuildContext context) {
+    final delay = stagger * (order > lastStaggered ? lastStaggered : order);
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: duration + delay,
+      curve: Interval(
+        delay.inMicroseconds / (duration + delay).inMicroseconds,
+        1,
+        curve: Curves.ease,
+      ),
+      builder: (context, t, child) => Opacity(
+        opacity: t,
+        child: Transform.translate(
+          offset: Offset(0, 10 * (1 - t)),
+          child: Transform.scale(scale: 0.97 + 0.03 * t, child: child),
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
 /// A row on a hairline-ruled list that slides right a touch as it is pressed.
 class HairlineRow extends StatefulWidget {
   const HairlineRow({

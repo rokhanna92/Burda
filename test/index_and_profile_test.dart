@@ -220,6 +220,28 @@ void main() {
       expect(find.byType(IssueScreen), findsOneWidget);
     });
 
+    testWidgets('gives a contents title the room the value leaves', (
+      tester,
+    ) async {
+      // The design's `1fr auto`: a one or two digit count should leave the
+      // title almost the whole row, not half of it.
+      tester.view.physicalSize = const Size(1206, 7200);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await open(tester);
+
+      // The title is rich text: a 28px name with a 15px italic sub inside it.
+      final finder = find.byWidgetPredicate(
+        (widget) =>
+            widget is RichText &&
+            widget.text.toPlainText().contains('still to find'),
+      );
+      expect(finder, findsOneWidget);
+      final title = tester.getSize(finder);
+      // The row is 350px wide inside the gutters; half would be 148.
+      expect(title.width, greaterThan(200));
+    });
+
     testWidgets('offers the search line', (tester) async {
       await open(tester);
 

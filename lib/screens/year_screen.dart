@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,11 +29,25 @@ class YearScreen extends StatefulWidget {
 class _YearScreenState extends State<YearScreen> {
   /// The issue whose heart is mid-beat.
   String? _beating;
+  Timer? _beat;
+
+  @override
+  void dispose() {
+    _beat?.cancel();
+    super.dispose();
+  }
 
   Future<void> _toggle(Magazine magazine) async {
     setState(() => _beating = magazine.id);
+    // The beat runs on its own clock. Clearing it when the database write
+    // returned, which is almost at once, cut it off a frame after it started
+    // and it never played.
+    _beat?.cancel();
+    _beat = Timer(_Heart.beat, () {
+      if (mounted) setState(() => _beating = null);
+    });
+
     await toggleIssueOwned(context, magazine);
-    if (mounted) setState(() => _beating = null);
   }
 
   Future<void> _fillYear(List<Magazine> present) async {
@@ -122,14 +138,17 @@ class _YearScreenState extends State<YearScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              for (final magazine in issues)
-                _YearCover(
+              for (final (index, magazine) in issues.indexed)
+                CoverIn(
                   key: ValueKey(magazine.id),
-                  edition: edition,
-                  magazine: magazine,
-                  beating: _beating == magazine.id,
-                  onOpen: () => nav.push(IssuePage(magazine.id)),
-                  onToggle: () => _toggle(magazine),
+                  order: index,
+                  child: _YearCover(
+                    edition: edition,
+                    magazine: magazine,
+                    beating: _beating == magazine.id,
+                    onOpen: () => nav.push(IssuePage(magazine.id)),
+                    onToggle: () => _toggle(magazine),
+                  ),
                 ),
             ],
           ),
@@ -151,7 +170,6 @@ class _YearScreenState extends State<YearScreen> {
 
 class _YearCover extends StatelessWidget {
   const _YearCover({
-    super.key,
     required this.edition,
     required this.magazine,
     required this.beating,
@@ -244,6 +262,9 @@ class _YearCover extends StatelessWidget {
 /// The little heart in the corner of a cover, which beats once as it is
 /// claimed.
 class _Heart extends StatelessWidget {
+  /// How long the heart takes to swell and settle.
+  static const Duration beat = Duration(milliseconds: 450);
+
   const _Heart({
     required this.edition,
     required this.owned,
@@ -265,7 +286,7 @@ class _Heart extends StatelessWidget {
         // Restarts whenever the beat flips on.
         key: ValueKey(beating),
         tween: Tween(begin: beating ? 0 : 1, end: 1),
-        duration: const Duration(milliseconds: 450),
+        duration: beat,
         curve: Curves.ease,
         builder: (context, t, child) {
           // 1 up to 1.35 and back, the design's `pop`.

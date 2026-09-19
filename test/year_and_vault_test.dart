@@ -137,6 +137,36 @@ void main() {
       await tester.pump(const Duration(milliseconds: 2200));
     });
 
+    testWidgets('the heart beats when an issue is claimed', (tester) async {
+      await open(tester, const YearPage(2011));
+
+      // Tap in the real zone so the database write can finish, but leave the
+      // fake clock where it is: the beat runs on that.
+      await tester.runAsync(() async {
+        await tester.tap(find.text('♡').first);
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+      });
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 120));
+
+      // Mid-beat the heart is swollen. Before, the beat was cancelled the
+      // moment the write returned and never played at all.
+      final scales = tester
+          .widgetList<Transform>(
+            // Every full heart: 1/2011 was already held, so the one that was
+            // just tapped is not the first.
+            find.ancestor(of: find.text('♥'), matching: find.byType(Transform)),
+          )
+          .map((t) => t.transform.storage[0]);
+      expect(
+        scales.any((s) => s > 1.01),
+        isTrue,
+        reason: 'the heart did not beat',
+      );
+
+      await settle(tester);
+    });
+
     testWidgets('finishing the volume rains hearts', (tester) async {
       await open(tester, const YearPage(2011));
 

@@ -78,31 +78,36 @@ class VaultScreen extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                for (final photo in photos)
-                  PressScale(
+                for (final (index, photo) in photos.indexed)
+                  CoverIn(
                     key: ValueKey(photo.path),
-                    onTap: () => nav.push(IssuePage(photo.magazine.id)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: PhotoTile(
-                            edition: edition,
-                            path: photo.path,
-                            placeholder: 'user photo',
+                    order: index,
+                    duration: const Duration(milliseconds: 350),
+                    stagger: const Duration(milliseconds: 50),
+                    child: PressScale(
+                      onTap: () => nav.push(IssuePage(photo.magazine.id)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: PhotoTile(
+                              edition: edition,
+                              path: photo.path,
+                              placeholder: 'user photo',
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'No. ${photo.magazine.issue} · ${photo.magazine.year}',
-                          overflow: TextOverflow.ellipsis,
-                          style: AppType.smallCaps(
-                            size: 15,
-                            trackingEm: 0.08,
-                            color: edition.ink,
+                          const SizedBox(height: 8),
+                          Text(
+                            'No. ${photo.magazine.issue} · ${photo.magazine.year}',
+                            overflow: TextOverflow.ellipsis,
+                            style: AppType.smallCaps(
+                              size: 15,
+                              trackingEm: 0.08,
+                              color: edition.ink,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
               ],

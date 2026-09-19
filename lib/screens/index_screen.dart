@@ -86,7 +86,8 @@ class IndexScreen extends StatelessWidget {
                     // Shrinks rather than clips: "100%" is a whole digit
                     // wider than the numbers before it, and it is the one
                     // number she is working towards.
-                    Flexible(
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 210),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
@@ -104,7 +105,7 @@ class IndexScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    Flexible(
+                    Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 6),
                         child: Text(
@@ -267,6 +268,12 @@ class _ContentsLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => _row(constraints.maxWidth * 0.42),
+    );
+  }
+
+  Widget _row(double valueCap) {
     return HairlineRow(
       edition: edition,
       onTap: line.go,
@@ -314,8 +321,12 @@ class _ContentsLine extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // The rank names are long enough to crowd the line they sit on.
-          Flexible(
+          // The design's `auto` column: natural width, so a one-digit count
+          // leaves the title almost the whole row. Capped because the rank
+          // names are long enough to crowd it, and shrunk rather than clipped
+          // when they hit the cap.
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: valueCap),
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerRight,
