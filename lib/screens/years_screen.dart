@@ -30,14 +30,19 @@ class YearsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ScreenTitle('Years', edition: edition),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  '$complete complete volumes',
-                  style: AppType.serif(
-                    size: 16,
-                    italic: true,
-                    color: edition.inkAt(65),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    '$complete complete volumes',
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppType.serif(
+                      size: 16,
+                      italic: true,
+                      color: edition.inkAt(65),
+                    ),
                   ),
                 ),
               ),

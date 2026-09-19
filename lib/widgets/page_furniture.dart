@@ -77,23 +77,31 @@ class SectionHeader extends StatelessWidget {
     textBaseline: TextBaseline.alphabetic,
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Text(
-        label,
-        style: AppType.smallCaps(
-          size: 13,
-          trackingEm: 0.22,
-          color: edition.ink,
+      Flexible(
+        child: Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+          style: AppType.smallCaps(
+            size: 13,
+            trackingEm: 0.22,
+            color: edition.ink,
+          ),
         ),
       ),
+      const SizedBox(width: 10),
       if (trailing != null)
-        trailing!
+        Flexible(child: trailing!)
       else if (note != null)
-        Text(
-          note!,
-          style: AppType.serif(
-            size: 13,
-            italic: true,
-            color: edition.inkAt(60),
+        Flexible(
+          child: Text(
+            note!,
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            style: AppType.serif(
+              size: 13,
+              italic: true,
+              color: edition.inkAt(60),
+            ),
           ),
         ),
     ],
@@ -239,12 +247,16 @@ class BurdaButton extends StatelessWidget {
               ),
               const SizedBox(width: 10),
             ],
-            Text(
-              label,
-              style: AppType.smallCaps(
-                size: size,
-                trackingEm: trackingEm,
-                color: foreground,
+            Flexible(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: AppType.smallCaps(
+                  size: size,
+                  trackingEm: trackingEm,
+                  color: foreground,
+                ),
               ),
             ),
           ],

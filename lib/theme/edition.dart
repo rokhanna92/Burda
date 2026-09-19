@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'oklab.dart';
+
 /// One of the ten "Éditions" the app can be printed in.
 ///
 /// The redesign drops the old palette roles (deep/dark/light) for the four a
@@ -51,6 +53,11 @@ class Edition {
 
   /// [ink] at 55%, the design's secondary text colour.
   Color get muted => inkAt(55);
+
+  /// The darker thread in the diagonal hatch a photo sits on.
+  ///
+  /// The design's one true colour mix: `color-mix(in oklab, tint 70%, ink)`.
+  Color get hatch => mixOklab(tint, ink, 0.7);
 
   /// The profile screen prints the day éditions in one row and the night ones
   /// in another.
