@@ -105,14 +105,14 @@ void main() {
         const RankSheet(edition: Edition.rose, ownedCount: 30),
       );
 
-      expect(find.text('Fabric Fanatic'), findsNWidgets(2)); // heading + rung
+      expect(find.text('Pedal Down'), findsNWidgets(2)); // heading + rung
       expect(
-        find.text('30 issues owned · 20 more to Sartorial Stylist'),
+        find.text('30 issues owned · 15 more to Toile & Error'),
         findsOneWidget,
       );
     });
 
-    testWidgets('lists all five rungs with their bands', (tester) async {
+    testWidgets('lists every rung with its band', (tester) async {
       await _pump(
         tester,
         const RankSheet(edition: Edition.rose, ownedCount: 0),
@@ -121,30 +121,30 @@ void main() {
       for (final rank in CollectorRank.ladder) {
         expect(find.text(rank.band), findsOneWidget, reason: rank.name);
       }
-      expect(find.text('0–9 issues'), findsOneWidget);
+      expect(find.text('0–4 issues'), findsOneWidget);
     });
 
     testWidgets('picks the current rung out in the accent', (tester) async {
       await _pump(
         tester,
-        const RankSheet(edition: Edition.rose, ownedCount: 120),
+        const RankSheet(edition: Edition.rose, ownedCount: 2),
       );
 
-      final band = tester.widget<Text>(find.text('100+ issues'));
+      final band = tester.widget<Text>(find.text('0–4 issues'));
       expect(band.style!.color, Edition.rose.accent);
 
-      final other = tester.widget<Text>(find.text('0–9 issues'));
+      final other = tester.widget<Text>(find.text('185+ issues'));
       expect(other.style!.color, Edition.rose.ink);
     });
 
     testWidgets('says so at the top of the ladder', (tester) async {
       await _pump(
         tester,
-        const RankSheet(edition: Edition.rose, ownedCount: 184),
+        const RankSheet(edition: Edition.rose, ownedCount: 201),
       );
 
       expect(
-        find.text('184 issues owned · the top of the ladder'),
+        find.text('201 issues owned · the top of the ladder'),
         findsOneWidget,
       );
     });

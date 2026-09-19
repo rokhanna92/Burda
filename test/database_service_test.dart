@@ -364,13 +364,42 @@ void main() {
   group('collector rank', () {
     test('each band maps to its rank', () {
       expect(CollectorRank.forOwnedCount(0).name, 'Threadling');
-      expect(CollectorRank.forOwnedCount(9).name, 'Threadling');
-      expect(CollectorRank.forOwnedCount(10).name, 'Stitch Starter');
-      expect(CollectorRank.forOwnedCount(24).name, 'Stitch Starter');
-      expect(CollectorRank.forOwnedCount(25).name, 'Fabric Fanatic');
-      expect(CollectorRank.forOwnedCount(50).name, 'Sartorial Stylist');
-      expect(CollectorRank.forOwnedCount(100).name, 'Design Diva');
-      expect(CollectorRank.forOwnedCount(999).name, 'Design Diva');
+      expect(CollectorRank.forOwnedCount(4).name, 'Threadling');
+      expect(CollectorRank.forOwnedCount(5).name, 'Tacking Along');
+      expect(CollectorRank.forOwnedCount(12).name, 'Measure Twice');
+      expect(CollectorRank.forOwnedCount(20).name, 'Standing Order');
+      expect(CollectorRank.forOwnedCount(30).name, 'Pedal Down');
+      expect(CollectorRank.forOwnedCount(45).name, 'Toile & Error');
+      expect(CollectorRank.forOwnedCount(60).name, 'Tailor Made');
+      expect(CollectorRank.forOwnedCount(80).name, 'Cover Story');
+      expect(CollectorRank.forOwnedCount(100).name, 'House Style');
+      expect(CollectorRank.forOwnedCount(125).name, "Editor's Pick");
+      expect(CollectorRank.forOwnedCount(150).name, 'Design Diva');
+      expect(CollectorRank.forOwnedCount(185).name, 'Dear Reader');
+      expect(CollectorRank.forOwnedCount(201).name, 'Dear Reader');
+    });
+
+    test('the bands run end to end, with no count between rungs', () {
+      // Every rung starts exactly where the one below it stops.
+      for (var i = 1; i < CollectorRank.ladder.length; i++) {
+        final below = CollectorRank.ladder[i - 1];
+        final rung = CollectorRank.ladder[i];
+        expect(rung.minimum, greaterThan(below.minimum), reason: rung.name);
+        expect(
+          CollectorRank.forOwnedCount(rung.minimum - 1).name,
+          below.name,
+          reason: 'the count below ${rung.name} should still be ${below.name}',
+        );
+      }
+    });
+
+    test('every rung has a mark of its own', () {
+      final icons = CollectorRank.ladder.map((r) => r.icon).toList();
+      expect(icons.toSet(), hasLength(icons.length));
+    });
+
+    test('the top of the ladder is reachable with the issues that exist', () {
+      expect(CollectorRank.ladder.last.minimum, lessThanOrEqualTo(201));
     });
   });
 

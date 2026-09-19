@@ -196,7 +196,7 @@ void main() {
       await settle(tester);
 
       expect(find.text('Collector rank'), findsOneWidget);
-      expect(find.text('0–9 issues'), findsOneWidget);
+      expect(find.text('0–4 issues'), findsOneWidget);
     });
 
     testWidgets('the rail shows what was claimed most recently first', (
@@ -257,7 +257,7 @@ void main() {
       expect(find.text('Colophon'), findsOneWidget);
       expect(find.text('Collector rank'), findsOneWidget);
       expect(find.text('Threadling'), findsOneWidget);
-      expect(find.text('7 more to Stitch Starter'), findsOneWidget);
+      expect(find.text('2 more to Tacking Along'), findsOneWidget);
     });
 
     testWidgets('prints the day and night éditions', (tester) async {
