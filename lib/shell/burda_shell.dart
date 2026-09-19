@@ -41,6 +41,9 @@ class BurdaShell extends StatefulWidget {
 
 class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
   NavTab _tab = NavTab.home;
+
+  /// Which side of the collection is on show. Always starts on what is held.
+  bool _showOwned = true;
   final List<BurdaPage> _stack = [];
   BurdaSheet? _sheet;
   String? _toast;
@@ -59,6 +62,14 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
   @override
   void goTab(NavTab tab) => setState(() {
     _tab = tab;
+    _stack.clear();
+    _sheet = null;
+  });
+
+  @override
+  void showCollection({required bool owned}) => setState(() {
+    _tab = NavTab.collection;
+    _showOwned = owned;
     _stack.clear();
     _sheet = null;
   });
@@ -142,7 +153,10 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
   Widget _page(Edition edition) => switch (_top) {
     null => switch (_tab) {
       NavTab.home => IndexScreen(edition: edition),
-      NavTab.collection => CollectionScreen(edition: edition),
+      NavTab.collection => CollectionScreen(
+        edition: edition,
+        showOwned: _showOwned,
+      ),
       NavTab.years => YearsScreen(edition: edition),
       NavTab.profile => ProfileScreen(edition: edition),
     },

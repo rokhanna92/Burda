@@ -43,6 +43,10 @@ abstract interface class BurdaNav {
   /// Switches tab, emptying the stack and closing any sheet.
   void goTab(NavTab tab);
 
+  /// Opens the collection showing either what is held or what is still out
+  /// there, which is how the index's first two lines get there.
+  void showCollection({required bool owned});
+
   /// Pushes a page over the current tab.
   void push(BurdaPage page);
 
