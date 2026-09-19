@@ -4,11 +4,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../app_version.dart';
 import '../models/collector_rank.dart';
 import '../providers/magazine_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/data_transfer_service.dart';
 import '../services/photo_relink_service.dart';
+import '../services/update_service.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
 import '../theme/motion.dart';
@@ -28,6 +30,62 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _busy = false;
+
+  /// What the update row says under its title.
+  String _updateNote = 'version $kAppVersion';
+  bool _updating = false;
+
+  /// Looks for a newer build, fetches it and hands it to Android, all from one
+  /// tap.
+  ///
+  /// Every step reports into the row itself rather than a sheet, so the whole
+  /// thing reads as one line of the archive the way the design draws the rest.
+  Future<void> _update() async {
+    if (_updating) return;
+    final nav = BurdaNav.of(context);
+    setState(() {
+      _updating = true;
+      _updateNote = 'looking for a newer build';
+    });
+
+    try {
+      final release = await UpdateService.check();
+      if (release == null) {
+        setState(() => _updateNote = 'this is the newest build');
+        nav.showToast('Already up to date');
+        return;
+      }
+
+      // Anything left from a previous update goes first.
+      await UpdateService.tidy();
+
+      var shown = -1;
+      final apk = await UpdateService.download(
+        release,
+        onProgress: (progress) {
+          final percent = (progress * 100).round();
+          // Only when the whole number moves, rather than every chunk.
+          if (percent == shown || !mounted) return;
+          shown = percent;
+          setState(
+            () => _updateNote = 'downloading ${release.tag} · $percent%',
+          );
+        },
+      );
+
+      if (!mounted) return;
+      setState(() => _updateNote = '${release.tag} ready to install');
+      await UpdateService.install(apk);
+    } on SocketException {
+      if (mounted) setState(() => _updateNote = 'could not reach GitHub');
+      nav.showToast('No connection');
+    } catch (error) {
+      if (mounted) setState(() => _updateNote = 'version $kAppVersion');
+      nav.showToast('Update failed');
+    } finally {
+      if (mounted) setState(() => _updating = false);
+    }
+  }
 
   Future<void> _export() async {
     if (_busy) return;
@@ -186,6 +244,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   sub: 'restore from a file',
                   glyph: '↑',
                   onTap: _busy ? null : _import,
+                ),
+                _ArchiveRow(
+                  edition: edition,
+                  title: 'Update Burda Style',
+                  sub: _updateNote,
+                  glyph: '↻',
+                  onTap: _updating ? null : _update,
                 ),
                 _ArchiveRow(
                   edition: edition,
