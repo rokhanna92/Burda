@@ -151,11 +151,40 @@ void main() {
         used += tester.getSize(find.text(tab.label)).width;
       }
 
-      // The four together fit beside the window, inside the gutters. Sized
-      // against their sum rather than four times the longest, which is what
-      // buys the lettering its size.
+      // The four together fit beside the window, inside the gutters.
       final room = 402 - NavBar.gutter * 2 - NavBar.windowColumn;
       expect(used, lessThanOrEqualTo(room));
+    });
+
+    testWidgets('the window sits dead centre', (tester) async {
+      tester.view.physicalSize = const Size(1206, 2622);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
+      await _pump(tester);
+
+      final bar = tester.getRect(find.byType(NavBar));
+      final window = tester.getRect(find.byType(SeasonWindow));
+
+      // Whatever the words happen to be, the window is centred: the two
+      // halves are given the same width rather than being left to the luck
+      // of how long "Issues" is against "Profile".
+      expect(window.center.dx, closeTo(bar.center.dx, 0.5));
+    });
+
+    testWidgets('both halves of the bar are the same width', (tester) async {
+      tester.view.physicalSize = const Size(1206, 2622);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
+      await _pump(tester);
+
+      final bar = tester.getRect(find.byType(NavBar));
+      final window = tester.getRect(find.byType(SeasonWindow));
+
+      final left = window.left - bar.left;
+      final right = bar.right - window.right;
+      expect(left, closeTo(right, 1));
     });
 
     testWidgets('sets all four labels at the same size', (tester) async {

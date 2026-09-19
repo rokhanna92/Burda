@@ -103,7 +103,7 @@ void main() {
   testWidgets('moves between the four tabs', (tester) async {
     await pumpShell(tester);
 
-    await tester.tap(find.text('Collection'));
+    await tester.tap(find.text('Issues'));
     await settle(tester);
     expect(find.byType(CollectionScreen), findsOneWidget);
     expect(find.byType(IndexScreen), findsNothing);

@@ -11,7 +11,10 @@ import 'season_window.dart';
 enum NavTab {
   /// Called "Index" on the bar, `home` everywhere else, as in the design.
   home('Index'),
-  collection('Collection'),
+
+  /// "Issues" on the bar rather than the screen's own "Collection": the long
+  /// word pushed the window off centre and held the lettering down.
+  collection('Issues'),
   years('Years'),
   profile('Profile');
 
@@ -76,6 +79,10 @@ class NavBar extends StatelessWidget {
     return painter.width;
   }
 
+  /// The tabs to the left of the window, and to the right.
+  static const List<NavTab> _left = [NavTab.home, NavTab.collection];
+  static const List<NavTab> _right = [NavTab.years, NavTab.profile];
+
   @override
   Widget build(BuildContext context) {
     // Sits on the system's own bottom inset, with nothing added: the design's
@@ -96,27 +103,33 @@ class NavBar extends StatelessWidget {
               for (final tab in NavTab.values)
                 tab: _widthOf(tab.label, _ceiling),
             };
-            final natural = widths.values.reduce((a, b) => a + b);
-            final room =
-                constraints.maxWidth -
-                windowColumn -
-                gap * NavTab.values.length;
-            final size = natural == 0
-                ? _ceiling
-                : math.min(_ceiling, _ceiling * room / natural);
+            double demand(List<NavTab> half) =>
+                half.map((t) => widths[t]!).reduce((a, b) => a + b);
 
-            // Each tab takes a share of the row in proportion to its own word,
-            // so the dots stay centred under the lettering rather than under
-            // four identical boxes.
-            Widget tab(NavTab which) => Expanded(
-              flex: (widths[which]! * 100).round(),
-              child: _tab(which, size),
+            // Each half gets exactly the same width, so the window lands dead
+            // centre whatever the words happen to be. The lettering is then
+            // sized by whichever half is tighter, so both halves match.
+            final perHalf = (constraints.maxWidth - windowColumn) / 2 - gap * 2;
+            final tightest = math.max(demand(_left), demand(_right));
+            final size = tightest <= 0
+                ? _ceiling
+                : math.min(_ceiling, _ceiling * perHalf / tightest);
+
+            Widget half(List<NavTab> tabs) => Expanded(
+              child: Row(
+                children: [
+                  for (final tab in tabs)
+                    Expanded(
+                      flex: (widths[tab]! * 100).round(),
+                      child: _tab(tab, size),
+                    ),
+                ],
+              ),
             );
 
             return Row(
               children: [
-                tab(NavTab.home),
-                tab(NavTab.collection),
+                half(_left),
                 SizedBox(
                   width: windowColumn,
                   child: Center(
@@ -126,8 +139,7 @@ class NavBar extends StatelessWidget {
                     ),
                   ),
                 ),
-                tab(NavTab.years),
-                tab(NavTab.profile),
+                half(_right),
               ],
             );
           },
