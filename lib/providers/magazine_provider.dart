@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../models/collector_rank.dart';
 import '../models/magazine.dart';
 import '../services/database_service.dart';
+import '../services/photo_relink_service.dart';
 
 /// Holds the whole collection in memory and derives every stat from it.
 ///
@@ -151,6 +152,20 @@ class MagazineProvider extends ChangeNotifier {
   Future<void> removeUploadedImage(String id, String path) async {
     final updated = await _database.removeUploadedImage(id, path);
     if (updated != null) _replace(updated);
+  }
+
+  /// Writes back photo and cover paths repaired after an import.
+  Future<void> applyRelink(List<RelinkedIssue> changes) async {
+    for (final change in changes) {
+      final magazine = byId(change.id);
+      if (magazine == null) continue;
+      final updated = magazine.copyWith(
+        image: change.cover,
+        uploadedImages: change.photos,
+      );
+      await _database.updateMagazine(updated);
+      _replace(updated);
+    }
   }
 
   /// Applies an exported collection and reloads from the database.

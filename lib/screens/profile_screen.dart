@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -5,6 +8,7 @@ import '../models/collector_rank.dart';
 import '../providers/magazine_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/data_transfer_service.dart';
+import '../services/photo_relink_service.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
 import '../theme/motion.dart';
@@ -58,6 +62,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final magazines = context.read<MagazineProvider>();
       final count = await magazines.import(entries);
       nav.showToast('$count issues restored');
+
+      await _restorePhotos(magazines, nav);
+
       if (magazines.completion == 1) {
         nav.celebrate('The whole collection. Every issue.');
       }
@@ -66,6 +73,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  /// Points the imported photo paths at files that exist on this phone.
+  ///
+  /// An export carries absolute paths belonging to the phone and the package
+  /// name it was written on, and the photos are not in the file. So: repair
+  /// what can be repaired silently, then, only if something is still missing,
+  /// ask where the photos were put and copy them in.
+  Future<void> _restorePhotos(MagazineProvider magazines, BurdaNav nav) async {
+    var (changes, report) = await PhotoRelinkService.repair(
+      magazines.magazines,
+    );
+    await magazines.applyRelink(changes);
+
+    if (!report.anyLost) {
+      if (report.recovered > 0) {
+        nav.showToast('${report.recovered} photos found again');
+      }
+      return;
+    }
+
+    final folder = await FilePicker.getDirectoryPath(
+      dialogTitle: 'Where are the photos from the old app?',
+    );
+    if (folder == null || !mounted) {
+      nav.showToast('${report.lost} photos not found');
+      return;
+    }
+
+    (changes, report) = await PhotoRelinkService.repair(
+      magazines.magazines,
+      sourceFolder: Directory(folder),
+    );
+    await magazines.applyRelink(changes);
+
+    nav.showToast(
+      report.anyLost
+          ? '${report.recovered} photos restored, ${report.lost} still missing'
+          : '${report.recovered} photos restored',
+    );
   }
 
   @override

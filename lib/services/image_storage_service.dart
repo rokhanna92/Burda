@@ -54,6 +54,24 @@ abstract final class ImageStorageService {
     return target;
   }
 
+  /// Where a photo called [name] would sit for [magazineId].
+  ///
+  /// Does not create anything, and does not promise the file is there: it is
+  /// for looking, not for writing.
+  static Future<String> photoPathFor({
+    required String magazineId,
+    required String name,
+  }) async {
+    final documents = await getApplicationDocumentsDirectory();
+    return p.join(documents.path, folder, magazineId, name);
+  }
+
+  /// Where a cover called [name] would sit.
+  static Future<String> coverPathFor({required String name}) async {
+    final documents = await getApplicationDocumentsDirectory();
+    return p.join(documents.path, coverFolder, name);
+  }
+
   /// Deletes the file if it is still there. Returns true when it is gone.
   static Future<bool> delete(String path) async {
     final file = File(path);

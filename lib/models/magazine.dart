@@ -98,6 +98,7 @@ class Magazine {
   };
 
   Magazine copyWith({
+    String? image,
     bool? isOwned,
     DateTime? dateAdded,
     bool clearDateAdded = false,
@@ -108,7 +109,7 @@ class Magazine {
     id: id,
     title: title,
     year: year,
-    image: image,
+    image: image ?? this.image,
     isOwned: isOwned ?? this.isOwned,
     dateAdded: clearDateAdded ? null : (dateAdded ?? this.dateAdded),
     conditionScore: clearConditionScore
