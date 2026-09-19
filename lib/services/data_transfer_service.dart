@@ -1,11 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 /// Moves the collection in and out of the app as a JSON file.
 ///
@@ -26,25 +22,6 @@ abstract final class DataTransferService {
     bytes: bytes,
     mimeType: mimeType,
   );
-
-  /// Writes the export inside the app's own folder and hands it to the share
-  /// sheet.
-  static Future<ShareResult> shareExport(
-    Uint8List bytes, {
-    required String text,
-    required String subject,
-  }) async {
-    final documents = await getApplicationDocumentsDirectory();
-    final file = File(p.join(documents.path, exportFileName));
-    await file.writeAsBytes(bytes);
-    return SharePlus.instance.share(
-      ShareParams(
-        files: [XFile(file.path, mimeType: mimeType)],
-        text: text,
-        subject: subject,
-      ),
-    );
-  }
 
   /// Picks a JSON file and decodes it. Null means cancelled or unreadable.
   static Future<List<Object?>?> pickImport() async {
