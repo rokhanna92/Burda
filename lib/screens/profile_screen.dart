@@ -49,33 +49,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      final release = await UpdateService.check();
-      if (release == null) {
-        setState(() => _updateNote = 'this is the newest build');
-        nav.showToast('Already up to date');
-        return;
-      }
+      switch (await UpdateService.check()) {
+        case NoUpdate():
+          setState(() => _updateNote = 'this is the newest build');
+          nav.showToast('Already up to date');
+          return;
 
-      // Anything left from a previous update goes first.
-      await UpdateService.tidy();
+        case UpdateWithoutApk(:final tag):
+          // Published, but with no apk on it. Saying "up to date" here would
+          // send him looking at the app when the answer is on the release.
+          setState(() => _updateNote = '$tag has no apk attached to it');
+          nav.showToast('$tag carries no apk');
+          return;
 
-      var shown = -1;
-      final apk = await UpdateService.download(
-        release,
-        onProgress: (progress) {
-          final percent = (progress * 100).round();
-          // Only when the whole number moves, rather than every chunk.
-          if (percent == shown || !mounted) return;
-          shown = percent;
-          setState(
-            () => _updateNote = 'downloading ${release.tag} · $percent%',
+        case UpdateAvailable(:final release):
+          // Anything left from a previous update goes first.
+          await UpdateService.tidy();
+
+          var shown = -1;
+          final apk = await UpdateService.download(
+            release,
+            onProgress: (progress) {
+              final percent = (progress * 100).round();
+              // Only when the whole number moves, rather than every chunk.
+              if (percent == shown || !mounted) return;
+              shown = percent;
+              setState(
+                () => _updateNote = 'downloading ${release.tag} · $percent%',
+              );
+            },
           );
-        },
-      );
 
-      if (!mounted) return;
-      setState(() => _updateNote = '${release.tag} ready to install');
-      await UpdateService.install(apk);
+          if (!mounted) return;
+          setState(() => _updateNote = '${release.tag} ready to install');
+          await UpdateService.install(apk);
+      }
     } on SocketException {
       if (mounted) setState(() => _updateNote = 'could not reach GitHub');
       nav.showToast('No connection');

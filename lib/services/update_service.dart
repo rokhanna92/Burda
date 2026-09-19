@@ -35,6 +35,34 @@ class Release {
       bytes == 0 ? '' : '${(bytes / 1024 / 1024).toStringAsFixed(1)} MB';
 }
 
+/// What a check for an update found.
+sealed class UpdateCheck {
+  const UpdateCheck();
+}
+
+/// Nothing newer than what is installed.
+class NoUpdate extends UpdateCheck {
+  const NoUpdate();
+}
+
+/// A newer release, with an apk ready to fetch.
+class UpdateAvailable extends UpdateCheck {
+  const UpdateAvailable(this.release);
+
+  final Release release;
+}
+
+/// A newer release, but nothing on it that can be installed.
+///
+/// Its own answer rather than a shrug, because the one way to get this wrong
+/// is to publish a release and forget to attach the apk, and being told
+/// "already up to date" sends you looking in entirely the wrong place.
+class UpdateWithoutApk extends UpdateCheck {
+  const UpdateWithoutApk(this.tag);
+
+  final String tag;
+}
+
 /// Checks GitHub for a newer build, fetches it and hands it to Android.
 ///
 /// Deliberately has no package behind it: a plain [HttpClient] does both calls,
@@ -53,13 +81,13 @@ abstract final class UpdateService {
   static Uri get endpoint =>
       Uri.parse('https://api.github.com/repos/$repository/releases/latest');
 
-  /// The newest release, or null when there is none newer than this build.
+  /// What GitHub has, measured against this build.
   ///
   /// Throws when the network is unreachable, so the caller can say so; a
   /// repository with no releases at all is not an error, it is just no update.
   ///
   /// [from] and [client] exist so a test can answer for GitHub.
-  static Future<Release?> check({HttpClient? client, Uri? from}) async {
+  static Future<UpdateCheck> check({HttpClient? client, Uri? from}) async {
     final http = client ?? HttpClient();
     try {
       final request = await http.getUrl(from ?? endpoint);
@@ -77,7 +105,7 @@ abstract final class UpdateService {
       if (response.statusCode == HttpStatus.notFound) {
         // Nothing published yet.
         await response.drain<void>();
-        return null;
+        return const NoUpdate();
       }
       if (response.statusCode != HttpStatus.ok) {
         await response.drain<void>();
@@ -87,33 +115,40 @@ abstract final class UpdateService {
       final body = jsonDecode(
         await response.transform(utf8.decoder).join(),
       ) as Map<String, dynamic>;
-      final release = _read(body);
-      if (release == null) return null;
-      return isNewer(release.version, kAppVersion) ? release : null;
+
+      final tag = body['tag_name'] as String?;
+      if (tag == null) return const NoUpdate();
+
+      final version = tag.startsWith('v') ? tag.substring(1) : tag;
+      if (!isNewer(version, kAppVersion)) return const NoUpdate();
+
+      final apk = _apkIn(body);
+      // GitHub adds source archives to every release on its own; they are not
+      // assets and cannot be installed, so a release with only those has
+      // nothing for us.
+      if (apk == null) return UpdateWithoutApk(tag);
+
+      return UpdateAvailable(
+        Release(
+          version: version,
+          tag: tag,
+          apkUrl: apk['browser_download_url'] as String,
+          notes: ((body['body'] as String?) ?? '').trim(),
+          bytes: (apk['size'] as num?)?.toInt() ?? 0,
+        ),
+      );
     } finally {
       if (client == null) http.close();
     }
   }
 
-  /// Pulls the release apart, or null when it carries no apk.
-  static Release? _read(Map<String, dynamic> body) {
-    final tag = body['tag_name'] as String?;
-    if (tag == null) return null;
-
+  /// The first attached apk, if the release carries one.
+  static Map<String, dynamic>? _apkIn(Map<String, dynamic> body) {
     final assets = (body['assets'] as List?) ?? const [];
-    final apk = assets.cast<Map<String, dynamic>>().where((asset) {
+    return assets.cast<Map<String, dynamic>>().where((asset) {
       final name = (asset['name'] as String?) ?? '';
       return name.toLowerCase().endsWith('.apk');
     }).firstOrNull;
-    if (apk == null) return null;
-
-    return Release(
-      version: tag.startsWith('v') ? tag.substring(1) : tag,
-      tag: tag,
-      apkUrl: apk['browser_download_url'] as String,
-      notes: ((body['body'] as String?) ?? '').trim(),
-      bytes: (apk['size'] as num?)?.toInt() ?? 0,
-    );
   }
 
   /// True when [candidate] is a later version than [current].

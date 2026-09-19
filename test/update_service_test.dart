@@ -67,7 +67,7 @@ void main() {
 
     tearDown(() => server.close(force: true));
 
-    Future<Release?> ask(Object body, {int status = HttpStatus.ok}) async {
+    Future<UpdateCheck> ask(Object body, {int status = HttpStatus.ok}) async {
       server = await _github(body, status: status);
       return UpdateService.check(
         from: Uri.parse('http://${server.address.host}:${server.port}/latest'),
@@ -75,7 +75,7 @@ void main() {
     }
 
     test('offers a release that is newer than this build', () async {
-      final release = await ask({
+      final found = await ask({
         'tag_name': 'v9.9.9',
         'body': 'Covers for 2026',
         'assets': [
@@ -87,8 +87,9 @@ void main() {
         ],
       });
 
-      expect(release, isNotNull);
-      expect(release!.version, '9.9.9');
+      expect(found, isA<UpdateAvailable>());
+      final release = (found as UpdateAvailable).release;
+      expect(release.version, '9.9.9');
       expect(release.tag, 'v9.9.9');
       expect(release.notes, 'Covers for 2026');
       expect(release.apkUrl, 'https://example.test/burda-style.apk');
@@ -107,24 +108,32 @@ void main() {
             },
           ],
         }),
-        isNull,
+        isA<NoUpdate>(),
       );
     });
 
-    test('offers nothing when the release carries no apk', () async {
-      expect(
-        await ask({
-          'tag_name': 'v9.9.9',
-          'assets': [
-            {
-              'name': 'notes.txt',
-              'browser_download_url': 'https://example.test/notes.txt',
-              'size': 1,
-            },
-          ],
-        }),
-        isNull,
-      );
+    test('says so when a newer release carries no apk', () async {
+      // The way to get a release wrong: publish it and forget the apk.
+      // Answering "up to date" here would send you looking at the app.
+      final found = await ask({'tag_name': 'v9.9.9', 'assets': <Object>[]});
+
+      expect(found, isA<UpdateWithoutApk>());
+      expect((found as UpdateWithoutApk).tag, 'v9.9.9');
+    });
+
+    test('ignores assets that are not an apk', () async {
+      final found = await ask({
+        'tag_name': 'v9.9.9',
+        'assets': [
+          {
+            'name': 'notes.txt',
+            'browser_download_url': 'https://example.test/notes.txt',
+            'size': 1,
+          },
+        ],
+      });
+
+      expect(found, isA<UpdateWithoutApk>());
     });
 
     test(
@@ -132,7 +141,7 @@ void main() {
       () async {
         expect(
           await ask({'message': 'Not Found'}, status: HttpStatus.notFound),
-          isNull,
+          isA<NoUpdate>(),
         );
       },
     );
@@ -145,7 +154,7 @@ void main() {
     });
 
     test('takes a tag without a leading v', () async {
-      final release = await ask({
+      final found = await ask({
         'tag_name': '9.9.9',
         'assets': [
           {
@@ -156,7 +165,8 @@ void main() {
         ],
       });
 
-      expect(release!.version, '9.9.9');
+      final release = (found as UpdateAvailable).release;
+      expect(release.version, '9.9.9');
       expect(release.tag, '9.9.9');
       expect(release.size, isEmpty);
     });
