@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/collector_rank.dart';
-import '../theme/app_theme.dart';
+import '../theme/typography.dart';
 
 /// Icon shown beside each rank in the ladder, in ladder order.
 const List<String?> _rankAssets = [
@@ -176,7 +176,7 @@ Future<void> showCoffeeModal(BuildContext context) async {
             'Buy me a digital coffee.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
-              fontFamily: AppFonts.display,
+              fontFamily: AppFonts.serif,
             ),
           ),
           const SizedBox(height: 8),

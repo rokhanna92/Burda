@@ -31,7 +31,7 @@ class BurdaApp extends StatelessWidget {
         builder: (context, theme, _) => MaterialApp(
           title: 'Burda Style',
           debugShowCheckedModeBanner: false,
-          theme: buildAppTheme(theme.palette),
+          theme: buildAppTheme(theme.edition),
           home: const AppShell(),
         ),
       ),

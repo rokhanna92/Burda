@@ -6,7 +6,8 @@ import 'package:share_plus/share_plus.dart';
 import '../providers/magazine_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/data_transfer_service.dart';
-import '../theme/palette.dart';
+import '../theme/edition.dart';
+import '../theme/typography.dart';
 import '../widgets/raining_hearts.dart';
 import '../widgets/settings_modals.dart';
 
@@ -171,11 +172,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               childAspectRatio: 2.9,
               padding: EdgeInsets.zero,
               children: [
-                for (final palette in Palette.all)
+                for (final edition in Edition.all)
                   _Swatch(
-                    palette: palette,
-                    selected: palette.name == themeProvider.palette.name,
-                    onTap: () => themeProvider.setPalette(palette),
+                    edition: edition,
+                    selected: edition.id == themeProvider.edition.id,
+                    onTap: () => themeProvider.setEdition(edition),
                   ),
               ],
             ),
@@ -304,19 +305,19 @@ class _SettingsSection extends StatelessWidget {
 
 class _Swatch extends StatelessWidget {
   const _Swatch({
-    required this.palette,
+    required this.edition,
     required this.selected,
     required this.onTap,
   });
 
-  final Palette palette;
+  final Edition edition;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: palette.deep,
+      color: edition.paper,
       borderRadius: BorderRadius.circular(10),
       elevation: selected ? 0 : 3,
       child: InkWell(
@@ -326,16 +327,16 @@ class _Swatch extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: selected
-                ? Border.all(color: palette.light, width: 3)
+                ? Border.all(color: edition.accent, width: 3)
                 : null,
           ),
           alignment: Alignment.center,
           child: Text(
-            palette.label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-              letterSpacing: 0.5,
+            edition.name,
+            style: AppType.smallCaps(
+              size: 15,
+              trackingEm: 0.14,
+              color: edition.ink,
             ),
           ),
         ),

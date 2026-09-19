@@ -1,99 +1,51 @@
 import 'package:flutter/material.dart';
 
-import 'palette.dart';
+import 'edition.dart';
+import 'typography.dart';
 
-/// Font families bundled with the app, named so call sites read clearly.
-abstract final class AppFonts {
-  /// The script face used for the "Burda Style" logo.
-  static const String script = 'FleurDeLeah';
-
-  /// The heavy slab face used for screen titles and section headings.
-  static const String display = 'AlfaSlabOne';
-
-  /// Body text.
-  static const String body = 'Roboto';
-}
-
-/// Builds the app theme for a chosen [palette].
-ThemeData buildAppTheme(Palette palette) {
-  final colorScheme = ColorScheme.fromSeed(
-    seedColor: palette.deep,
-    primary: palette.deep,
+/// Builds the app theme for the chosen [edition].
+///
+/// The redesign draws its own surfaces almost everywhere, so this stays thin:
+/// it maps the édition's four roles onto the scheme Material needs and sets
+/// the serif as the default face. Anything with a size or a tracking in the
+/// design is built with [AppType] at the call site instead.
+ThemeData buildAppTheme(Edition edition) {
+  final colorScheme = ColorScheme(
+    brightness: edition.dark ? Brightness.dark : Brightness.light,
+    primary: edition.accent,
+    // The design prints white on the accent wherever the two meet, in both
+    // the day and the night éditions.
     onPrimary: Colors.white,
-    secondary: palette.light,
-    onSecondary: palette.dark,
-    surface: Colors.white,
-    onSurface: palette.dark,
+    secondary: edition.tint,
+    onSecondary: edition.ink,
+    surface: edition.paper,
+    onSurface: edition.ink,
+    error: edition.accent,
+    onError: Colors.white,
   );
 
   return ThemeData(
     useMaterial3: true,
     colorScheme: colorScheme,
-    fontFamily: AppFonts.body,
-    scaffoldBackgroundColor: Colors.white,
-    appBarTheme: AppBarTheme(
-      backgroundColor: palette.deep,
-      foregroundColor: Colors.white,
-      centerTitle: true,
-      elevation: 0,
-      titleTextStyle: const TextStyle(
-        fontFamily: AppFonts.body,
-        fontSize: 22,
-        fontWeight: FontWeight.w500,
-        color: Colors.white,
-      ),
-    ),
-    cardTheme: CardThemeData(
-      color: palette.light,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    ),
+    scaffoldBackgroundColor: edition.paper,
+    fontFamily: AppFonts.serif,
     textTheme: TextTheme(
-      // Screen titles: "Settings", "Browse Issues".
-      displayLarge: TextStyle(
-        fontFamily: AppFonts.display,
-        fontSize: 44,
-        color: palette.dark,
-      ),
-      // Section headings in settings.
-      titleLarge: TextStyle(
-        fontFamily: AppFonts.display,
-        fontSize: 22,
-        color: palette.deep,
-      ),
-      titleMedium: TextStyle(fontSize: 17, color: palette.dark),
-      bodyLarge: TextStyle(fontSize: 17, color: palette.dark),
-      bodyMedium: TextStyle(fontSize: 16, color: palette.dark),
-      labelLarge: TextStyle(
-        fontSize: 14,
-        letterSpacing: 0.5,
-        color: palette.dark,
+      displayLarge: AppType.serif(size: 46, weight: 500, color: edition.ink),
+      titleLarge: AppType.serif(size: 30, weight: 500, color: edition.ink),
+      titleMedium: AppType.serif(size: 24, color: edition.ink),
+      bodyLarge: AppType.serif(size: 19, color: edition.ink),
+      bodyMedium: AppType.serif(size: 17, color: edition.ink),
+      labelLarge: AppType.smallCaps(
+        size: 15,
+        trackingEm: 0.14,
+        color: edition.ink,
       ),
     ),
-    snackBarTheme: SnackBarThemeData(
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: palette.deep,
-      contentTextStyle: const TextStyle(color: Colors.white, fontSize: 15),
-    ),
-    dialogTheme: DialogThemeData(
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-    ),
+    // Every sheet in the design paints its own panel and scrim.
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-    ),
-    sliderTheme: SliderThemeData(
-      activeTrackColor: palette.light,
-      inactiveTrackColor: Colors.white24,
-      thumbColor: palette.light,
-      valueIndicatorColor: palette.deep,
-    ),
-    progressIndicatorTheme: ProgressIndicatorThemeData(
-      color: palette.light,
-      linearTrackColor: palette.light.withValues(alpha: 0.35),
     ),
   );
 }

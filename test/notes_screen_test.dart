@@ -5,7 +5,7 @@ import 'package:burda/providers/theme_provider.dart';
 import 'package:burda/screens/notes_screen.dart';
 import 'package:burda/services/database_service.dart';
 import 'package:burda/theme/app_theme.dart';
-import 'package:burda/theme/palette.dart';
+import 'package:burda/theme/edition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +40,7 @@ void main() {
           ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ],
         child: MaterialApp(
-          theme: buildAppTheme(Palette.pink),
+          theme: buildAppTheme(Edition.rose),
           home: const NotesScreen(),
         ),
       ),

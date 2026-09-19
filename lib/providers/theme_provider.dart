@@ -1,34 +1,38 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../theme/palette.dart';
+import '../theme/edition.dart';
 
-/// Selected palette plus the home-screen quote toggle, both persisted.
+/// Selected édition plus the home-screen quote toggle, both persisted.
 ///
 /// Preference keys match the original app: `theme` and `quotesEnabled`.
+///
+/// The stored value used to be one of the eight palette names. None of those
+/// is an édition id, so an install carrying one falls back to Rosé through
+/// [Edition.byId] and is rewritten the first time a new édition is picked.
 class ThemeProvider extends ChangeNotifier {
   static const String themeKey = 'theme';
   static const String quotesKey = 'quotesEnabled';
 
-  Palette _palette = Palette.pink;
+  Edition _edition = Edition.rose;
   bool _quotesEnabled = true;
 
-  Palette get palette => _palette;
+  Edition get edition => _edition;
   bool get quotesEnabled => _quotesEnabled;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    _palette = Palette.byName(prefs.getString(themeKey));
+    _edition = Edition.byId(prefs.getString(themeKey));
     _quotesEnabled = prefs.getBool(quotesKey) ?? true;
     notifyListeners();
   }
 
-  Future<void> setPalette(Palette palette) async {
-    if (palette.name == _palette.name) return;
-    _palette = palette;
+  Future<void> setEdition(Edition edition) async {
+    if (edition.id == _edition.id) return;
+    _edition = edition;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(themeKey, palette.name);
+    await prefs.setString(themeKey, edition.id);
   }
 
   Future<void> toggleQuotes() => setQuotesEnabled(!_quotesEnabled);

@@ -1,6 +1,6 @@
 import 'package:burda/services/quote_service.dart';
 import 'package:burda/theme/app_theme.dart';
-import 'package:burda/theme/palette.dart';
+import 'package:burda/theme/edition.dart';
 import 'package:burda/widgets/quote_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,7 +26,7 @@ void main() {
   Future<void> pumpQuote(WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        theme: buildAppTheme(Palette.pink),
+        theme: buildAppTheme(Edition.rose),
         home: const Scaffold(body: Center(child: QuoteDisplay())),
       ),
     );

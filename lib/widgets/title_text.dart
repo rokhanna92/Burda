@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../theme/app_theme.dart';
+import '../theme/typography.dart';
 
 /// One sewing icon circling the logo.
 class _Orbiter {
