@@ -15,9 +15,11 @@ import '../screens/vault_screen.dart';
 import '../screens/year_screen.dart';
 import '../screens/years_screen.dart';
 import '../sheets/about_sheet.dart';
+import '../sheets/add_sheet.dart';
 import '../sheets/confirm_sheet.dart';
 import '../sheets/note_sheet.dart';
 import '../sheets/rank_sheet.dart';
+import '../sheets/search_sheet.dart';
 import '../theme/edition.dart';
 import '../theme/motion.dart';
 import '../widgets/hearts.dart';
@@ -126,9 +128,11 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
   Widget? _sheetContent(Edition edition) {
     switch (_sheet) {
       case null:
-      case BurdaSheet.add:
-      case BurdaSheet.search:
         return null;
+      case BurdaSheet.add:
+        return AddSheet(edition: edition);
+      case BurdaSheet.search:
+        return SearchSheet(edition: edition);
       case BurdaSheet.rank:
         return RankSheet(
           edition: edition,

@@ -83,15 +83,24 @@ class IndexScreen extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      '$percent%',
-                      style: AppType.serif(
-                        size: 104,
-                        weight: 300,
-                        trackingEm: -0.03,
-                        height: 0.82,
-                        tabular: true,
-                        color: edition.ink,
+                    // Shrinks rather than clips: "100%" is a whole digit
+                    // wider than the numbers before it, and it is the one
+                    // number she is working towards.
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '$percent%',
+                          style: AppType.serif(
+                            size: 104,
+                            weight: 300,
+                            trackingEm: -0.03,
+                            height: 0.82,
+                            tabular: true,
+                            color: edition.ink,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -305,13 +314,20 @@ class _ContentsLine extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          Text(
-            line.value,
-            style: AppType.serif(
-              size: 26,
-              weight: 300,
-              tabular: true,
-              color: edition.ink,
+          // The rank names are long enough to crowd the line they sit on.
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Text(
+                line.value,
+                style: AppType.serif(
+                  size: 26,
+                  weight: 300,
+                  tabular: true,
+                  color: edition.ink,
+                ),
+              ),
             ),
           ),
         ],

@@ -350,3 +350,42 @@ class _HairlineRowState extends State<HairlineRow> {
     );
   }
 }
+
+/// A dashed outline, which BoxDecoration cannot draw.
+class DashedBorder extends CustomPainter {
+  const DashedBorder({required this.colour});
+
+  final Color colour;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stroke = Paint()
+      ..color = colour
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    const dash = 4.0;
+    const gap = 3.0;
+
+    void run(Offset from, Offset to) {
+      final total = (to - from).distance;
+      final step = (to - from) / total;
+      for (var at = 0.0; at < total; at += dash + gap) {
+        final end = (at + dash).clamp(0.0, total);
+        canvas.drawLine(from + step * at, from + step * end, stroke);
+      }
+    }
+
+    final topRight = Offset(size.width, 0);
+    final bottomRight = Offset(size.width, size.height);
+    final bottomLeft = Offset(0, size.height);
+
+    run(Offset.zero, topRight);
+    run(topRight, bottomRight);
+    run(bottomRight, bottomLeft);
+    run(bottomLeft, Offset.zero);
+  }
+
+  @override
+  bool shouldRepaint(DashedBorder oldDelegate) => oldDelegate.colour != colour;
+}
