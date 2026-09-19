@@ -44,6 +44,9 @@ void main() {
   databaseFactory = databaseFactoryFfi;
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // The bundled list stopped being a blank catalogue when her collection was
+  // baked into it: it is her shelf as the original app had it on 19 September
+  // 2026, so a fresh install is already hers rather than an empty one.
   group('the bundled issue list', () {
     late List<Magazine> issues;
 
@@ -55,17 +58,25 @@ void main() {
       ];
     });
 
-    test('runs from 2010 to 2026', () {
+    test('runs from 2002 to 2026', () {
       final years = issues.map((m) => m.year).toSet().toList()..sort();
-      expect(years.first, 2010);
+      expect(years.first, 2002);
       expect(years.last, 2026);
-      expect(years, hasLength(17));
+      expect(years, hasLength(25));
     });
 
-    test('gives every finished year twelve issues', () {
+    test('gives every year she collected in full its twelve issues', () {
       for (var year = 2010; year <= 2025; year++) {
         expect(issues.where((m) => m.year == year).length, 12, reason: '$year');
       }
+    });
+
+    test('carries only what she has of the years before 2010', () {
+      // The original app only ever recorded the issues she bought, so those
+      // years are partial on purpose and nothing in them counts as missing.
+      final back = issues.where((m) => m.year < 2010).toList();
+      expect(back, hasLength(52));
+      expect(back.every((m) => m.isOwned), isTrue);
     });
 
     test('carries the nine issues of 2026 that are out', () {
@@ -84,9 +95,20 @@ void main() {
       ]);
     });
 
-    test('starts with nothing owned', () {
-      expect(issues.every((m) => !m.isOwned), isTrue);
-      expect(issues, hasLength(201));
+    test('is her collection, not an empty one', () {
+      expect(issues, hasLength(253));
+      expect(issues.where((m) => m.isOwned), hasLength(247));
+      expect(
+        issues.where((m) => !m.isOwned).map((m) => m.id).toList()..sort(),
+        ['10-2018', '11-2021', '2-2019', '4-2021', '5-2021', '9-2017'],
+      );
+    });
+
+    test('carries the day she got each one, and the one she rated', () {
+      expect(issues.every((m) => m.dateAdded != null), isTrue);
+      expect(issues.where((m) => m.conditionScore != null).map((m) => m.id), [
+        '4-2006',
+      ]);
     });
 
     test('has no duplicates', () {

@@ -37,8 +37,8 @@ class DatabaseService {
   /// 1: the first build. 2: 2025 filled out to twelve issues and 2026 began.
   /// 3: the contents index. 4: makes and the sew queue. 5: the settings table.
   /// 6: a favourite mark and a score for what is inside. 7: lending.
-  /// 8: shelves beyond the main line.
-  static const int schemaVersion = 8;
+  /// 8: shelves beyond the main line. 9: her own collection, back to 2002.
+  static const int schemaVersion = 9;
 
   static const String magazinesTable = 'magazines';
   static const String notesTable = 'notes';

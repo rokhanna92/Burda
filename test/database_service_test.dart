@@ -49,6 +49,58 @@ void main() {
 
   tearDown(() => service.close());
 
+  group('a file exported by the original app', () {
+    test('has its bundled covers re-pointed at this app s asset root', () {
+      // The original wrote "assets/covers/1-2011.jpg". This app stores the
+      // path relative to the bundle and adds the "assets/" itself, so without
+      // this every one of her covers would be looked up twice over and the
+      // issue would show a bare number.
+      final magazine = Magazine.fromJson({
+        'id': '1-2011',
+        'title': '1',
+        'year': 2011,
+        'image': 'assets/covers/1-2011.jpg',
+        'isOwned': 1,
+      });
+
+      expect(magazine.image, 'covers/1-2011.jpg');
+      expect(magazine.hasFileCover, isFalse);
+      expect(magazine.hasCover, isTrue);
+    });
+
+    test('leaves a cover she picked herself alone', () {
+      final magazine = Magazine.fromJson({
+        'id': '4-2002',
+        'title': '4',
+        'year': 2002,
+        'image': '/data/user/0/com.example.burda/app_flutter/covers/4-2002.jpg',
+        'isOwned': 1,
+      });
+
+      expect(magazine.hasFileCover, isTrue, reason: 'for the relink to repair');
+      expect(magazine.image, startsWith('/data/'));
+    });
+
+    test('reads its flags, dates and scores in the shapes it wrote them', () {
+      final magazine = Magazine.fromJson({
+        'id': '4-2006',
+        'title': '4',
+        'year': 2006,
+        'image': 'assets/covers/4-2006.jpg',
+        'isOwned': 1,
+        'dateAdded': '2025-10-17T12:33:04.170230',
+        // The original wrote this one as a double.
+        'conditionScore': 5.0,
+        'uploadedImages': '',
+      });
+
+      expect(magazine.isOwned, isTrue);
+      expect(magazine.conditionScore, 5);
+      expect(magazine.dateAdded, DateTime.parse('2025-10-17T12:33:04.170230'));
+      expect(magazine.uploadedImages, isEmpty);
+    });
+  });
+
   group('seeding', () {
     test('a fresh database gets the bundled issue list', () async {
       final magazines = await service.getAllMagazines();

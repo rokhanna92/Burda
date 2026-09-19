@@ -175,7 +175,7 @@ class Magazine {
     id: json['id'] as String,
     title: json['title'] as String,
     year: json['year'] as int,
-    image: json['image'] as String,
+    image: _parseImage(json['image']),
     isOwned: _parseBool(json['isOwned']),
     dateAdded: _parseDate(json['dateAdded']),
     conditionScore: (json['conditionScore'] as num?)?.toInt(),
@@ -193,7 +193,7 @@ class Magazine {
     id: map['id'] as String,
     title: map['title'] as String,
     year: (map['year'] as num).toInt(),
-    image: map['image'] as String,
+    image: _parseImage(map['image']),
     isOwned: _parseBool(map['isOwned']),
     dateAdded: _parseDate(map['dateAdded']),
     conditionScore: (map['conditionScore'] as num?)?.toInt(),
@@ -277,6 +277,23 @@ class Magazine {
     series: series,
     issue: _issue,
   );
+
+  /// Reads a cover path, whichever app wrote it.
+  ///
+  /// The original app stored its bundled covers as `assets/covers/1-2011.jpg`.
+  /// This one stores the path relative to the asset bundle and adds the
+  /// `assets/` itself, so a file exported from the original would otherwise be
+  /// looked up as `assets/assets/covers/1-2011.jpg` and every one of those
+  /// issues would show a bare number instead of its cover.
+  ///
+  /// An absolute path, which is a cover she picked herself, is left alone for
+  /// [PhotoRelinkService] to deal with.
+  static String _parseImage(Object? value) {
+    final image = (value as String?) ?? '';
+    return image.startsWith('assets/')
+        ? image.substring('assets/'.length)
+        : image;
+  }
 
   /// SQLite stores a flag as 0 or 1, JSON writes true or false, and an export
   /// from the original app wrote the string "1". All three mean the same thing,

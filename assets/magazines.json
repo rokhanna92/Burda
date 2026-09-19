@@ -1,1409 +1,2027 @@
 [
   {
+    "id": "4-2002",
+    "title": "4/2002",
+    "year": 2002,
+    "image": "covers/4-2002.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-09-02T15:09:47.966184"
+  },
+  {
+    "id": "5-2002",
+    "title": "5/2002",
+    "year": 2002,
+    "image": "covers/5-2002.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-09-02T15:09:49.600745"
+  },
+  {
+    "id": "3-2003",
+    "title": "3/2003",
+    "year": 2003,
+    "image": "covers/3-2003.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-02-27T14:48:54.517066"
+  },
+  {
+    "id": "9-2004",
+    "title": "9/2004",
+    "year": 2004,
+    "image": "covers/9-2004.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-02-27T14:45:58.215335"
+  },
+  {
+    "id": "10-2004",
+    "title": "10/2004",
+    "year": 2004,
+    "image": "covers/10-2004.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-02-27T14:43:51.086272"
+  },
+  {
+    "id": "12-2004",
+    "title": "12/2004",
+    "year": 2004,
+    "image": "covers/12-2004.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-02-27T14:41:21.886640"
+  },
+  {
+    "id": "1-2005",
+    "title": "1/2005",
+    "year": 2005,
+    "image": "covers/1-2005.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-02-27T14:39:21.949077"
+  },
+  {
+    "id": "2-2005",
+    "title": "2/2005",
+    "year": 2005,
+    "image": "covers/2-2005.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-02-27T14:36:43.018540"
+  },
+  {
+    "id": "4-2005",
+    "title": "4/2005",
+    "year": 2005,
+    "image": "covers/4-2005.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-06-27T17:24:22.841523"
+  },
+  {
+    "id": "6-2005",
+    "title": "6/2005",
+    "year": 2005,
+    "image": "covers/6-2005.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-03-05T15:34:32.461697"
+  },
+  {
+    "id": "10-2005",
+    "title": "10/2005",
+    "year": 2005,
+    "image": "covers/10-2005.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-06-27T17:24:26.744292"
+  },
+  {
+    "id": "1-2006",
+    "title": "1/2006",
+    "year": 2006,
+    "image": "covers/1-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-12-29T16:27:20.821940"
+  },
+  {
+    "id": "2-2006",
+    "title": "2/2006",
+    "year": 2006,
+    "image": "covers/2-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-12-29T16:27:21.647378"
+  },
+  {
+    "id": "4-2006",
+    "title": "4/2006",
+    "year": 2006,
+    "image": "covers/4-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-17T12:33:04.170230",
+    "conditionScore": 5
+  },
+  {
+    "id": "5-2006",
+    "title": "5/2006",
+    "year": 2006,
+    "image": "covers/5-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-17T16:33:04.456758"
+  },
+  {
+    "id": "7-2006",
+    "title": "7/2006",
+    "year": 2006,
+    "image": "covers/7-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-14T17:28:37.414228"
+  },
+  {
+    "id": "9-2006",
+    "title": "9/2006",
+    "year": 2006,
+    "image": "covers/9-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:42:43.120156"
+  },
+  {
+    "id": "10-2006",
+    "title": "10/2006",
+    "year": 2006,
+    "image": "covers/10-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-08-09T19:03:28.392897"
+  },
+  {
+    "id": "11-2006",
+    "title": "11/2006",
+    "year": 2006,
+    "image": "covers/11-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:42:44.488775"
+  },
+  {
+    "id": "12-2006",
+    "title": "12/2006",
+    "year": 2006,
+    "image": "covers/12-2006.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-08-09T19:34:40.641320"
+  },
+  {
+    "id": "1-2007",
+    "title": "1/2007",
+    "year": 2007,
+    "image": "covers/1-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-17T16:33:50.275703"
+  },
+  {
+    "id": "3-2007",
+    "title": "3/2007",
+    "year": 2007,
+    "image": "covers/3-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-14T17:29:46.231420"
+  },
+  {
+    "id": "4-2007",
+    "title": "4/2007",
+    "year": 2007,
+    "image": "covers/4-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:42:53.707898"
+  },
+  {
+    "id": "5-2007",
+    "title": "5/2007",
+    "year": 2007,
+    "image": "covers/5-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:42:54.224849"
+  },
+  {
+    "id": "6-2007",
+    "title": "6/2007",
+    "year": 2007,
+    "image": "covers/6-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:42:55.776693"
+  },
+  {
+    "id": "8-2007",
+    "title": "8/2007",
+    "year": 2007,
+    "image": "covers/8-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-17T16:34:13.470450"
+  },
+  {
+    "id": "9-2007",
+    "title": "9/2007",
+    "year": 2007,
+    "image": "covers/9-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-17T16:34:16.181258"
+  },
+  {
+    "id": "10-2007",
+    "title": "10/2007",
+    "year": 2007,
+    "image": "covers/10-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:22:17.772719"
+  },
+  {
+    "id": "11-2007",
+    "title": "11/2007",
+    "year": 2007,
+    "image": "covers/11-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:20:20.813373"
+  },
+  {
+    "id": "12-2007",
+    "title": "12/2007",
+    "year": 2007,
+    "image": "covers/12-2007.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:18:41.765966"
+  },
+  {
+    "id": "1-2008",
+    "title": "1/2008",
+    "year": 2008,
+    "image": "covers/1-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:16:07.776860"
+  },
+  {
+    "id": "2-2008",
+    "title": "2/2008",
+    "year": 2008,
+    "image": "covers/2-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:13:54.358927"
+  },
+  {
+    "id": "3-2008",
+    "title": "3/2008",
+    "year": 2008,
+    "image": "covers/3-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-08-09T19:34:56.327912"
+  },
+  {
+    "id": "4-2008",
+    "title": "4/2008",
+    "year": 2008,
+    "image": "covers/4-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:43:06.021414"
+  },
+  {
+    "id": "5-2008",
+    "title": "5/2008",
+    "year": 2008,
+    "image": "covers/5-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:43:06.889324"
+  },
+  {
+    "id": "6-2008",
+    "title": "6/2008",
+    "year": 2008,
+    "image": "covers/6-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-12-29T16:27:33.918698"
+  },
+  {
+    "id": "7-2008",
+    "title": "7/2008",
+    "year": 2008,
+    "image": "covers/7-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-12-29T16:27:35.727968"
+  },
+  {
+    "id": "8-2008",
+    "title": "8/2008",
+    "year": 2008,
+    "image": "covers/8-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-03-10T12:25:37.113275"
+  },
+  {
+    "id": "11-2008",
+    "title": "11/2008",
+    "year": 2008,
+    "image": "covers/11-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:43:10.026575"
+  },
+  {
+    "id": "12-2008",
+    "title": "12/2008",
+    "year": 2008,
+    "image": "covers/12-2008.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:12:17.739474"
+  },
+  {
+    "id": "1-2009",
+    "title": "1/2009",
+    "year": 2009,
+    "image": "covers/1-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-09-02T15:07:26.709176"
+  },
+  {
+    "id": "2-2009",
+    "title": "2/2009",
+    "year": 2009,
+    "image": "covers/2-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2026-09-02T15:07:27.601587"
+  },
+  {
+    "id": "3-2009",
+    "title": "3/2009",
+    "year": 2009,
+    "image": "covers/3-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-14T17:30:41.193268"
+  },
+  {
+    "id": "4-2009",
+    "title": "4/2009",
+    "year": 2009,
+    "image": "covers/4-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-06-02T13:17:30.106170"
+  },
+  {
+    "id": "5-2009",
+    "title": "5/2009",
+    "year": 2009,
+    "image": "covers/5-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-14T17:30:52.230758"
+  },
+  {
+    "id": "6-2009",
+    "title": "6/2009",
+    "year": 2009,
+    "image": "covers/6-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-11-14T17:30:52.989611"
+  },
+  {
+    "id": "7-2009",
+    "title": "7/2009",
+    "year": 2009,
+    "image": "covers/7-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-08-09T10:48:22.575892"
+  },
+  {
+    "id": "8-2009",
+    "title": "8/2009",
+    "year": 2009,
+    "image": "covers/8-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:43:21.973378"
+  },
+  {
+    "id": "9-2009",
+    "title": "9/2009",
+    "year": 2009,
+    "image": "covers/9-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-04-01T16:45:42.657899"
+  },
+  {
+    "id": "10-2009",
+    "title": "10/2009",
+    "year": 2009,
+    "image": "covers/10-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-09-24T13:56:26.739716"
+  },
+  {
+    "id": "11-2009",
+    "title": "11/2009",
+    "year": 2009,
+    "image": "covers/11-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-04-01T16:46:03.061395"
+  },
+  {
+    "id": "12-2009",
+    "title": "12/2009",
+    "year": 2009,
+    "image": "covers/12-2009.jpg",
+    "isOwned": true,
+    "dateAdded": "2025-09-24T13:56:29.650323"
+  },
+  {
     "id": "1-2010",
     "title": "1/2010",
     "year": 2010,
     "image": "covers/1-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T16:19:18.659460"
   },
   {
     "id": "2-2010",
     "title": "2/2010",
     "year": 2010,
     "image": "covers/2-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:45:35.190696"
   },
   {
     "id": "3-2010",
     "title": "3/2010",
     "year": 2010,
     "image": "covers/3-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T16:19:21.323767"
   },
   {
     "id": "4-2010",
     "title": "4/2010",
     "year": 2010,
     "image": "covers/4-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T16:19:21.908509"
   },
   {
     "id": "5-2010",
     "title": "5/2010",
     "year": 2010,
     "image": "covers/5-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T16:19:23.094894"
   },
   {
     "id": "6-2010",
     "title": "6/2010",
     "year": 2010,
     "image": "covers/6-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-05-13T12:27:48.489171"
   },
   {
     "id": "7-2010",
     "title": "7/2010",
     "year": 2010,
     "image": "covers/7-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T16:19:24.765549"
   },
   {
     "id": "8-2010",
     "title": "8/2010",
     "year": 2010,
     "image": "covers/8-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:55:20.950695"
   },
   {
     "id": "9-2010",
     "title": "9/2010",
     "year": 2010,
     "image": "covers/9-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T16:19:27.713688"
   },
   {
     "id": "10-2010",
     "title": "10/2010",
     "year": 2010,
     "image": "covers/10-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-10-28T15:46:29.466773"
   },
   {
     "id": "11-2010",
     "title": "11/2010",
     "year": 2010,
     "image": "covers/11-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T16:19:28.883249"
   },
   {
     "id": "12-2010",
     "title": "12/2010",
     "year": 2010,
     "image": "covers/12-2010.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T16:19:29.509699"
   },
   {
     "id": "1-2011",
     "title": "1/2011",
     "year": 2011,
     "image": "covers/1-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2011",
     "title": "2/2011",
     "year": 2011,
     "image": "covers/2-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-11T21:04:51.666087"
   },
   {
     "id": "3-2011",
     "title": "3/2011",
     "year": 2011,
     "image": "covers/3-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2011",
     "title": "4/2011",
     "year": 2011,
     "image": "covers/4-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2011",
     "title": "5/2011",
     "year": 2011,
     "image": "covers/5-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "6-2011",
     "title": "6/2011",
     "year": 2011,
     "image": "covers/6-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2011",
     "title": "7/2011",
     "year": 2011,
     "image": "covers/7-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2011",
     "title": "8/2011",
     "year": 2011,
     "image": "covers/8-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2011",
     "title": "9/2011",
     "year": 2011,
     "image": "covers/9-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2011",
     "title": "10/2011",
     "year": 2011,
     "image": "covers/10-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2011",
     "title": "11/2011",
     "year": 2011,
     "image": "covers/11-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2011",
     "title": "12/2011",
     "year": 2011,
     "image": "covers/12-2011.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:46:49.441232"
   },
   {
     "id": "1-2012",
     "title": "1/2012",
     "year": 2012,
     "image": "covers/1-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:46:58.549047"
   },
   {
     "id": "2-2012",
     "title": "2/2012",
     "year": 2012,
     "image": "covers/2-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:00.968153"
   },
   {
     "id": "3-2012",
     "title": "3/2012",
     "year": 2012,
     "image": "covers/3-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2012",
     "title": "4/2012",
     "year": 2012,
     "image": "covers/4-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:58:51.808116"
   },
   {
     "id": "5-2012",
     "title": "5/2012",
     "year": 2012,
     "image": "covers/5-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:58:54.038415"
   },
   {
     "id": "6-2012",
     "title": "6/2012",
     "year": 2012,
     "image": "covers/6-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:02.419423"
   },
   {
     "id": "7-2012",
     "title": "7/2012",
     "year": 2012,
     "image": "covers/7-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2012",
     "title": "8/2012",
     "year": 2012,
     "image": "covers/8-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:58:57.446701"
   },
   {
     "id": "9-2012",
     "title": "9/2012",
     "year": 2012,
     "image": "covers/9-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2012",
     "title": "10/2012",
     "year": 2012,
     "image": "covers/10-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:09.251767"
   },
   {
     "id": "11-2012",
     "title": "11/2012",
     "year": 2012,
     "image": "covers/11-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:11.387362"
   },
   {
     "id": "12-2012",
     "title": "12/2012",
     "year": 2012,
     "image": "covers/12-2012.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "1-2013",
     "title": "1/2013",
     "year": 2013,
     "image": "covers/1-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2013",
     "title": "2/2013",
     "year": 2013,
     "image": "covers/2-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:20.371131"
   },
   {
     "id": "3-2013",
     "title": "3/2013",
     "year": 2013,
     "image": "covers/3-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2013",
     "title": "4/2013",
     "year": 2013,
     "image": "covers/4-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2013",
     "title": "5/2013",
     "year": 2013,
     "image": "covers/5-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "6-2013",
     "title": "6/2013",
     "year": 2013,
     "image": "covers/6-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2013",
     "title": "7/2013",
     "year": 2013,
     "image": "covers/7-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2013",
     "title": "8/2013",
     "year": 2013,
     "image": "covers/8-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2013",
     "title": "9/2013",
     "year": 2013,
     "image": "covers/9-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2013",
     "title": "10/2013",
     "year": 2013,
     "image": "covers/10-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2013",
     "title": "11/2013",
     "year": 2013,
     "image": "covers/11-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2013",
     "title": "12/2013",
     "year": 2013,
     "image": "covers/12-2013.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "1-2014",
     "title": "1/2014",
     "year": 2014,
     "image": "covers/1-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2014",
     "title": "2/2014",
     "year": 2014,
     "image": "covers/2-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:36.586753"
   },
   {
     "id": "3-2014",
     "title": "3/2014",
     "year": 2014,
     "image": "covers/3-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2014",
     "title": "4/2014",
     "year": 2014,
     "image": "covers/4-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2014",
     "title": "5/2014",
     "year": 2014,
     "image": "covers/5-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:46.205178"
   },
   {
     "id": "6-2014",
     "title": "6/2014",
     "year": 2014,
     "image": "covers/6-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2014",
     "title": "7/2014",
     "year": 2014,
     "image": "covers/7-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2014",
     "title": "8/2014",
     "year": 2014,
     "image": "covers/8-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:49.591809"
   },
   {
     "id": "9-2014",
     "title": "9/2014",
     "year": 2014,
     "image": "covers/9-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2014",
     "title": "10/2014",
     "year": 2014,
     "image": "covers/10-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2014",
     "title": "11/2014",
     "year": 2014,
     "image": "covers/11-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:56.248178"
   },
   {
     "id": "12-2014",
     "title": "12/2014",
     "year": 2014,
     "image": "covers/12-2014.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-09T17:47:57.282227"
   },
   {
     "id": "1-2015",
     "title": "1/2015",
     "year": 2015,
     "image": "covers/1-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-05-28T20:52:09.899398"
   },
   {
     "id": "2-2015",
     "title": "2/2015",
     "year": 2015,
     "image": "covers/2-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-09-24T13:56:51.276034"
   },
   {
     "id": "3-2015",
     "title": "3/2015",
     "year": 2015,
     "image": "covers/3-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-10-06T14:00:13.899264"
   },
   {
     "id": "4-2015",
     "title": "4/2015",
     "year": 2015,
     "image": "covers/4-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-08-08T20:17:42.342286"
   },
   {
     "id": "5-2015",
     "title": "5/2015",
     "year": 2015,
     "image": "covers/5-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "6-2015",
     "title": "6/2015",
     "year": 2015,
     "image": "covers/6-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2015",
     "title": "7/2015",
     "year": 2015,
     "image": "covers/7-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2015",
     "title": "8/2015",
     "year": 2015,
     "image": "covers/8-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2015",
     "title": "9/2015",
     "year": 2015,
     "image": "covers/9-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-09-24T13:56:58.041317"
   },
   {
     "id": "10-2015",
     "title": "10/2015",
     "year": 2015,
     "image": "covers/10-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2015",
     "title": "11/2015",
     "year": 2015,
     "image": "covers/11-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2015",
     "title": "12/2015",
     "year": 2015,
     "image": "covers/12-2015.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-07-08T12:09:01.682710"
   },
   {
     "id": "1-2016",
     "title": "1/2016",
     "year": 2016,
     "image": "covers/1-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-11T21:04:58.939551"
   },
   {
     "id": "2-2016",
     "title": "2/2016",
     "year": 2016,
     "image": "covers/2-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-05-28T19:19:10.579389"
   },
   {
     "id": "3-2016",
     "title": "3/2016",
     "year": 2016,
     "image": "covers/3-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-09-24T13:57:11.187080"
   },
   {
     "id": "4-2016",
     "title": "4/2016",
     "year": 2016,
     "image": "covers/4-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2016",
     "title": "5/2016",
     "year": 2016,
     "image": "covers/5-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-08-08T20:17:47.205481"
   },
   {
     "id": "6-2016",
     "title": "6/2016",
     "year": 2016,
     "image": "covers/6-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:10:30.990534"
   },
   {
     "id": "7-2016",
     "title": "7/2016",
     "year": 2016,
     "image": "covers/7-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2016",
     "title": "8/2016",
     "year": 2016,
     "image": "covers/8-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-03-10T12:27:35.230060"
   },
   {
     "id": "9-2016",
     "title": "9/2016",
     "year": 2016,
     "image": "covers/9-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2016",
     "title": "10/2016",
     "year": 2016,
     "image": "covers/10-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:59:07.579770"
   },
   {
     "id": "11-2016",
     "title": "11/2016",
     "year": 2016,
     "image": "covers/11-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2016",
     "title": "12/2016",
     "year": 2016,
     "image": "covers/12-2016.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-11T21:05:04.094549"
   },
   {
     "id": "1-2017",
     "title": "1/2017",
     "year": 2017,
     "image": "covers/1-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-03-10T12:29:00.299874"
   },
   {
     "id": "2-2017",
     "title": "2/2017",
     "year": 2017,
     "image": "covers/2-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "3-2017",
     "title": "3/2017",
     "year": 2017,
     "image": "covers/3-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-05-28T19:19:16.084746"
   },
   {
     "id": "4-2017",
     "title": "4/2017",
     "year": 2017,
     "image": "covers/4-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:59:13.820699"
   },
   {
     "id": "5-2017",
     "title": "5/2017",
     "year": 2017,
     "image": "covers/5-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-04-03T15:09:30.666597"
   },
   {
     "id": "6-2017",
     "title": "6/2017",
     "year": 2017,
     "image": "covers/6-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-09-24T13:57:20.136675"
   },
   {
     "id": "7-2017",
     "title": "7/2017",
     "year": 2017,
     "image": "covers/7-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-11-17T16:36:41.932350"
   },
   {
     "id": "8-2017",
     "title": "8/2017",
     "year": 2017,
     "image": "covers/8-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:59:16.794690"
   },
   {
     "id": "9-2017",
     "title": "9/2017",
     "year": 2017,
     "image": "covers/9-2017.jpg",
-    "isOwned": false
+    "isOwned": false,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2017",
     "title": "10/2017",
     "year": 2017,
     "image": "covers/10-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2017",
     "title": "11/2017",
     "year": 2017,
     "image": "covers/11-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:10:26.125701"
   },
   {
     "id": "12-2017",
     "title": "12/2017",
     "year": 2017,
     "image": "covers/12-2017.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-12-29T14:43:28.651926"
   },
   {
     "id": "1-2018",
     "title": "1/2018",
     "year": 2018,
     "image": "covers/1-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-04-03T15:09:37.907280"
   },
   {
     "id": "2-2018",
     "title": "2/2018",
     "year": 2018,
     "image": "covers/2-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-03-05T15:34:43.453642"
   },
   {
     "id": "3-2018",
     "title": "3/2018",
     "year": 2018,
     "image": "covers/3-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-11T21:05:10.332965"
   },
   {
     "id": "4-2018",
     "title": "4/2018",
     "year": 2018,
     "image": "covers/4-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:59:23.553508"
   },
   {
     "id": "5-2018",
     "title": "5/2018",
     "year": 2018,
     "image": "covers/5-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-11-17T16:36:29.896003"
   },
   {
     "id": "6-2018",
     "title": "6/2018",
     "year": 2018,
     "image": "covers/6-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2018",
     "title": "7/2018",
     "year": 2018,
     "image": "covers/7-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-08-11T19:16:18.228177"
   },
   {
     "id": "8-2018",
     "title": "8/2018",
     "year": 2018,
     "image": "covers/8-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2018",
     "title": "9/2018",
     "year": 2018,
     "image": "covers/9-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-11T21:05:14.120065"
   },
   {
     "id": "10-2018",
     "title": "10/2018",
     "year": 2018,
     "image": "covers/10-2018.jpg",
-    "isOwned": false
+    "isOwned": false,
+    "dateAdded": "2025-05-28T19:19:26.187466"
   },
   {
     "id": "11-2018",
     "title": "11/2018",
     "year": 2018,
     "image": "covers/11-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-08-15T14:02:12.171184"
   },
   {
     "id": "12-2018",
     "title": "12/2018",
     "year": 2018,
     "image": "covers/12-2018.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-03-10T12:30:20.521211"
   },
   {
     "id": "1-2019",
     "title": "1/2019",
     "year": 2019,
     "image": "covers/1-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2019",
     "title": "2/2019",
     "year": 2019,
     "image": "covers/2-2019.jpg",
-    "isOwned": false
+    "isOwned": false,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "3-2019",
     "title": "3/2019",
     "year": 2019,
     "image": "covers/3-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2019",
     "title": "4/2019",
     "year": 2019,
     "image": "covers/4-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2019",
     "title": "5/2019",
     "year": 2019,
     "image": "covers/5-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-09-24T13:57:28.510117"
   },
   {
     "id": "6-2019",
     "title": "6/2019",
     "year": 2019,
     "image": "covers/6-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-05-28T19:19:31.476917"
   },
   {
     "id": "7-2019",
     "title": "7/2019",
     "year": 2019,
     "image": "covers/7-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2019",
     "title": "8/2019",
     "year": 2019,
     "image": "covers/8-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-11T21:05:22.635715"
   },
   {
     "id": "9-2019",
     "title": "9/2019",
     "year": 2019,
     "image": "covers/9-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-04-11T21:05:23.461865"
   },
   {
     "id": "10-2019",
     "title": "10/2019",
     "year": 2019,
     "image": "covers/10-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2019",
     "title": "11/2019",
     "year": 2019,
     "image": "covers/11-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2019",
     "title": "12/2019",
     "year": 2019,
     "image": "covers/12-2019.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-10-13T12:10:18.633290"
   },
   {
     "id": "1-2020",
     "title": "1/2020",
     "year": 2020,
     "image": "covers/1-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2020",
     "title": "2/2020",
     "year": 2020,
     "image": "covers/2-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "3-2020",
     "title": "3/2020",
     "year": 2020,
     "image": "covers/3-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2020",
     "title": "4/2020",
     "year": 2020,
     "image": "covers/4-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2020",
     "title": "5/2020",
     "year": 2020,
     "image": "covers/5-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "6-2020",
     "title": "6/2020",
     "year": 2020,
     "image": "covers/6-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2020",
     "title": "7/2020",
     "year": 2020,
     "image": "covers/7-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2020",
     "title": "8/2020",
     "year": 2020,
     "image": "covers/8-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2020",
     "title": "9/2020",
     "year": 2020,
     "image": "covers/9-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2020",
     "title": "10/2020",
     "year": 2020,
     "image": "covers/10-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2020",
     "title": "11/2020",
     "year": 2020,
     "image": "covers/11-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2020",
     "title": "12/2020",
     "year": 2020,
     "image": "covers/12-2020.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "1-2021",
     "title": "1/2021",
     "year": 2021,
     "image": "covers/1-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2021",
     "title": "2/2021",
     "year": 2021,
     "image": "covers/2-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-08-15T14:02:19.068228"
   },
   {
     "id": "3-2021",
     "title": "3/2021",
     "year": 2021,
     "image": "covers/3-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-08-15T14:02:21.670949"
   },
   {
     "id": "4-2021",
     "title": "4/2021",
     "year": 2021,
     "image": "covers/4-2021.jpg",
-    "isOwned": false
+    "isOwned": false,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2021",
     "title": "5/2021",
     "year": 2021,
     "image": "covers/5-2021.jpg",
-    "isOwned": false
+    "isOwned": false,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "6-2021",
     "title": "6/2021",
     "year": 2021,
     "image": "covers/6-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2021",
     "title": "7/2021",
     "year": 2021,
     "image": "covers/7-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2021",
     "title": "8/2021",
     "year": 2021,
     "image": "covers/8-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2021",
     "title": "9/2021",
     "year": 2021,
     "image": "covers/9-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2021",
     "title": "10/2021",
     "year": 2021,
     "image": "covers/10-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2021",
     "title": "11/2021",
     "year": 2021,
     "image": "covers/11-2021.jpg",
-    "isOwned": false
+    "isOwned": false,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2021",
     "title": "12/2021",
     "year": 2021,
     "image": "covers/12-2021.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-08-15T14:02:29.354050"
   },
   {
     "id": "1-2022",
     "title": "1/2022",
     "year": 2022,
     "image": "covers/1-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2022",
     "title": "2/2022",
     "year": 2022,
     "image": "covers/2-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "3-2022",
     "title": "3/2022",
     "year": 2022,
     "image": "covers/3-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2022",
     "title": "4/2022",
     "year": 2022,
     "image": "covers/4-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2022",
     "title": "5/2022",
     "year": 2022,
     "image": "covers/5-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "6-2022",
     "title": "6/2022",
     "year": 2022,
     "image": "covers/6-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2022",
     "title": "7/2022",
     "year": 2022,
     "image": "covers/7-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2022",
     "title": "8/2022",
     "year": 2022,
     "image": "covers/8-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2022",
     "title": "9/2022",
     "year": 2022,
     "image": "covers/9-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2022",
     "title": "10/2022",
     "year": 2022,
     "image": "covers/10-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2022",
     "title": "11/2022",
     "year": 2022,
     "image": "covers/11-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2022",
     "title": "12/2022",
     "year": 2022,
     "image": "covers/12-2022.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "1-2023",
     "title": "1/2023",
     "year": 2023,
     "image": "covers/1-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2023",
     "title": "2/2023",
     "year": 2023,
     "image": "covers/2-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "3-2023",
     "title": "3/2023",
     "year": 2023,
     "image": "covers/3-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2023",
     "title": "4/2023",
     "year": 2023,
     "image": "covers/4-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2023",
     "title": "5/2023",
     "year": 2023,
     "image": "covers/5-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "6-2023",
     "title": "6/2023",
     "year": 2023,
     "image": "covers/6-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2023",
     "title": "7/2023",
     "year": 2023,
     "image": "covers/7-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2023",
     "title": "8/2023",
     "year": 2023,
     "image": "covers/8-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2023",
     "title": "9/2023",
     "year": 2023,
     "image": "covers/9-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2023",
     "title": "10/2023",
     "year": 2023,
     "image": "covers/10-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2023",
     "title": "11/2023",
     "year": 2023,
     "image": "covers/11-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2023",
     "title": "12/2023",
     "year": 2023,
     "image": "covers/12-2023.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "1-2024",
     "title": "1/2024",
     "year": 2024,
     "image": "covers/1-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2024",
     "title": "2/2024",
     "year": 2024,
     "image": "covers/2-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "3-2024",
     "title": "3/2024",
     "year": 2024,
     "image": "covers/3-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2024",
     "title": "4/2024",
     "year": 2024,
     "image": "covers/4-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "5-2024",
     "title": "5/2024",
     "year": 2024,
     "image": "covers/5-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "6-2024",
     "title": "6/2024",
     "year": 2024,
     "image": "covers/6-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "7-2024",
     "title": "7/2024",
     "year": 2024,
     "image": "covers/7-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "8-2024",
     "title": "8/2024",
     "year": 2024,
     "image": "covers/8-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "9-2024",
     "title": "9/2024",
     "year": 2024,
     "image": "covers/9-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "10-2024",
     "title": "10/2024",
     "year": 2024,
     "image": "covers/10-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "11-2024",
     "title": "11/2024",
     "year": 2024,
     "image": "covers/11-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "12-2024",
     "title": "12/2024",
     "year": 2024,
     "image": "covers/12-2024.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "1-2025",
     "title": "1/2025",
     "year": 2025,
     "image": "covers/1-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "2-2025",
     "title": "2/2025",
     "year": 2025,
     "image": "covers/2-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "3-2025",
     "title": "3/2025",
     "year": 2025,
     "image": "covers/3-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-28T16:36:56.067948"
   },
   {
     "id": "4-2025",
     "title": "4/2025",
     "year": 2025,
     "image": "covers/4-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-03-31T23:52:07.933235"
   },
   {
     "id": "5-2025",
     "title": "5/2025",
     "year": 2025,
     "image": "covers/5-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-05-13T12:32:28.560059"
   },
   {
     "id": "6-2025",
     "title": "6/2025",
     "year": 2025,
     "image": "covers/6-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-06-03T11:46:53.481329"
   },
   {
     "id": "7-2025",
     "title": "7/2025",
     "year": 2025,
     "image": "covers/7-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-07-02T13:03:09.655997"
   },
   {
     "id": "8-2025",
     "title": "8/2025",
     "year": 2025,
     "image": "covers/8-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-08-03T12:15:42.354485"
   },
   {
     "id": "9-2025",
     "title": "9/2025",
     "year": 2025,
     "image": "covers/9-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-08-30T13:45:30.272384"
   },
   {
     "id": "10-2025",
     "title": "10/2025",
     "year": 2025,
     "image": "covers/10-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-11-12T12:07:39.301702"
   },
   {
     "id": "11-2025",
     "title": "11/2025",
     "year": 2025,
     "image": "covers/11-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-11-12T12:07:40.594521"
   },
   {
     "id": "12-2025",
     "title": "12/2025",
     "year": 2025,
     "image": "covers/12-2025.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2025-12-01T18:53:22.147010"
   },
   {
     "id": "1-2026",
     "title": "1/2026",
     "year": 2026,
     "image": "covers/1-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-01-31T18:10:01.059632"
   },
   {
     "id": "2-2026",
     "title": "2/2026",
     "year": 2026,
     "image": "covers/2-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-01-31T18:16:01.942549"
   },
   {
     "id": "3-2026",
     "title": "3/2026",
     "year": 2026,
     "image": "covers/3-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-02-28T15:31:22.384750"
   },
   {
     "id": "4-2026",
     "title": "4/2026",
     "year": 2026,
     "image": "covers/4-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-04-04T13:42:32.906085"
   },
   {
     "id": "5-2026",
     "title": "5/2026",
     "year": 2026,
     "image": "covers/5-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-05-02T14:44:12.325365"
   },
   {
     "id": "6-2026",
     "title": "6/2026",
     "year": 2026,
     "image": "covers/6-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-06-05T19:49:38.416878"
   },
   {
     "id": "7-2026",
     "title": "7/2026",
     "year": 2026,
     "image": "covers/7-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-07-01T19:45:01.653528"
   },
   {
     "id": "8-2026",
     "title": "8/2026",
     "year": 2026,
     "image": "covers/8-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-08-08T18:31:15.453817"
   },
   {
     "id": "9-2026",
     "title": "9/2026",
     "year": 2026,
     "image": "covers/9-2026.jpg",
-    "isOwned": false
+    "isOwned": true,
+    "dateAdded": "2026-09-02T15:04:47.853705"
   }
 ]
