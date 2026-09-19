@@ -1286,5 +1286,124 @@
     "year": 2025,
     "image": "covers/4-2025.jpg",
     "isOwned": false
+  },
+  {
+    "id": "5-2025",
+    "title": "5/2025",
+    "year": 2025,
+    "image": "covers/5-2025.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "6-2025",
+    "title": "6/2025",
+    "year": 2025,
+    "image": "covers/6-2025.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "7-2025",
+    "title": "7/2025",
+    "year": 2025,
+    "image": "covers/7-2025.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "8-2025",
+    "title": "8/2025",
+    "year": 2025,
+    "image": "covers/8-2025.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "9-2025",
+    "title": "9/2025",
+    "year": 2025,
+    "image": "covers/9-2025.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "10-2025",
+    "title": "10/2025",
+    "year": 2025,
+    "image": "covers/10-2025.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "11-2025",
+    "title": "11/2025",
+    "year": 2025,
+    "image": "covers/11-2025.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "12-2025",
+    "title": "12/2025",
+    "year": 2025,
+    "image": "covers/12-2025.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "1-2026",
+    "title": "1/2026",
+    "year": 2026,
+    "image": "covers/1-2026.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "2-2026",
+    "title": "2/2026",
+    "year": 2026,
+    "image": "covers/2-2026.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "3-2026",
+    "title": "3/2026",
+    "year": 2026,
+    "image": "covers/3-2026.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "4-2026",
+    "title": "4/2026",
+    "year": 2026,
+    "image": "covers/4-2026.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "5-2026",
+    "title": "5/2026",
+    "year": 2026,
+    "image": "covers/5-2026.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "6-2026",
+    "title": "6/2026",
+    "year": 2026,
+    "image": "covers/6-2026.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "7-2026",
+    "title": "7/2026",
+    "year": 2026,
+    "image": "covers/7-2026.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "8-2026",
+    "title": "8/2026",
+    "year": 2026,
+    "image": "covers/8-2026.jpg",
+    "isOwned": false
+  },
+  {
+    "id": "9-2026",
+    "title": "9/2026",
+    "year": 2026,
+    "image": "covers/9-2026.jpg",
+    "isOwned": false
   }
 ]

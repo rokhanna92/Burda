@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../theme/edition.dart';
@@ -41,11 +43,38 @@ class NavBar extends StatelessWidget {
   /// How far the button rides above the bar.
   static const double lift = 30;
 
+  /// The label size that lets the longest tab sit on one line.
+  ///
+  /// "Collection" is half again as wide as "Index", and at phone width the
+  /// design's 15px does not fit the column, so it wrapped. Rather than pick a
+  /// smaller number and hope, this measures the real font and scales every
+  /// label by the same amount, so the four stay the same size as each other on
+  /// any screen.
+  static double _labelSize(double available) {
+    const wanted = 15.0;
+    var widest = 0.0;
+
+    for (final tab in NavTab.values) {
+      final painter = TextPainter(
+        text: TextSpan(
+          text: tab.label,
+          style: AppType.smallCaps(size: wanted, trackingEm: 0.16),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      widest = math.max(widest, painter.width);
+    }
+
+    if (widest <= available || widest == 0) return wanted;
+    return wanted * available / widest;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // The design's 30px of space under the tabs is an allowance for the home
-    // indicator, so a device that asks for more gets it.
-    final bottom = MediaQuery.paddingOf(context).bottom;
+    // Sits on the system's own bottom inset, with nothing added: the design's
+    // extra 30px was an iOS home-indicator allowance the platform already
+    // gives us, and doubling it left the bar floating.
+    final bottom = math.max(MediaQuery.paddingOf(context).bottom, 8.0);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -53,29 +82,35 @@ class NavBar extends StatelessWidget {
         border: Border(top: BorderSide(color: edition.inkAt(16))),
       ),
       child: Padding(
-        padding: EdgeInsets.fromLTRB(18, 8, 18, bottom > 30 ? bottom : 30),
-        child: Row(
-          children: [
-            _tab(NavTab.home),
-            _tab(NavTab.collection),
-            SizedBox(
-              width: 76,
-              child: Center(
-                child: Transform.translate(
-                  offset: const Offset(0, -lift),
-                  child: _AddButton(edition: edition, onTap: onAdd),
+        padding: EdgeInsets.fromLTRB(18, 8, 18, bottom),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final size = _labelSize((constraints.maxWidth - 76) / 4);
+
+            return Row(
+              children: [
+                _tab(NavTab.home, size),
+                _tab(NavTab.collection, size),
+                SizedBox(
+                  width: 76,
+                  child: Center(
+                    child: Transform.translate(
+                      offset: const Offset(0, -lift),
+                      child: _AddButton(edition: edition, onTap: onAdd),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            _tab(NavTab.years),
-            _tab(NavTab.profile),
-          ],
+                _tab(NavTab.years, size),
+                _tab(NavTab.profile, size),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _tab(NavTab tab) {
+  Widget _tab(NavTab tab, double size) {
     final active = tab == current;
 
     return Expanded(
@@ -90,11 +125,11 @@ class NavBar extends StatelessWidget {
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 250),
                 style: AppType.smallCaps(
-                  size: 15,
+                  size: size,
                   trackingEm: 0.16,
                   color: active ? edition.ink : edition.muted,
                 ),
-                child: Text(tab.label),
+                child: Text(tab.label, maxLines: 1, softWrap: false),
               ),
               const SizedBox(height: 5),
               AnimatedContainer(

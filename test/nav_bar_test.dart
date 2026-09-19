@@ -134,6 +134,62 @@ void main() {
       expect(added, isTrue);
     });
 
+    testWidgets('fits every label inside its own column', (tester) async {
+      // The frame the design is drawn against, where "Collection" wrapped onto
+      // a second line.
+      tester.view.physicalSize = const Size(1206, 2622);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
+      await _pump(tester);
+
+      // Four tabs share what is left after the 18px gutters and the 76px the
+      // window sits in.
+      final column = (402 - 36 - 76) / 4;
+
+      for (final tab in NavTab.values) {
+        final text = tester.widget<Text>(find.text(tab.label));
+        expect(text.maxLines, 1, reason: tab.label);
+        expect(text.softWrap, isFalse, reason: tab.label);
+
+        // Fits, so it is neither wrapped nor cut off.
+        expect(
+          tester.getSize(find.text(tab.label)).width,
+          lessThanOrEqualTo(column),
+          reason: '${tab.label} is wider than its column',
+        );
+      }
+    });
+
+    testWidgets('sets all four labels at the same size', (tester) async {
+      tester.view.physicalSize = const Size(1206, 2622);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
+      await _pump(tester);
+
+      final sizes = {
+        for (final tab in NavTab.values)
+          _labelStyle(tester, tab.label).fontSize,
+      };
+      expect(sizes, hasLength(1), reason: 'the labels should match each other');
+      expect(sizes.single, lessThanOrEqualTo(15));
+    });
+
+    testWidgets('sits on the system inset without padding it out', (
+      tester,
+    ) async {
+      await _pump(tester);
+
+      final padding = tester.widget<Padding>(
+        find
+            .descendant(of: find.byType(NavBar), matching: find.byType(Padding))
+            .first,
+      );
+      // No bottom inset in the test view, so only the small floor remains.
+      expect((padding.padding as EdgeInsets).bottom, 8);
+    });
+
     testWidgets('takes its colours from the édition', (tester) async {
       await _pump(tester, edition: Edition.noir, current: NavTab.home);
 

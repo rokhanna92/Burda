@@ -24,7 +24,10 @@ class DatabaseService {
 
   static final DatabaseService instance = DatabaseService();
 
-  static const int schemaVersion = 1;
+  /// Bumped whenever the bundled issue list grows.
+  ///
+  /// 1: the first build. 2: 2025 filled out to twelve issues and 2026 began.
+  static const int schemaVersion = 2;
   static const String magazinesTable = 'magazines';
   static const String notesTable = 'notes';
 
@@ -68,6 +71,15 @@ class DatabaseService {
         );
         await _seed(db);
       },
+      // The magazine keeps publishing, so the bundled list keeps growing. A
+      // re-seed inserts what is new and, because it ignores conflicts, leaves
+      // every row already there untouched: ownership, condition and photos all
+      // survive.
+      //
+      // An issue deleted by hand does come back at this point. That is the
+      // trade for ever seeing a new one, and it only happens on an update that
+      // extends the list.
+      onUpgrade: (db, from, to) async => _seed(db),
     );
   }
 
