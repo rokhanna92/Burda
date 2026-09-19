@@ -36,7 +36,8 @@ class DatabaseService {
   ///
   /// 1: the first build. 2: 2025 filled out to twelve issues and 2026 began.
   /// 3: the contents index. 4: makes and the sew queue. 5: the settings table.
-  static const int schemaVersion = 5;
+  /// 6: a favourite mark and a score for what is inside.
+  static const int schemaVersion = 6;
 
   static const String magazinesTable = 'magazines';
   static const String notesTable = 'notes';
@@ -59,6 +60,7 @@ class DatabaseService {
     3: [_createContents],
     4: [_createMakes],
     5: [_createSettings],
+    6: [_addIsFavourite, _addContentScore],
   };
 
   final Future<String> Function() _loadSeed;
@@ -202,6 +204,16 @@ class DatabaseService {
           )
         ''';
 
+  // Rung 6, rating what is inside. A flag needs a constant default because
+  // SQLite cannot add a NOT NULL column without one; the score is nullable
+  // exactly as conditionScore is, and null means not judged.
+  static const String _addIsFavourite =
+      'ALTER TABLE $magazinesTable '
+      'ADD COLUMN isFavourite INTEGER NOT NULL DEFAULT 0';
+
+  static const String _addContentScore =
+      'ALTER TABLE $magazinesTable ADD COLUMN contentScore INTEGER';
+
   /// Fills a fresh database with the bundled issue list.
   Future<void> _seed(DatabaseExecutor db) async {
     final seeds = jsonDecode(await _loadSeed()) as List;
@@ -288,7 +300,9 @@ class DatabaseService {
     if (magazine == null) return null;
     final owned = !magazine.isOwned;
     // Setting an issue aside clears its condition along with its date, as the
-    // design does: the score describes a copy that is no longer held.
+    // design does: the score describes a copy that is no longer held. Her
+    // favourite mark and her score for what is inside stay, because those are
+    // about what is printed, and printing does not change hands.
     final updated = owned
         ? magazine.copyWith(isOwned: true, dateAdded: now ?? DateTime.now())
         : magazine.copyWith(
@@ -305,6 +319,28 @@ class DatabaseService {
     final magazine = await getMagazine(id);
     if (magazine == null) return null;
     final updated = magazine.copyWith(conditionScore: score.clamp(1, 10));
+    await updateMagazine(updated);
+    return updated;
+  }
+
+  /// Stores a 1 to 10 judgment of what is printed inside.
+  ///
+  /// The same range as [setCondition] on purpose: the two numbers sit on one
+  /// screen and have to be readable against each other. The issue screen writes
+  /// even numbers, its instrument having five marks.
+  Future<Magazine?> setContentScore(String id, int score) async {
+    final magazine = await getMagazine(id);
+    if (magazine == null) return null;
+    final updated = magazine.copyWith(contentScore: score.clamp(1, 10));
+    await updateMagazine(updated);
+    return updated;
+  }
+
+  /// Puts her mark on an issue, or takes it off.
+  Future<Magazine?> toggleFavourite(String id) async {
+    final magazine = await getMagazine(id);
+    if (magazine == null) return null;
+    final updated = magazine.copyWith(isFavourite: !magazine.isFavourite);
     await updateMagazine(updated);
     return updated;
   }

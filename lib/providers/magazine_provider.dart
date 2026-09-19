@@ -116,6 +116,21 @@ class MagazineProvider extends ChangeNotifier {
 
   Magazine? byId(String id) => _magazines.firstWhereOrNull((m) => m.id == id);
 
+  /// Best first: her marks lead, then the higher score, then the newest volume,
+  /// then the issue number.
+  ///
+  /// A favourite with no score sorts above an unmarked ten, because the mark is
+  /// the judgment she made unprompted and the score is the one she was asked
+  /// for. Static, like [DatabaseService.compareByIssue], so a screen can sort a
+  /// list it already filtered rather than asking for a second one.
+  static int compareByRating(Magazine a, Magazine b) {
+    if (a.isFavourite != b.isFavourite) return a.isFavourite ? -1 : 1;
+    final byScore = (b.contentScore ?? 0).compareTo(a.contentScore ?? 0);
+    if (byScore != 0) return byScore;
+    final byYear = b.year.compareTo(a.year);
+    return byYear != 0 ? byYear : a.issue.compareTo(b.issue);
+  }
+
   // Mutations
 
   /// Returns true when the issue is now owned.
@@ -129,6 +144,19 @@ class MagazineProvider extends ChangeNotifier {
   Future<void> setCondition(String id, int score) async {
     final updated = await _database.setCondition(id, score);
     if (updated != null) _replace(updated);
+  }
+
+  Future<void> setContentScore(String id, int score) async {
+    final updated = await _database.setContentScore(id, score);
+    if (updated != null) _replace(updated);
+  }
+
+  /// Returns true when the issue now carries her mark.
+  Future<bool> toggleFavourite(String id) async {
+    final updated = await _database.toggleFavourite(id);
+    if (updated == null) return false;
+    _replace(updated);
+    return updated.isFavourite;
   }
 
   Future<void> addMagazine(Magazine magazine) async {

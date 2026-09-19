@@ -13,6 +13,8 @@ class Magazine {
     this.dateAdded,
     this.conditionScore,
     this.uploadedImages = const [],
+    this.isFavourite = false,
+    this.contentScore,
   });
 
   /// `"<issue>-<year>"`, e.g. `"1-2010"`.
@@ -34,6 +36,57 @@ class Magazine {
 
   /// Absolute paths of photos the user attached to this issue.
   final List<String> uploadedImages;
+
+  /// Her mark on an issue worth going back to.
+  ///
+  /// Survives giving the copy up, unlike [conditionScore]: what is printed
+  /// inside does not change because the paper left the house.
+  final bool isFavourite;
+
+  /// What is printed inside, on the same 1 to 10 scale as [conditionScore].
+  /// Null means not judged.
+  ///
+  /// Two scores, two subjects: [conditionScore] rates the paper, this rates the
+  /// patterns on it. A mint copy of an issue with nothing in it is a real thing
+  /// and the shelf should be able to say so.
+  final int? contentScore;
+
+  /// How many marks the instrument prints.
+  static const int contentMarks = 5;
+
+  /// The score a tap on the nth mark writes.
+  ///
+  /// Even numbers on a scale of ten, so the column keeps the meaning
+  /// [conditionScore] has and an average of either still reads out of ten.
+  static int contentScoreFor(int marks) => marks * 2;
+
+  /// [contentScore] as marks out of five, or null while it is not judged.
+  ///
+  /// Rounds up, so a 7 from a hand edited file draws four marks rather than
+  /// refusing to draw. Re-tapping writes an even number back.
+  int? get contentMarksFilled => contentScore == null
+      ? null
+      : ((contentScore! + 1) ~/ 2).clamp(1, contentMarks);
+
+  /// What a score of [marks] is called.
+  ///
+  /// Five names for five marks, which is the argument for five: ten steps would
+  /// need ten names and nobody can tell the seventh from the eighth.
+  static String contentLabelFor(int marks) => switch (marks) {
+    <= 1 => 'not for me',
+    2 => 'one or two things',
+    3 => 'a good issue',
+    4 => 'a lot to sew',
+    _ => 'one of the best',
+  };
+
+  String? get contentLabel => switch (contentMarksFilled) {
+    null => null,
+    final marks => contentLabelFor(marks),
+  };
+
+  /// True once she has said anything at all about what is inside.
+  bool get isJudged => isFavourite || contentScore != null;
 
   /// Issue number within the year, e.g. `1` for `"1-2010"`.
   int get issue => int.parse(id.split('-').first);
@@ -60,6 +113,8 @@ class Magazine {
     dateAdded: _parseDate(json['dateAdded']),
     conditionScore: (json['conditionScore'] as num?)?.toInt(),
     uploadedImages: _parseImages(json['uploadedImages']),
+    isFavourite: _parseBool(json['isFavourite']),
+    contentScore: (json['contentScore'] as num?)?.toInt(),
   );
 
   /// Reads a row of the `magazines` table.
@@ -72,6 +127,8 @@ class Magazine {
     dateAdded: _parseDate(map['dateAdded']),
     conditionScore: (map['conditionScore'] as num?)?.toInt(),
     uploadedImages: _parseImages(map['uploadedImages']),
+    isFavourite: _parseBool(map['isFavourite']),
+    contentScore: (map['contentScore'] as num?)?.toInt(),
   );
 
   Map<String, Object?> toMap() => {
@@ -83,6 +140,8 @@ class Magazine {
     'dateAdded': dateAdded?.toIso8601String(),
     'conditionScore': conditionScore,
     'uploadedImages': jsonEncode(uploadedImages),
+    'isFavourite': isFavourite ? 1 : 0,
+    'contentScore': contentScore,
   };
 
   /// Export shape: a plain JSON object, with the image list inline.
@@ -95,6 +154,8 @@ class Magazine {
     'dateAdded': dateAdded?.toIso8601String(),
     'conditionScore': conditionScore,
     'uploadedImages': uploadedImages,
+    'isFavourite': isFavourite,
+    'contentScore': contentScore,
   };
 
   Magazine copyWith({
@@ -105,6 +166,9 @@ class Magazine {
     int? conditionScore,
     bool clearConditionScore = false,
     List<String>? uploadedImages,
+    bool? isFavourite,
+    int? contentScore,
+    bool clearContentScore = false,
   }) => Magazine(
     id: id,
     title: title,
@@ -116,6 +180,10 @@ class Magazine {
         ? null
         : (conditionScore ?? this.conditionScore),
     uploadedImages: uploadedImages ?? this.uploadedImages,
+    isFavourite: isFavourite ?? this.isFavourite,
+    contentScore: clearContentScore
+        ? null
+        : (contentScore ?? this.contentScore),
   );
 
   /// SQLite stores a flag as 0 or 1, JSON writes true or false, and an export

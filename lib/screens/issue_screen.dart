@@ -114,6 +114,30 @@ class _IssueScreenState extends State<IssueScreen> {
     nav.showToast('Condition set to $score');
   }
 
+  Future<void> _setContentScore(int marks) async {
+    final nav = BurdaNav.of(context);
+    await context.read<MagazineProvider>().setContentScore(
+      widget.id,
+      Magazine.contentScoreFor(marks),
+    );
+    nav.showToast('Inside: ${Magazine.contentLabelFor(marks)}');
+  }
+
+  Future<void> _toggleFavourite() async {
+    final nav = BurdaNav.of(context);
+    final marked = await context.read<MagazineProvider>().toggleFavourite(
+      widget.id,
+    );
+    nav.showToast(marked ? 'Marked a favourite ❦' : 'No longer a favourite');
+  }
+
+  /// The judgment is for issues she holds, and for any she has already judged.
+  ///
+  /// Setting a copy aside keeps the mark, so this is also the only way back out
+  /// of one she has changed her mind about.
+  static bool _showsInside(Magazine magazine) =>
+      magazine.isOwned || magazine.isJudged;
+
   /// What the Contents header says on the right.
   static String _pageNote(int pages) => switch (pages) {
     0 => 'nothing photographed yet',
@@ -237,6 +261,41 @@ class _IssueScreenState extends State<IssueScreen> {
                     ),
                   ),
               ],
+            ),
+          ],
+          if (_showsInside(magazine)) ...[
+            const SizedBox(height: 30),
+            SectionHeader(
+              'Inside',
+              edition: edition,
+              trailing: Text(
+                magazine.contentLabel ?? 'not judged yet',
+                textAlign: TextAlign.end,
+                overflow: TextOverflow.ellipsis,
+                style: AppType.serif(
+                  size: 17,
+                  italic: true,
+                  color: edition.ink,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _ContentMarks(
+              edition: edition,
+              filled: magazine.contentMarksFilled ?? 0,
+              onSet: _setContentScore,
+            ),
+            const SizedBox(height: 14),
+            BurdaButton(
+              edition: edition,
+              label: magazine.isFavourite
+                  ? 'A favourite'
+                  : 'Mark as a favourite',
+              glyph: '❦',
+              filled: magazine.isFavourite,
+              size: 15,
+              padding: const EdgeInsets.all(12),
+              onTap: _toggleFavourite,
             ),
           ],
           const SizedBox(height: 30),
@@ -411,6 +470,49 @@ class _Hero extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Five marks, filled up to the score.
+///
+/// Not a second row of ten boxes. The paper is measured and a measurement wants
+/// a meter; what is printed on it is judged, and a judgment wants marks. They
+/// sit one above the other, so they have to be told apart without reading
+/// either heading.
+class _ContentMarks extends StatelessWidget {
+  const _ContentMarks({
+    required this.edition,
+    required this.filled,
+    required this.onSet,
+  });
+
+  final Edition edition;
+  final int filled;
+  final ValueChanged<int> onSet;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      for (var n = 1; n <= Magazine.contentMarks; n++)
+        PressScale(
+          scale: 0.88,
+          onTap: () => onSet(n),
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Center(
+              child: Text(
+                filled >= n ? '◆' : '◇',
+                style: AppType.serif(
+                  size: 24,
+                  height: 1,
+                  color: filled >= n ? edition.accent : edition.inkAt(35),
+                ),
+              ),
+            ),
+          ),
+        ),
+    ],
+  );
 }
 
 /// Ten squares filling up to the score.

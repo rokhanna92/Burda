@@ -61,7 +61,14 @@ class CoverTile extends StatelessWidget {
   final double imageOpacity;
 
   /// Drawn over the cover, for the heart on a year's grid.
+  ///
+  /// It is drawn last, on top of every mark the tile puts on itself, because
+  /// the heart is the one thing on a cover that is tapped.
   final Widget? child;
+
+  /// The seal scales with the number, the tile's one size knob: 12 on a grid
+  /// cover, 16 on the rail, 22 on the hero.
+  double get _sealSize => (numeralSize * 0.4).clamp(11, 22);
 
   static const ColorFilter _grey = ColorFilter.matrix(<double>[
     0.2126, 0.7152, 0.0722, 0, 0, //
@@ -156,6 +163,16 @@ class CoverTile extends StatelessWidget {
               ),
             ),
             artwork,
+            // The draw order, fixed once because three things want a corner of
+            // this tile: the number underneath, then the artwork, then the
+            // marks the tile puts on itself, then whatever the caller passes.
+            if (magazine.isFavourite)
+              Align(
+                alignment: Alignment.topRight,
+                // Outside the desaturation on purpose: a favourite she no
+                // longer holds still carries its mark.
+                child: _Seal(edition: edition, size: _sealSize),
+              ),
             ?child,
           ],
         ),
@@ -166,4 +183,34 @@ class CoverTile extends StatelessWidget {
   /// A cover that will not load simply leaves the number showing.
   static Widget _nothing(BuildContext context, Object error, StackTrace? s) =>
       const SizedBox.shrink();
+}
+
+/// The printer's fleuron, on a small accent block.
+///
+/// A heart was spoken for twice over: filled and hollow hearts are ownership on
+/// the issue button and on the year grid, and the app rains them. The fleuron
+/// is a real printer's ornament, which is what this app is dressed as, and it
+/// is one of the few Cormorant Garamond actually carries, so it prints in the
+/// app's own face rather than in whatever the phone falls back to.
+///
+/// On a block rather than bare, because a glyph laid straight on artwork is
+/// legible over one cover and lost over the next.
+class _Seal extends StatelessWidget {
+  const _Seal({required this.edition, required this.size});
+
+  final Edition edition;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    color: edition.accent,
+    padding: EdgeInsets.symmetric(
+      horizontal: size * 0.34,
+      vertical: size * 0.2,
+    ),
+    child: Text(
+      '❦',
+      style: AppType.serif(size: size, height: 1, color: edition.onAccent),
+    ),
+  );
 }
