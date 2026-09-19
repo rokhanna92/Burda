@@ -4,15 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/magazine_provider.dart';
 import '../providers/theme_provider.dart';
 import '../screens/collection_screen.dart';
 import '../screens/index_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/years_screen.dart';
+import '../sheets/about_sheet.dart';
+import '../sheets/rank_sheet.dart';
 import '../theme/edition.dart';
 import '../theme/motion.dart';
 import '../widgets/hearts.dart';
 import '../widgets/nav_bar.dart';
+import '../widgets/sheet_scaffold.dart';
 import '../widgets/toast.dart';
 import 'burda_nav.dart';
 
@@ -101,6 +105,17 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     VaultPage() => 'vault',
   };
 
+  /// What the sheet is holding, or null for the ones not built yet.
+  Widget? _sheetContent(Edition edition) => switch (_sheet) {
+    null => null,
+    BurdaSheet.rank => RankSheet(
+      edition: edition,
+      ownedCount: context.read<MagazineProvider>().ownedCount,
+    ),
+    BurdaSheet.about => AboutSheet(edition: edition),
+    _ => null,
+  };
+
   Widget _page(Edition edition) => switch (_top) {
     null => switch (_tab) {
       NavTab.home => IndexScreen(edition: edition),
@@ -161,6 +176,14 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
                     ),
                   ],
                 ),
+                if (_sheetContent(edition) case final sheet?)
+                  Positioned.fill(
+                    child: SheetScaffold(
+                      edition: edition,
+                      onClose: closeSheet,
+                      child: sheet,
+                    ),
+                  ),
                 if (_hearts)
                   Positioned.fill(
                     child: Hearts(
