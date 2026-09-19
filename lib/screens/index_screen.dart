@@ -8,6 +8,7 @@ import '../models/note_provider.dart';
 import '../providers/magazine_provider.dart';
 import '../providers/make_provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/tonight_provider.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
 import '../theme/typography.dart';
@@ -132,6 +133,13 @@ class IndexScreen extends StatelessWidget {
                   fraction: total == 0 ? 0 : owned / total,
                 ),
                 const SizedBox(height: 30),
+                // Above the contents table, because the percentage has been 99
+                // for weeks and the six numbered lines do not move: this is the
+                // only thing on the page that is different tonight than it was
+                // last night. A printed contents page puts the editor's pick
+                // above the numbered list too.
+                _Tonight(edition: edition, now: now),
+                const SizedBox(height: 30),
                 SectionHeader('Contents', edition: edition, note: 'tap a line'),
                 const SizedBox(height: 4),
                 for (final line in _lines(magazines, makes, noteCount, nav))
@@ -244,6 +252,139 @@ class _Line {
   final String sub;
   final String value;
   final VoidCallback go;
+}
+
+/// The evening's card: one issue off the shelf, with a link for another.
+///
+/// It only reads the deck. Dealing happens at start-up and when she asks for
+/// another, never while the page is building, which keeps the index a stateless
+/// read of what the app has already decided.
+class _Tonight extends StatelessWidget {
+  const _Tonight({required this.edition, required this.now});
+
+  final Edition edition;
+
+  /// The index's own clock, so a test can put the app on a given evening.
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) {
+    final tonight = context.watch<TonightProvider>();
+    final magazine = tonight.id == null
+        ? null
+        : context.watch<MagazineProvider>().byId(tonight.id!);
+    final nav = BurdaNav.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHeader(
+          'Tonight',
+          edition: edition,
+          trailing: magazine == null
+              ? null
+              : GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () =>
+                      context.read<TonightProvider>().another(now: now),
+                  child: Text(
+                    'another →',
+                    textAlign: TextAlign.end,
+                    style: AppType.serif(
+                      size: 15,
+                      italic: true,
+                      color: edition.accent,
+                    ),
+                  ),
+                ),
+        ),
+        const SizedBox(height: 16),
+        if (magazine == null)
+          Text(
+            'Nothing to deal yet. The first issue you claim turns up here.',
+            style: AppType.serif(
+              size: 16,
+              italic: true,
+              color: edition.inkAt(60),
+            ),
+          )
+        else
+          // Keyed on the issue so the card fades up again when she asks for
+          // another, rather than swapping the artwork in place.
+          CoverIn(
+            key: ValueKey(magazine.id),
+            child: PressScale(
+              scale: 0.98,
+              onTap: () => nav.push(IssuePage(magazine.id)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 96,
+                    height: 132,
+                    child: CoverTile(
+                      magazine: magazine,
+                      edition: edition,
+                      numeralSize: 46,
+                      depth: CoverDepth.rail,
+                    ),
+                  ),
+                  const SizedBox(width: 18),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'No. ${magazine.issue}',
+                            style: AppType.serif(
+                              size: 30,
+                              weight: 500,
+                              trackingEm: -0.02,
+                              height: 1,
+                              color: edition.ink,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '${magazine.year}',
+                            style: AppType.smallCaps(
+                              size: 14,
+                              trackingEm: 0.16,
+                              color: edition.inkAt(62),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            _line(context, magazine.id),
+                            style: AppType.serif(
+                              size: 17,
+                              italic: true,
+                              height: 1.3,
+                              color: edition.inkAt(72),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// What the card says under the address.
+  ///
+  /// One sentence. The point of the card is that there is nothing to decide, so
+  /// anything longer is the card arguing with itself.
+  String _line(BuildContext context, String id) =>
+      context.watch<MakeProvider>().madeCountFor(id) > 0
+      ? 'You have sewn from this one before.'
+      : 'An evening with nothing planned. Take this one down.';
 }
 
 /// The gutter the page is set in, which the cover rail alone escapes.
