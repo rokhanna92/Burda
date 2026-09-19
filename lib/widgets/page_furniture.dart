@@ -139,6 +139,121 @@ class BackLink extends StatelessWidget {
   );
 }
 
+/// Shrinks its child while it is held, the design's press on every button.
+class PressScale extends StatefulWidget {
+  const PressScale({
+    super.key,
+    required this.onTap,
+    required this.child,
+    this.scale = 0.97,
+    this.duration = const Duration(milliseconds: 150),
+    this.curve = Curves.easeOut,
+  });
+
+  final VoidCallback? onTap;
+  final Widget child;
+  final double scale;
+  final Duration duration;
+  final Curve curve;
+
+  @override
+  State<PressScale> createState() => _PressScaleState();
+}
+
+class _PressScaleState extends State<PressScale> {
+  bool _pressed = false;
+
+  void _set(bool value) {
+    if (widget.onTap == null) return;
+    setState(() => _pressed = value);
+  }
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    behavior: HitTestBehavior.opaque,
+    onTap: widget.onTap,
+    onTapDown: (_) => _set(true),
+    onTapUp: (_) => _set(false),
+    onTapCancel: () => _set(false),
+    child: AnimatedScale(
+      scale: _pressed ? widget.scale : 1,
+      duration: widget.duration,
+      curve: widget.curve,
+      child: widget.child,
+    ),
+  );
+}
+
+/// A small-caps button, either printed in ink or merely outlined in it.
+class BurdaButton extends StatelessWidget {
+  const BurdaButton({
+    super.key,
+    required this.edition,
+    required this.label,
+    required this.onTap,
+    this.filled = false,
+    this.glyph,
+    this.size = 16,
+    this.trackingEm = 0.14,
+    this.padding = const EdgeInsets.all(15),
+    this.pressScale = 0.97,
+  });
+
+  final Edition edition;
+  final String label;
+  final VoidCallback? onTap;
+
+  /// Ink block with paper lettering, rather than an outline.
+  final bool filled;
+
+  /// Set larger and to the left of the label, e.g. the heart on the own button.
+  final String? glyph;
+
+  final double size;
+  final double trackingEm;
+  final EdgeInsets padding;
+  final double pressScale;
+
+  @override
+  Widget build(BuildContext context) {
+    final foreground = filled ? edition.paper : edition.ink;
+
+    return PressScale(
+      onTap: onTap,
+      scale: pressScale,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: padding,
+        decoration: BoxDecoration(
+          color: filled ? edition.ink : Colors.transparent,
+          border: Border.all(color: edition.ink),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (glyph != null) ...[
+              Text(
+                glyph!,
+                style: AppType.serif(size: 20, height: 1, color: foreground),
+              ),
+              const SizedBox(width: 10),
+            ],
+            Text(
+              label,
+              style: AppType.smallCaps(
+                size: size,
+                trackingEm: trackingEm,
+                color: foreground,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// A row on a hairline-ruled list that slides right a touch as it is pressed.
 class HairlineRow extends StatefulWidget {
   const HairlineRow({

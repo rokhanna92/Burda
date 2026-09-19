@@ -1,267 +1,166 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../models/date_label.dart';
 import '../models/note.dart';
 import '../models/note_provider.dart';
+import '../shell/burda_nav.dart';
+import '../theme/edition.dart';
+import '../theme/typography.dart';
+import '../widgets/page_furniture.dart';
 
-/// Her notes, newest first.
+/// Patterns, sizes and ideas, kept loose rather than pinned to an issue.
 class NotesScreen extends StatelessWidget {
-  const NotesScreen({super.key});
+  const NotesScreen({super.key, required this.edition});
 
-  static final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
+  final Edition edition;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final notes = context.watch<NoteProvider>();
+    final notes = context.watch<NoteProvider>().notes;
+    final nav = BurdaNav.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: const Icon(Icons.edit, color: Colors.white)),
-      // A Row, not an Align: a bottom bar child gets loose height
-      // constraints, and Align would expand to fill the whole screen.
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.secondary,
-                foregroundColor: theme.colorScheme.primary,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(kGutter, 0, kGutter, 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: BackLink(edition: edition, onTap: nav.back),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ScreenTitle('Notes', edition: edition),
+              BurdaButton(
+                edition: edition,
+                label: '+ New note',
+                filled: true,
+                size: 15,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 14,
+                  horizontal: 16,
+                  vertical: 9,
+                ),
+                pressScale: 0.96,
+                onTap: () => nav.openSheet(BurdaSheet.note),
+              ),
+            ],
+          ),
+          if (notes.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 60),
+              child: Text(
+                'A blank page. Write the first line.',
+                textAlign: TextAlign.center,
+                style: AppType.serif(
+                  size: 19,
+                  italic: true,
+                  color: edition.inkAt(60),
                 ),
               ),
-              onPressed: () => _showAddNoteModal(context),
-              child: const Text(
-                'Add Note',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: notes.notes.isEmpty
-          ? Center(
-              child: Text(
-                'Add a new note!',
-                style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey),
-              ),
             )
-          : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-              itemCount: notes.notes.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final note = notes.notes[index];
-                return Material(
-                  color: theme.colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(14),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(14),
-                    onTap: () => _showNoteDetails(context, note),
-                    child: Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  note.title.isEmpty ? 'Note' : note.title,
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                _dateFormat.format(note.date),
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (note.content.isNotEmpty) ...[
-                            const SizedBox(height: 6),
-                            Text(
-                              note.content,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+          else ...[
+            const SizedBox(height: 14),
+            for (final note in notes)
+              _NoteEntry(key: ValueKey(note.id), edition: edition, note: note),
+          ],
+        ],
+      ),
     );
   }
 }
 
-/// The add-note dialog: a title, some content, and save.
-Future<void> _showAddNoteModal(BuildContext context) async {
-  final provider = context.read<NoteProvider>();
-  final messenger = ScaffoldMessenger.of(context);
+class _NoteEntry extends StatelessWidget {
+  const _NoteEntry({super.key, required this.edition, required this.note});
 
-  final draft = await showDialog<({String title, String content})>(
-    context: context,
-    builder: (context) => const _AddNoteDialog(),
-  );
-  if (draft == null) return;
+  final Edition edition;
+  final Note note;
 
-  if (draft.title.isEmpty && draft.content.isEmpty) {
-    messenger
-      ..clearSnackBars()
-      ..showSnackBar(const SnackBar(content: Text('Add a new note!')));
-    return;
-  }
-  await provider.addNote(title: draft.title, content: draft.content);
-  messenger
-    ..clearSnackBars()
-    ..showSnackBar(const SnackBar(content: Text('Note added!')));
-}
-
-/// Owns its text controllers so they outlive the closing animation.
-class _AddNoteDialog extends StatefulWidget {
-  const _AddNoteDialog();
-
-  @override
-  State<_AddNoteDialog> createState() => _AddNoteDialogState();
-}
-
-class _AddNoteDialogState extends State<_AddNoteDialog> {
-  final TextEditingController _title = TextEditingController();
-  final TextEditingController _content = TextEditingController();
-
-  @override
-  void dispose() {
-    _title.dispose();
-    _content.dispose();
-    super.dispose();
-  }
-
-  void _save() {
-    Navigator.of(context)
-        .pop((title: _title.text.trim(), content: _content.text.trim()));
+  Future<void> _remove(BuildContext context) async {
+    final nav = BurdaNav.of(context);
+    await context.read<NoteProvider>().deleteNote(note.id);
+    nav.showToast('Note deleted');
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return AlertDialog(
-      title: Text(
-        'Add Note',
-        textAlign: TextAlign.center,
-        style: theme.textTheme.titleLarge,
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _title,
-            autofocus: true,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(labelText: 'Title'),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _content,
-            maxLines: 4,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(labelText: 'Content'),
-          ),
-        ],
-      ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: theme.colorScheme.onSurface),
-              ),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.onSurface,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: _save,
-              child: const Text('SAVE'),
-            ),
-          ],
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.ease,
+      builder: (context, t, child) => Opacity(
+        opacity: t,
+        child: Transform.translate(
+          offset: Offset(0, 10 * (1 - t)),
+          child: child,
         ),
-      ],
-    );
-  }
-}
-
-/// The full note, with the option to delete it.
-Future<void> _showNoteDetails(BuildContext context, Note note) async {
-  final theme = Theme.of(context);
-  final provider = context.read<NoteProvider>();
-  final messenger = ScaffoldMessenger.of(context);
-
-  final delete = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text(
-        note.title.isEmpty ? 'Note' : note.title,
-        textAlign: TextAlign.center,
-        style: theme.textTheme.titleLarge,
       ),
-      content: SingleChildScrollView(
-        child: Column(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: edition.inkAt(14))),
+        ),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              NotesScreen._dateFormat.format(note.date),
-              style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    dayMonthYear(note.date),
+                    style: AppType.smallCaps(
+                      size: 12,
+                      trackingEm: 0.18,
+                      color: edition.accent,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    note.title.isEmpty ? 'Note' : note.title,
+                    style: AppType.serif(
+                      size: 26,
+                      weight: 500,
+                      height: 1.1,
+                      color: edition.ink,
+                    ),
+                  ),
+                  if (note.content.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      note.content,
+                      style: AppType.serif(
+                        size: 17,
+                        height: 1.4,
+                        color: edition.inkAt(78),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            Text(note.content, style: theme.textTheme.bodyMedium),
+            const SizedBox(width: 12),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _remove(context),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Text(
+                  '×',
+                  style: AppType.serif(
+                    size: 24,
+                    height: 1,
+                    color: edition.inkAt(50),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(
-                'Delete',
-                style: TextStyle(color: theme.colorScheme.onSurface),
-              ),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.onSurface,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Close'),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
-  if (delete != true) return;
-  await provider.deleteNote(note.id);
-  messenger
-    ..clearSnackBars()
-    ..showSnackBar(const SnackBar(content: Text('Note deleted!')));
+    );
+  }
 }

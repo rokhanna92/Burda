@@ -8,9 +8,11 @@ import '../providers/magazine_provider.dart';
 import '../providers/theme_provider.dart';
 import '../screens/collection_screen.dart';
 import '../screens/index_screen.dart';
+import '../screens/notes_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/years_screen.dart';
 import '../sheets/about_sheet.dart';
+import '../sheets/note_sheet.dart';
 import '../sheets/rank_sheet.dart';
 import '../theme/edition.dart';
 import '../theme/motion.dart';
@@ -113,6 +115,7 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
       ownedCount: context.read<MagazineProvider>().ownedCount,
     ),
     BurdaSheet.about => AboutSheet(edition: edition),
+    BurdaSheet.note => NoteSheet(edition: edition),
     _ => null,
   };
 
@@ -123,6 +126,7 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
       NavTab.years => YearsScreen(edition: edition),
       NavTab.profile => ProfileScreen(edition: edition),
     },
+    NotesPage() => NotesScreen(edition: edition),
     // Filled in as each pushed page is built.
     _ => const SizedBox.shrink(),
   };
@@ -149,60 +153,65 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 500),
             color: edition.paper,
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    Expanded(
-                      child: PageStorage(
-                        bucket: _bucket,
-                        child: _PageEntrance(
-                          pageKey: _pageKey,
-                          // A pushed page comes in from the side, a tab fades up.
-                          fromSide: _top != null,
-                          child: SingleChildScrollView(
-                            key: PageStorageKey(_pageKey),
-                            padding: EdgeInsets.only(top: topInset + 10),
-                            child: _page(edition),
+            // The design draws every surface itself, but the text fields in
+            // the sheets still need a Material above them.
+            child: Material(
+              type: MaterialType.transparency,
+              child: Stack(
+                children: [
+                  Column(
+                    children: [
+                      Expanded(
+                        child: PageStorage(
+                          bucket: _bucket,
+                          child: _PageEntrance(
+                            pageKey: _pageKey,
+                            // A pushed page comes in from the side, a tab fades up.
+                            fromSide: _top != null,
+                            child: SingleChildScrollView(
+                              key: PageStorageKey(_pageKey),
+                              padding: EdgeInsets.only(top: topInset + 10),
+                              child: _page(edition),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    NavBar(
-                      edition: edition,
-                      current: _top == null ? _tab : null,
-                      onSelect: goTab,
-                      onAdd: () => openSheet(BurdaSheet.add),
-                    ),
-                  ],
-                ),
-                if (_sheetContent(edition) case final sheet?)
-                  Positioned.fill(
-                    child: SheetScaffold(
-                      edition: edition,
-                      onClose: closeSheet,
-                      child: sheet,
-                    ),
+                      NavBar(
+                        edition: edition,
+                        current: _top == null ? _tab : null,
+                        onSelect: goTab,
+                        onAdd: () => openSheet(BurdaSheet.add),
+                      ),
+                    ],
                   ),
-                if (_hearts)
-                  Positioned.fill(
-                    child: Hearts(
-                      edition: edition,
-                      onDone: () {
-                        if (mounted) setState(() => _hearts = false);
-                      },
+                  if (_sheetContent(edition) case final sheet?)
+                    Positioned.fill(
+                      child: SheetScaffold(
+                        edition: edition,
+                        onClose: closeSheet,
+                        child: sheet,
+                      ),
                     ),
-                  ),
-                if (_toast != null)
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 124,
-                    child: Center(
-                      child: Toast(message: _toast!, edition: edition),
+                  if (_hearts)
+                    Positioned.fill(
+                      child: Hearts(
+                        edition: edition,
+                        onDone: () {
+                          if (mounted) setState(() => _hearts = false);
+                        },
+                      ),
                     ),
-                  ),
-              ],
+                  if (_toast != null)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 124,
+                      child: Center(
+                        child: Toast(message: _toast!, edition: edition),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
