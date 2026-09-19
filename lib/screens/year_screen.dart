@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/magazine.dart';
+import '../models/series.dart';
 import '../providers/magazine_provider.dart';
 import '../shell/burda_nav.dart';
 import '../shell/collection_actions.dart';
@@ -14,10 +15,16 @@ import '../widgets/page_furniture.dart';
 
 /// One volume: every issue of a year, with a heart on each to claim it.
 class YearScreen extends StatefulWidget {
-  const YearScreen({super.key, required this.edition, required this.year});
+  const YearScreen({
+    super.key,
+    required this.edition,
+    required this.year,
+    this.series = Series.style,
+  });
 
   final Edition edition;
   final int year;
+  final Series series;
 
   /// The last year the magazine ran to twelve issues.
   static const int lastFullYear = 2025;
@@ -50,20 +57,27 @@ class _YearScreenState extends State<YearScreen> {
     await toggleIssueOwned(context, magazine);
   }
 
-  Future<void> _fillYear(List<Magazine> present) async {
+  Future<void> _fillYear(List<Magazine> present, int perYear) async {
     final nav = BurdaNav.of(context);
     final magazines = context.read<MagazineProvider>();
     final have = present.map((m) => m.issue).toSet();
 
     var added = 0;
-    for (var issue = 1; issue <= 12; issue++) {
+    for (var issue = 1; issue <= perYear; issue++) {
       if (have.contains(issue)) continue;
+      final id = Magazine.idFor(
+        series: widget.series,
+        issue: issue,
+        year: widget.year,
+      );
       await magazines.addMagazine(
         Magazine(
-          id: '$issue-${widget.year}',
+          id: id,
           title: '$issue/${widget.year}',
           year: widget.year,
-          image: 'covers/$issue-${widget.year}.jpg',
+          issue: issue,
+          series: widget.series,
+          image: widget.series.bundledCovers ? 'covers/$id.jpg' : '',
         ),
       );
       added++;
@@ -76,9 +90,12 @@ class _YearScreenState extends State<YearScreen> {
     final edition = widget.edition;
     final nav = BurdaNav.of(context);
     final magazines = context.watch<MagazineProvider>();
-    final issues = magazines.magazinesForYear(widget.year)
-      ..sort((a, b) => a.issue.compareTo(b.issue));
+    final issues = magazines.magazinesForYear(
+      widget.year,
+      series: widget.series,
+    )..sort((a, b) => a.issue.compareTo(b.issue));
     final owned = issues.where((m) => m.isOwned).length;
+    final perYear = widget.series.perYear;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(kGutter, 0, kGutter, 30),
@@ -90,6 +107,11 @@ class _YearScreenState extends State<YearScreen> {
             child: BackLink(edition: edition, onTap: nav.back),
           ),
           const SizedBox(height: 6),
+          // Off the main line, a 2019 has to say which 2019 it is.
+          if (widget.series != Series.style) ...[
+            Eyebrow(widget.series.title, edition: edition),
+            const SizedBox(height: 8),
+          ],
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,7 +132,9 @@ class _YearScreenState extends State<YearScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 6),
                   child: Text(
-                    '$owned of ${issues.length}\nin the collection',
+                    perYear == null
+                        ? '${issues.length} filed\nunder ${widget.year}'
+                        : '$owned of ${issues.length}\nin the collection',
                     textAlign: TextAlign.end,
                     style: AppType.serif(
                       size: 17,
@@ -123,12 +147,16 @@ class _YearScreenState extends State<YearScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          ProgressRule(
-            edition: edition,
-            fraction: issues.isEmpty ? 0 : owned / issues.length,
-            duration: const Duration(milliseconds: 700),
-          ),
+          // No rule on an open shelf: one that is always full is not a
+          // measurement, it is noise.
+          if (perYear != null) ...[
+            const SizedBox(height: 14),
+            ProgressRule(
+              edition: edition,
+              fraction: issues.isEmpty ? 0 : owned / issues.length,
+              duration: const Duration(milliseconds: 700),
+            ),
+          ],
           const SizedBox(height: 26),
           GridView.count(
             crossAxisCount: 3,
@@ -152,14 +180,18 @@ class _YearScreenState extends State<YearScreen> {
                 ),
             ],
           ),
-          if (issues.length < 12 && widget.year <= YearScreen.lastFullYear) ...[
+          // Never on an open shelf: the window in the nav bar is how an issue
+          // goes on one of those, one at a time.
+          if (perYear != null &&
+              issues.length < perYear &&
+              widget.year <= YearScreen.lastFullYear) ...[
             const SizedBox(height: 28),
             BurdaButton(
               edition: edition,
               label: 'Add the remaining issues of ${widget.year}',
               size: 17,
               padding: const EdgeInsets.all(14),
-              onTap: () => _fillYear(issues),
+              onTap: () => _fillYear(issues, perYear),
             ),
           ],
         ],
@@ -230,7 +262,7 @@ class _YearCover extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                'No. ${magazine.issue}',
+                magazine.mark,
                 overflow: TextOverflow.ellipsis,
                 style: AppType.smallCaps(
                   size: 15,

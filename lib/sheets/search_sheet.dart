@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/garment_tag.dart';
 import '../models/issue_address.dart';
 import '../models/magazine.dart';
+import '../models/series.dart';
 import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
 import '../shell/burda_nav.dart';
@@ -37,11 +38,17 @@ class _SearchSheetState extends State<SearchSheet> {
     super.dispose();
   }
 
-  /// The issue the query points at, once it is a whole address.
-  Magazine? _found(MagazineProvider magazines) {
+  /// Every issue at that address, on whatever shelf.
+  ///
+  /// "3/2019" cannot say which shelf it means, so it means all of them.
+  List<Magazine> _found(MagazineProvider magazines) {
     final address = IssueAddress.parse(_query.text);
-    if (address == null) return null;
-    return magazines.byId('${address.issue}-${address.year}');
+    if (address == null) return const [];
+    return [
+      for (final magazine in magazines.magazines)
+        if (magazine.issue == address.issue && magazine.year == address.year)
+          magazine,
+    ];
   }
 
   bool get _addressComplete => IssueAddress.parse(_query.text) != null;
@@ -118,12 +125,15 @@ class _SearchSheetState extends State<SearchSheet> {
             color: edition.inkAt(60),
           ),
         ),
-        if (found != null) ...[
+        if (found.isNotEmpty) ...[
           const SizedBox(height: 22),
-          CoverIn(
-            duration: const Duration(milliseconds: 300),
-            child: _Result(edition: edition, magazine: found),
-          ),
+          for (final (index, magazine) in found.indexed) ...[
+            if (index > 0) const SizedBox(height: 10),
+            CoverIn(
+              duration: const Duration(milliseconds: 300),
+              child: _Result(edition: edition, magazine: magazine),
+            ),
+          ],
         ] else if (_addressComplete) ...[
           const SizedBox(height: 24),
           Text(
@@ -267,6 +277,16 @@ class _Result extends StatelessWidget {
   final Edition edition;
   final Magazine magazine;
 
+  /// Where it is, and which shelf it is on when that is a question.
+  static String _where(Magazine magazine) {
+    final state = magazine.isLent
+        ? 'with ${magazine.lentTo}'
+        : (magazine.isOwned ? 'in the collection' : 'still missing');
+    return magazine.series == Series.style
+        ? state
+        : '${magazine.series.shelf}, $state';
+  }
+
   @override
   Widget build(BuildContext context) {
     final nav = BurdaNav.of(context);
@@ -299,7 +319,7 @@ class _Result extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'No. ${magazine.issue} · ${magazine.year}',
+                    '${magazine.mark} · ${magazine.year}',
                     overflow: TextOverflow.ellipsis,
                     style: AppType.serif(
                       size: 24,
@@ -310,11 +330,7 @@ class _Result extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    magazine.isLent
-                        ? 'with ${magazine.lentTo}'
-                        : (magazine.isOwned
-                              ? 'in the collection'
-                              : 'still missing'),
+                    _where(magazine),
                     overflow: TextOverflow.ellipsis,
                     style: AppType.serif(
                       size: 15,

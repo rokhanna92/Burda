@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/endgame.dart';
 import '../models/magazine.dart';
+import '../models/series.dart';
 import '../providers/magazine_provider.dart';
 import 'burda_nav.dart';
 
@@ -32,14 +33,19 @@ Future<void> toggleIssueOwned(BuildContext context, Magazine magazine) async {
   // complete.
   nav.rain();
 
-  // The first time it is finished is not the same sentence as every time
-  // after: markComplete returns true only for the call that wrote the date.
-  if (magazines.endgame is Finished) {
+  // The main line finishing is the collection finishing, and the first time it
+  // does is not the same sentence as every time after: markComplete returns
+  // true only for the call that wrote the date.
+  if (magazine.series == Series.style && magazines.endgame is Finished) {
     final first = await magazines.markComplete();
     nav.celebrate(
       first ? 'The whole collection. Every issue.' : 'Every issue again ♥',
     );
-  } else if (magazines.isYearComplete(magazine.year)) {
+  } else if (magazine.series != Series.style &&
+      magazines.shelfFor(magazine.series).completion == 1) {
+    nav.celebrate('${magazine.series.title}. Every issue.');
+  } else if (magazine.series.counted &&
+      magazines.isYearComplete(magazine.year, series: magazine.series)) {
     nav.celebrate('Volume ${magazine.year} complete ♥');
   } else {
     nav.showToast('$label added');

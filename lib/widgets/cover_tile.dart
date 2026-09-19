@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../models/magazine.dart';
+import '../models/series.dart';
 import '../theme/edition.dart';
 import '../theme/typography.dart';
 
@@ -151,18 +152,14 @@ class CoverTile extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Center(
-              child: Text(
-                '${magazine.issue}',
-                style: AppType.serif(
-                  size: numeralSize,
-                  weight: 300,
-                  height: 1,
-                  color: edition.ink,
-                ),
-              ),
+            _Plate(
+              magazine: magazine,
+              edition: edition,
+              numeralSize: numeralSize,
             ),
-            artwork,
+            // Only when there is any: a shelf with no bundled artwork must not
+            // ask for a file that is not there on every build.
+            if (magazine.hasCover) artwork,
             // The draw order, fixed once because several things want a corner of
             // this tile: the number underneath, then the artwork, then the
             // marks the tile puts on itself, then whatever the caller passes.
@@ -185,6 +182,78 @@ class CoverTile extends StatelessWidget {
   /// A cover that will not load simply leaves the number showing.
   static Widget _nothing(BuildContext context, Object error, StackTrace? s) =>
       const SizedBox.shrink();
+}
+
+/// What is printed under the artwork: the number, and off the main line the
+/// shelf and the year as well.
+///
+/// On Burda Style it is exactly the centred numeral the design draws, so the
+/// bundled covers are unchanged to the pixel. A shelf the app ships no art for
+/// has nothing but this, so it says a little more, and only on a tile with the
+/// room: a search thumbnail keeps just its number.
+class _Plate extends StatelessWidget {
+  const _Plate({
+    required this.magazine,
+    required this.edition,
+    required this.numeralSize,
+  });
+
+  final Magazine magazine;
+  final Edition edition;
+  final double numeralSize;
+
+  /// Under this the extra lines are unreadable, so they are not drawn.
+  static const double _roomy = 80;
+
+  @override
+  Widget build(BuildContext context) {
+    final numeral = Center(
+      child: Text(
+        '${magazine.issue}',
+        style: AppType.serif(
+          size: numeralSize,
+          weight: 300,
+          height: 1,
+          color: edition.ink,
+        ),
+      ),
+    );
+
+    if (magazine.series == Series.style) return numeral;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxHeight < _roomy) return numeral;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                magazine.series.shelf,
+                textAlign: TextAlign.center,
+                style: AppType.smallCaps(
+                  size: 11,
+                  trackingEm: 0.18,
+                  color: edition.inkAt(55),
+                ),
+              ),
+              Expanded(child: numeral),
+              Text(
+                '${magazine.year}',
+                style: AppType.serif(
+                  size: 12,
+                  tabular: true,
+                  color: edition.inkAt(55),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 /// The band across the foot of a cover that is out of the house.

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../models/series.dart';
 import '../widgets/nav_bar.dart';
 
 /// A page pushed over a tab.
@@ -11,9 +12,10 @@ sealed class BurdaPage {
 }
 
 class YearPage extends BurdaPage {
-  const YearPage(this.year);
+  const YearPage(this.year, {this.series = Series.style});
 
   final int year;
+  final Series series;
 }
 
 class IssuePage extends BurdaPage {

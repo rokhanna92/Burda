@@ -41,10 +41,20 @@ class _CollectionScreenState extends State<CollectionScreen> {
     final nav = BurdaNav.of(context);
 
     final listed = widget.showOwned ? magazines.owned : magazines.missing;
-    // Newest volume first, and a year with nothing in it is not printed.
-    final years = magazines.years.reversed.where(
-      (year) => listed.any((m) => m.year == year),
-    );
+    // Shelf, then year inside it, newest volume first. A year with nothing in
+    // it is not printed, and with one shelf no heading is drawn at all, so the
+    // screen is what it was before the shelves existed.
+    final groups = [
+      for (final shelf in magazines.startedShelves)
+        (
+          shelf: shelf,
+          years: [
+            for (final year in shelf.years.reversed)
+              if (listed.any((m) => m.year == year && m.series == shelf.series))
+                year,
+          ],
+        ),
+    ];
     final judged = listed.where((m) => m.isJudged).toList()
       ..sort(MagazineProvider.compareByRating);
 
@@ -105,7 +115,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
               ],
             ],
           ] else ...[
-            if (years.isEmpty)
+            if (groups.every((group) => group.years.isEmpty))
               _EmptyNote(
                 widget.showOwned
                     ? 'Nothing filed yet.\n'
@@ -113,17 +123,32 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     : 'Not one issue missing.\nThe shelf is complete.',
                 edition: edition,
               ),
-            for (final year in years) ...[
-              _YearGroup(
-                edition: edition,
-                year: year,
-                issues: listed.where((m) => m.year == year).toList()
-                  ..sort((a, b) => a.issue.compareTo(b.issue)),
-                onOpenYear: () => nav.push(YearPage(year)),
-                onOpenIssue: (id) => nav.push(IssuePage(id)),
-              ),
-              const SizedBox(height: 26),
-            ],
+            for (final group in groups)
+              if (group.years.isNotEmpty) ...[
+                if (magazines.manyShelves) ...[
+                  SectionHeader(group.shelf.series.title, edition: edition),
+                  const SizedBox(height: 14),
+                ],
+                for (final year in group.years) ...[
+                  _YearGroup(
+                    edition: edition,
+                    year: year,
+                    issues:
+                        listed
+                            .where(
+                              (m) =>
+                                  m.year == year &&
+                                  m.series == group.shelf.series,
+                            )
+                            .toList()
+                          ..sort((a, b) => a.issue.compareTo(b.issue)),
+                    onOpenYear: () =>
+                        nav.push(YearPage(year, series: group.shelf.series)),
+                    onOpenIssue: (id) => nav.push(IssuePage(id)),
+                  ),
+                  const SizedBox(height: 26),
+                ],
+              ],
           ],
         ],
       ),

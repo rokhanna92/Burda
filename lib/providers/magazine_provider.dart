@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../models/collector_rank.dart';
 import '../models/endgame.dart';
 import '../models/magazine.dart';
+import '../models/series.dart';
 import '../services/database_service.dart';
 import '../services/photo_relink_service.dart';
 
@@ -46,12 +47,42 @@ class MagazineProvider extends ChangeNotifier {
   /// has, so it is complete the day she starts it and can never be what
   /// "complete" means. [totalCount], [ownedCount] and [completion] keep meaning
   /// the whole library, which is what the rank ladder wants.
-  MainLine get mainLine => (
-    owned: _magazines.where((m) => m.isOwned).length,
-    total: _magazines.length,
-    missing: _magazines.where((m) => !m.isOwned).toList(growable: false),
-    years: _magazines.map((m) => m.year).toSet().toList()..sort(),
-  );
+  MainLine get mainLine {
+    // The one line that changed when the shelves landed. A shelf she fills by
+    // hand holds only issues she has, so it is complete the day she starts it
+    // and can never be what "complete" means.
+    final rows = _magazines.where((m) => m.series == Series.style);
+    return (
+      owned: rows.where((m) => m.isOwned).length,
+      total: rows.length,
+      missing: rows.where((m) => !m.isOwned).toList(growable: false),
+      years: rows.map((m) => m.year).toSet().toList()..sort(),
+    );
+  }
+
+  /// What one shelf holds.
+  Shelf shelfFor(Series series) {
+    final rows = _magazines.where((m) => m.series == series);
+    return Shelf(
+      series: series,
+      owned: rows.where((m) => m.isOwned).length,
+      total: rows.length,
+      years: rows.map((m) => m.year).toSet().toList()..sort(),
+    );
+  }
+
+  /// Every shelf with anything on it, in the order the enum prints them.
+  List<Shelf> get startedShelves => [
+    for (final series in Series.values)
+      if (shelfFor(series) case final shelf when shelf.started) shelf,
+  ];
+
+  /// True once the collection is more than the main line, which is what gates
+  /// every shelf heading in the app: with one shelf nothing is drawn at all.
+  bool get manyShelves => startedShelves.length > 1;
+
+  /// The shelf the headline percentage is about.
+  Shelf get headline => shelfFor(Series.style);
 
   /// How close the main line is to finished.
   Endgame get endgame {
@@ -109,28 +140,28 @@ class MagazineProvider extends ChangeNotifier {
 
   int get lentCount => _magazines.where((m) => m.isLent).length;
 
-  /// Years present in the collection, oldest first.
-  List<int> get years => _magazines.map((m) => m.year).toSet().toList()..sort();
+  /// Years present on the main line, oldest first.
+  List<int> get years => mainLine.years;
 
-  List<Magazine> magazinesForYear(int year) =>
-      _magazines.where((m) => m.year == year).toList();
+  List<Magazine> magazinesForYear(int year, {Series series = Series.style}) =>
+      _magazines.where((m) => m.year == year && m.series == series).toList();
 
-  int ownedCountForYear(int year) =>
-      _magazines.where((m) => m.year == year && m.isOwned).length;
+  int ownedCountForYear(int year, {Series series = Series.style}) =>
+      magazinesForYear(year, series: series).where((m) => m.isOwned).length;
 
-  int missingCountForYear(int year) =>
-      _magazines.where((m) => m.year == year && !m.isOwned).length;
+  int missingCountForYear(int year, {Series series = Series.style}) =>
+      magazinesForYear(year, series: series).where((m) => !m.isOwned).length;
 
   /// Share of [year]'s issues that are owned, between 0 and 1.
-  double completionForYear(int year) {
-    final issues = magazinesForYear(year);
+  double completionForYear(int year, {Series series = Series.style}) {
+    final issues = magazinesForYear(year, series: series);
     if (issues.isEmpty) return 0;
     return issues.where((m) => m.isOwned).length / issues.length;
   }
 
   /// True when every issue of [year] is owned.
-  bool isYearComplete(int year) {
-    final issues = magazinesForYear(year);
+  bool isYearComplete(int year, {Series series = Series.style}) {
+    final issues = magazinesForYear(year, series: series);
     return issues.isNotEmpty && issues.every((m) => m.isOwned);
   }
 
@@ -150,8 +181,8 @@ class MagazineProvider extends ChangeNotifier {
     return sorted.take(8).toList(growable: false);
   }
 
-  /// How many years are owned end to end.
-  int get completeYearCount => years.where(isYearComplete).length;
+  /// How many years of the main line are owned end to end.
+  int get completeYearCount => years.where((y) => isYearComplete(y)).length;
 
   /// Most recent moment an issue was marked owned.
   DateTime? get latestAddition {

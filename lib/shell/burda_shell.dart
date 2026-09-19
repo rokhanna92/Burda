@@ -150,7 +150,7 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
   /// entrance replays when it changes.
   String get _pageKey => switch (_top) {
     null => 'tab:${_tab.name}',
-    YearPage(:final year) => 'year:$year',
+    YearPage(:final year, :final series) => 'year:${series.id}:$year',
     IssuePage(:final id) => 'issue:$id',
     NotesPage() => 'notes',
     VaultPage() => 'vault',
@@ -239,7 +239,11 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     QueuePage() => QueueScreen(edition: edition),
     MeasurePage() => MeasureScreen(edition: edition),
     MakePage(:final id) => MakeScreen(edition: edition, id: id),
-    YearPage(:final year) => YearScreen(edition: edition, year: year),
+    YearPage(:final year, :final series) => YearScreen(
+      edition: edition,
+      year: year,
+      series: series,
+    ),
   };
 
   @override

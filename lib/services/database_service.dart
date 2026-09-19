@@ -37,7 +37,8 @@ class DatabaseService {
   /// 1: the first build. 2: 2025 filled out to twelve issues and 2026 began.
   /// 3: the contents index. 4: makes and the sew queue. 5: the settings table.
   /// 6: a favourite mark and a score for what is inside. 7: lending.
-  static const int schemaVersion = 7;
+  /// 8: shelves beyond the main line.
+  static const int schemaVersion = 8;
 
   static const String magazinesTable = 'magazines';
   static const String notesTable = 'notes';
@@ -62,6 +63,7 @@ class DatabaseService {
     5: [_createSettings],
     6: [_addIsFavourite, _addContentScore],
     7: [_addLentTo, _addLentOn],
+    8: [_addSeries, _addIssue, _backfillIssue],
   };
 
   final Future<String> Function() _loadSeed;
@@ -223,6 +225,30 @@ class DatabaseService {
 
   static const String _addLentOn =
       'ALTER TABLE $magazinesTable ADD COLUMN lentOn TEXT';
+
+  // Rung 8, shelves beyond the main line. Both carry a constant default,
+  // because SQLite cannot add a NOT NULL column without one, and every row
+  // written before this belongs to the main line.
+  static const String _addSeries =
+      "ALTER TABLE $magazinesTable ADD COLUMN series TEXT NOT NULL "
+      "DEFAULT 'style'";
+
+  static const String _addIssue =
+      'ALTER TABLE $magazinesTable ADD COLUMN issue INTEGER NOT NULL DEFAULT 0';
+
+  /// Fills [issue] for every row written before the column existed.
+  ///
+  /// Each of those ids is `<issue>-<year>`, so the number is the text in front
+  /// of the dash. Guarded on `issue = 0` so it is safe to run twice and on an
+  /// empty table, which is what a fresh install replaying the ladder gives it.
+  static const String _backfillIssue =
+      '''
+          UPDATE $magazinesTable
+             SET issue = CAST(substr(id, 1, instr(id, '-') - 1) AS INTEGER)
+           WHERE issue = 0
+             AND instr(id, '-') > 1
+             AND CAST(substr(id, 1, instr(id, '-') - 1) AS INTEGER) > 0
+        ''';
 
   /// Fills a fresh database with the bundled issue list.
   Future<void> _seed(DatabaseExecutor db) async {
@@ -646,9 +672,15 @@ class DatabaseService {
   /// to a make is what files it.
   static int compareByMade(Make a, Make b) => b.sortDate.compareTo(a.sortDate);
 
-  /// Chronological order: by year, then by issue number within the year.
+  /// Chronological order: by year, then by shelf, then by issue number.
+  ///
+  /// Year first rather than shelf first, so the list this returns stays in the
+  /// order the vault and the collection grid want to read it, and so it is
+  /// byte-identical to what it was while every row is on the main line.
   static int compareByIssue(Magazine a, Magazine b) {
     final byYear = a.year.compareTo(b.year);
-    return byYear != 0 ? byYear : a.issue.compareTo(b.issue);
+    if (byYear != 0) return byYear;
+    final byShelf = a.series.index.compareTo(b.series.index);
+    return byShelf != 0 ? byShelf : a.issue.compareTo(b.issue);
   }
 }

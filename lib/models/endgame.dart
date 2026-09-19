@@ -1,4 +1,5 @@
 import 'magazine.dart';
+import 'series.dart';
 
 /// The main line's numbers, which is what the endgame is judged on.
 ///
@@ -11,6 +12,38 @@ typedef MainLine = ({
   List<Magazine> missing,
   List<int> years,
 });
+
+/// What one shelf holds, and how much of it is hers.
+///
+/// A shelf off the main line is open ended: she fills it by hand, so every
+/// issue on it is one she has, and [completion] is null rather than 1. A bar
+/// that is always full is not a measurement.
+class Shelf {
+  const Shelf({
+    required this.series,
+    required this.owned,
+    required this.total,
+    required this.years,
+  });
+
+  final Series series;
+  final int owned;
+  final int total;
+
+  /// Oldest first.
+  final List<int> years;
+
+  int get missing => total - owned;
+
+  /// True once there is anything on it at all.
+  bool get started => total > 0;
+
+  /// Null on a shelf whose size nobody can know.
+  double? get completion {
+    if (!series.counted || total == 0) return null;
+    return owned / total;
+  }
+}
 
 /// How close the main line is to finished, which is what the index leads with.
 ///

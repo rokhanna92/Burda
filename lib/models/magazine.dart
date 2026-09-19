@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'date_label.dart';
+import 'series.dart';
 
 /// A single Burda Style issue.
 ///
@@ -19,7 +20,12 @@ class Magazine {
     this.contentScore,
     this.lentTo,
     this.lentOn,
-  });
+    this.series = Series.style,
+    int? issue,
+    // A named parameter cannot be private, so this cannot be an initialising
+    // formal however much the lint would like it to be.
+    // ignore: prefer_initializing_formals
+  }) : _issue = issue;
 
   /// `"<issue>-<year>"`, e.g. `"1-2010"`.
   final String id;
@@ -112,8 +118,45 @@ class Magazine {
   /// True once a loan has run long enough to be printed in the accent.
   bool lentLong(DateTime now) => (daysLent(now) ?? 0) >= kLongLoan;
 
-  /// Issue number within the year, e.g. `1` for `"1-2010"`.
-  int get issue => int.parse(id.split('-').first);
+  /// Which shelf it stands on.
+  final Series series;
+
+  /// Set from the column once shelves exist. Null on anything written before
+  /// that, and on every literal in the app that never had to say it.
+  final int? _issue;
+
+  /// Issue number within the year: the month on the main line, the running
+  /// number on a shelf off it.
+  int get issue => _issue ?? issueFromId(id);
+
+  /// How this issue is named: "No. 4", or "Special No. 3".
+  String get mark => series.markOf(issue);
+
+  /// `"1-2010"` gives 1, `"special-3-2019"` gives 3.
+  ///
+  /// The fallback for a row written before the column existed, and the same
+  /// rule the rung 8 backfill applies in SQL.
+  static int issueFromId(String id) {
+    final parts = id.split('-');
+    return int.tryParse(parts.first) ??
+        (parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0);
+  }
+
+  /// The id a new issue is filed under.
+  ///
+  /// The main line keeps the bare `"<issue>-<year>"` it has always used, and a
+  /// shelf off it is prefixed. The asymmetry is deliberate and lives only here:
+  /// those 201 ids name photo folders on disk and appear in every collection
+  /// file she has ever exported, including the one from the original app, so
+  /// rewriting them would buy tidiness and cost a migration.
+  static String idFor({
+    required Series series,
+    required int issue,
+    required int year,
+  }) => series == Series.style ? '$issue-$year' : '${series.id}-$issue-$year';
+
+  /// True when there is artwork to draw at all.
+  bool get hasCover => image.isNotEmpty;
 
   /// True when [image] points at a file the user chose, rather than one of the
   /// covers bundled with the app.
@@ -141,6 +184,8 @@ class Magazine {
     contentScore: (json['contentScore'] as num?)?.toInt(),
     lentTo: json['lentTo'] as String?,
     lentOn: _parseDate(json['lentOn']),
+    series: Series.byId(json['series'] as String?),
+    issue: (json['issue'] as num?)?.toInt(),
   );
 
   /// Reads a row of the `magazines` table.
@@ -157,6 +202,8 @@ class Magazine {
     contentScore: (map['contentScore'] as num?)?.toInt(),
     lentTo: map['lentTo'] as String?,
     lentOn: _parseDate(map['lentOn']),
+    series: Series.byId(map['series'] as String?),
+    issue: (map['issue'] as num?)?.toInt(),
   );
 
   Map<String, Object?> toMap() => {
@@ -172,6 +219,8 @@ class Magazine {
     'contentScore': contentScore,
     'lentTo': lentTo,
     'lentOn': lentOn?.toIso8601String(),
+    'series': series.id,
+    'issue': issue,
   };
 
   /// Export shape: a plain JSON object, with the image list inline.
@@ -188,6 +237,8 @@ class Magazine {
     'contentScore': contentScore,
     'lentTo': lentTo,
     'lentOn': lentOn?.toIso8601String(),
+    'series': series.id,
+    'issue': issue,
   };
 
   Magazine copyWith({
@@ -222,6 +273,9 @@ class Magazine {
     // One flag clears both, because they are one fact.
     lentTo: clearLoan ? null : (lentTo ?? this.lentTo),
     lentOn: clearLoan ? null : (lentOn ?? this.lentOn),
+    // Neither is in the parameter list: both are fixed by the row's identity.
+    series: series,
+    issue: _issue,
   );
 
   /// SQLite stores a flag as 0 or 1, JSON writes true or false, and an export

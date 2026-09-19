@@ -198,7 +198,7 @@ class _IssueScreenState extends State<IssueScreen> {
           ),
           const SizedBox(height: 22),
           Text(
-            'No. ${magazine.issue}',
+            magazine.mark,
             textAlign: TextAlign.center,
             style: AppType.serif(
               size: 44,
@@ -210,7 +210,7 @@ class _IssueScreenState extends State<IssueScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Burda Style, ${magazine.year}',
+            '${magazine.series.title}, ${magazine.year}',
             textAlign: TextAlign.center,
             style: AppType.serif(
               size: 19,

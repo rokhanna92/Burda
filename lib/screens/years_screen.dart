@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/magazine.dart';
+import '../models/series.dart';
 import '../providers/magazine_provider.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
@@ -11,9 +12,15 @@ import '../widgets/page_furniture.dart';
 
 /// What one year looks like on the shelf.
 class _Volume {
-  const _Volume({required this.year, required this.owned, required this.total});
+  const _Volume({
+    required this.year,
+    required this.series,
+    required this.owned,
+    required this.total,
+  });
 
   final int year;
+  final Series series;
   final int owned;
   final int total;
 
@@ -42,23 +49,36 @@ class YearsScreen extends StatelessWidget {
     final magazines = context.watch<MagazineProvider>();
     final nav = BurdaNav.of(context);
 
-    final volumes = [
-      for (final year in magazines.years)
-        _Volume(
-          year: year,
-          owned: magazines.ownedCountForYear(year),
-          total: magazines.magazinesForYear(year).length,
+    // One run of boards per shelf, each under its own heading. With a single
+    // shelf no heading is drawn and the screen is what it always was.
+    final boards = [
+      for (final shelf in magazines.startedShelves)
+        (
+          shelf: shelf,
+          volumes: [
+            for (final year in shelf.years)
+              _Volume(
+                year: year,
+                series: shelf.series,
+                owned: magazines.ownedCountForYear(year, series: shelf.series),
+                total: magazines
+                    .magazinesForYear(year, series: shelf.series)
+                    .length,
+              ),
+          ],
         ),
     ];
-    final complete = volumes.where((v) => v.fraction == 1).length;
-    final shelves = [
-      for (var at = 0; at < volumes.length; at += perShelf)
-        volumes.sublist(
-          at,
-          at + perShelf > volumes.length ? volumes.length : at + perShelf,
-        ),
+
+    // Only a shelf whose size is known can be complete or be missing anything:
+    // an open one is full by definition and would inflate both counts.
+    final counted = [
+      for (final board in boards)
+        if (board.shelf.series.counted) ...board.volumes,
     ];
-    final incomplete = volumes.where((v) => v.missing > 0).toList();
+    final volumes = [for (final board in boards) ...board.volumes];
+    final complete = counted.where((v) => v.fraction == 1).length;
+    final incomplete = counted.where((v) => v.missing > 0).toList();
+    final missing = incomplete.fold(0, (sum, v) => sum + v.missing);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(kGutter, 6, kGutter, 30),
@@ -102,29 +122,39 @@ class YearsScreen extends StatelessWidget {
                 color: edition.inkAt(60),
               ),
             ),
-          for (final shelf in shelves) ...[
-            _Shelf(
-              edition: edition,
-              volumes: shelf,
-              onOpen: (year) => nav.push(YearPage(year)),
-            ),
-            const SizedBox(height: 34),
+          for (final board in boards) ...[
+            if (magazines.manyShelves) ...[
+              SectionHeader(board.shelf.series.title, edition: edition),
+              const SizedBox(height: 14),
+            ],
+            for (final run in _runs(board.volumes)) ...[
+              _Board(
+                edition: edition,
+                volumes: run,
+                onOpen: (volume) =>
+                    nav.push(YearPage(volume.year, series: volume.series)),
+              ),
+              const SizedBox(height: 34),
+            ],
           ],
           if (incomplete.isNotEmpty) ...[
             const SizedBox(height: 2),
             SectionHeader(
               'Still missing',
               edition: edition,
-              note: '${magazines.missingCount} issues',
+              note: '$missing issues',
             ),
             const SizedBox(height: 4),
             for (final volume in incomplete)
               _MissingRow(
                 edition: edition,
                 volume: volume,
-                issues: magazines.magazinesForYear(volume.year)
-                  ..sort((a, b) => a.issue.compareTo(b.issue)),
-                onOpen: () => nav.push(YearPage(volume.year)),
+                issues: magazines.magazinesForYear(
+                  volume.year,
+                  series: volume.series,
+                )..sort((a, b) => a.issue.compareTo(b.issue)),
+                onOpen: () =>
+                    nav.push(YearPage(volume.year, series: volume.series)),
               ),
           ],
         ],
@@ -133,9 +163,26 @@ class YearsScreen extends StatelessWidget {
   }
 }
 
-/// One shelf: up to eight spines standing on a board.
-class _Shelf extends StatelessWidget {
-  const _Shelf({
+/// Breaks a shelf's volumes into boards of [YearsScreen.perShelf].
+///
+/// A top-level function rather than a line in build, because it now runs once
+/// per shelf rather than once.
+List<List<_Volume>> _runs(List<_Volume> volumes) => [
+  for (var at = 0; at < volumes.length; at += YearsScreen.perShelf)
+    volumes.sublist(
+      at,
+      at + YearsScreen.perShelf > volumes.length
+          ? volumes.length
+          : at + YearsScreen.perShelf,
+    ),
+];
+
+/// One board: up to eight spines standing on it.
+///
+/// Named board rather than shelf, since Shelf now means the data three lines
+/// above it.
+class _Board extends StatelessWidget {
+  const _Board({
     required this.edition,
     required this.volumes,
     required this.onOpen,
@@ -143,7 +190,7 @@ class _Shelf extends StatelessWidget {
 
   final Edition edition;
   final List<_Volume> volumes;
-  final ValueChanged<int> onOpen;
+  final ValueChanged<_Volume> onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +211,7 @@ class _Shelf extends StatelessWidget {
                       edition: edition,
                       volume: volume,
                       order: index,
-                      onTap: () => onOpen(volume.year),
+                      onTap: () => onOpen(volume),
                     ),
                   ),
                 ],
