@@ -8,23 +8,25 @@
 /// Stored by [name], never by index, so the order here is only the order the
 /// words are printed in.
 enum GarmentTag {
-  dress('Dresses', 'dress'),
-  blouse('Blouses', 'blouse'),
-  skirt('Skirts', 'skirt'),
-  trousers('Trousers', 'trousers'),
-  jacket('Jackets', 'jacket'),
-  coat('Coats', 'coat'),
-  knitwear('Knitwear', 'knitwear'),
-  children('Children', 'something for a child'),
-  accessories('Accessories', 'accessory'),
-  plus('Plus sizes', 'plus size');
+  dress('Dresses', 'Dress'),
+  blouse('Blouses', 'Blouse'),
+  skirt('Skirts', 'Skirt'),
+  trousers('Trousers', 'Trousers'),
+  jacket('Jackets', 'Jacket'),
+  coat('Coats', 'Coat'),
+  knitwear('Knitwear', 'Knitwear'),
+  children('Children', 'For a child'),
+  accessories('Accessories', 'Accessory'),
+  plus('Plus sizes', 'Plus size');
 
   const GarmentTag(this.label, this.one);
 
   /// How the word is printed on a chip, where it names a whole shelf of them.
   final String label;
 
-  /// The same word for one garment, for a line that names a single make.
+  /// The same word for one garment, which is what a make's own heading wants:
+  /// a journal entry headed "Dresses" reads as a category rather than as the
+  /// thing she sewed.
   final String one;
 
   /// The tag that goes by [name], or null for a word this build has not heard

@@ -1,6 +1,7 @@
 import 'package:burda/models/note_provider.dart';
 import 'package:burda/providers/contents_provider.dart';
 import 'package:burda/providers/magazine_provider.dart';
+import 'package:burda/providers/make_provider.dart';
 import 'package:burda/providers/theme_provider.dart';
 import 'package:burda/services/database_service.dart';
 import 'package:provider/provider.dart';
@@ -16,15 +17,18 @@ class TestApp {
   TestApp(DatabaseService service)
     : magazines = MagazineProvider(database: service),
       contents = ContentsProvider(database: service),
+      makes = MakeProvider(database: service),
       notes = NoteProvider(database: service);
 
   final MagazineProvider magazines;
   final ContentsProvider contents;
+  final MakeProvider makes;
   final NoteProvider notes;
 
   Future<void> load() async {
     await magazines.load();
     await contents.load();
+    await makes.load();
     await notes.load();
   }
 
@@ -32,6 +36,7 @@ class TestApp {
   List<SingleChildWidget> get providers => [
     ChangeNotifierProvider.value(value: magazines),
     ChangeNotifierProvider.value(value: contents),
+    ChangeNotifierProvider.value(value: makes),
     ChangeNotifierProvider.value(value: notes),
     ChangeNotifierProvider(create: (_) => ThemeProvider()),
   ];

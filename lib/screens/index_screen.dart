@@ -6,6 +6,7 @@ import '../models/date_label.dart';
 import '../models/magazine.dart';
 import '../models/note_provider.dart';
 import '../providers/magazine_provider.dart';
+import '../providers/make_provider.dart';
 import '../providers/theme_provider.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
@@ -30,6 +31,7 @@ class IndexScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final magazines = context.watch<MagazineProvider>();
+    final makes = context.watch<MakeProvider>();
     final noteCount = context.select<NoteProvider, int>((n) => n.count);
     final editionName = context.select<ThemeProvider, String>(
       (theme) => theme.edition.name,
@@ -132,7 +134,7 @@ class IndexScreen extends StatelessWidget {
                 const SizedBox(height: 30),
                 SectionHeader('Contents', edition: edition, note: 'tap a line'),
                 const SizedBox(height: 4),
-                for (final line in _lines(magazines, noteCount, nav))
+                for (final line in _lines(magazines, makes, noteCount, nav))
                   _ContentsLine(edition: edition, line: line),
                 const SizedBox(height: 30),
                 SectionHeader(
@@ -173,51 +175,55 @@ class IndexScreen extends StatelessWidget {
     );
   }
 
-  List<_Line> _lines(MagazineProvider magazines, int noteCount, BurdaNav nav) =>
-      [
-        _Line(
-          no: '01',
-          title: 'Owned',
-          sub: 'in the collection',
-          value: '${magazines.ownedCount}',
-          go: () => nav.showCollection(owned: true),
-        ),
-        _Line(
-          no: '02',
-          title: 'Missing',
-          sub: 'still to find',
-          value: '${magazines.missingCount}',
-          go: () => nav.showCollection(owned: false),
-        ),
-        _Line(
-          no: '03',
-          title: 'Years',
-          sub: '${magazines.completeYearCount} complete',
-          value: '${magazines.years.length}',
-          go: () => nav.goTab(NavTab.years),
-        ),
-        _Line(
-          no: '04',
-          title: 'Notes',
-          sub: 'patterns, sizes, ideas',
-          value: '$noteCount',
-          go: () => nav.push(const NotesPage()),
-        ),
-        _Line(
-          no: '05',
-          title: 'Vault',
-          sub: 'photos of things you made',
-          value: '${magazines.vaultCount}',
-          go: () => nav.push(const VaultPage()),
-        ),
-        _Line(
-          no: '06',
-          title: 'Rank',
-          sub: CollectorRank.hintFor(magazines.ownedCount),
-          value: magazines.rank.name,
-          go: () => nav.openSheet(BurdaSheet.rank),
-        ),
-      ];
+  List<_Line> _lines(
+    MagazineProvider magazines,
+    MakeProvider makes,
+    int noteCount,
+    BurdaNav nav,
+  ) => [
+    _Line(
+      no: '01',
+      title: 'Owned',
+      sub: 'in the collection',
+      value: '${magazines.ownedCount}',
+      go: () => nav.showCollection(owned: true),
+    ),
+    _Line(
+      no: '02',
+      title: 'Missing',
+      sub: 'still to find',
+      value: '${magazines.missingCount}',
+      go: () => nav.showCollection(owned: false),
+    ),
+    _Line(
+      no: '03',
+      title: 'Years',
+      sub: '${magazines.completeYearCount} complete',
+      value: '${magazines.years.length}',
+      go: () => nav.goTab(NavTab.years),
+    ),
+    _Line(
+      no: '04',
+      title: 'Notes',
+      sub: 'patterns, sizes, ideas',
+      value: '$noteCount',
+      go: () => nav.push(const NotesPage()),
+    ),
+    _Line(
+      no: '05',
+      title: 'Makes',
+      sub: '${makes.finishedCount} finished',
+      value: '${makes.count}',
+      go: () => nav.push(const MakesPage()),
+    ),
+    _Line(
+      no: '06',
+      title: 'Rank',
+      sub: CollectorRank.hintFor(magazines.ownedCount),
+      value: magazines.rank.name,
+      go: () => nav.openSheet(BurdaSheet.rank),
+    ),
+  ];
 }
 
 /// One line of the contents table.

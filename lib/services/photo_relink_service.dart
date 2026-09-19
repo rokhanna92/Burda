@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 
 import '../models/contents_entry.dart';
 import '../models/magazine.dart';
+import '../models/make.dart';
 import 'image_storage_service.dart';
 
 /// What a relink pass managed to do.
@@ -43,6 +44,9 @@ typedef RelinkedIssue = ({String id, List<String> photos, String? cover});
 
 /// One photographed page's repaired path. Null means the photograph is gone.
 typedef RelinkedPage = ({String id, String? path});
+
+/// One make's repaired photo paths.
+typedef RelinkedMake = ({String id, List<String> photos});
 
 /// Which of the app's folders a file belongs in, which decides where a copy
 /// goes back to.
@@ -145,12 +149,52 @@ abstract final class PhotoRelinkService {
     return (changed, report);
   }
 
+  /// Repairs the photos of [makes], optionally drawing on [sourceFolder].
+  ///
+  /// A photo brought over from an issue keeps the path it had under that
+  /// issue's folder, so the search covers the make's folder and the issue's
+  /// both, which [_ownCopy] already does.
+  static Future<(List<RelinkedMake>, RelinkReport)> repairMakes(
+    List<Make> makes, {
+    Directory? sourceFolder,
+  }) async {
+    final byName = sourceFolder == null
+        ? const <String, File>{}
+        : await _indexByName(sourceFolder);
+
+    final changed = <RelinkedMake>[];
+    var report = const RelinkReport();
+
+    for (final make in makes) {
+      final photos = <String>[];
+      var touched = false;
+
+      for (final path in make.photos) {
+        final (resolved, outcome) = await _resolve(
+          path: path,
+          magazineId: make.magazineId ?? '',
+          makeId: make.id,
+          byName: byName,
+          kind: _Kind.make,
+        );
+        report += outcome;
+        if (resolved != null) photos.add(resolved);
+        if (resolved != path) touched = true;
+      }
+
+      if (touched) changed.add((id: make.id, photos: photos));
+    }
+
+    return (changed, report);
+  }
+
   /// Finds one file, wherever it may now be.
   static Future<(String?, RelinkReport)> _resolve({
     required String path,
     required String magazineId,
     required Map<String, File> byName,
     required _Kind kind,
+    String? makeId,
   }) async {
     if (File(path).existsSync()) {
       return (path, const RelinkReport(alreadyThere: 1));
@@ -160,7 +204,11 @@ abstract final class PhotoRelinkService {
 
     // Already sitting in this app's own folders, just under a different root:
     // the case when the whole data directory was copied across.
-    final mine = await _ownCopy(name: name, magazineId: magazineId);
+    final mine = await _ownCopy(
+      name: name,
+      magazineId: magazineId,
+      makeId: makeId,
+    );
     if (mine != null) return (mine, const RelinkReport(relinked: 1));
 
     final found = byName[name];
@@ -174,7 +222,11 @@ abstract final class PhotoRelinkService {
           magazineId: magazineId,
           sourcePath: found.path,
         ),
-        _Kind.photo || _Kind.make => await ImageStorageService.save(
+        _Kind.make => await ImageStorageService.saveMakePhoto(
+          makeId: makeId!,
+          sourcePath: found.path,
+        ),
+        _Kind.photo => await ImageStorageService.save(
           magazineId: magazineId,
           sourcePath: found.path,
         ),
@@ -185,16 +237,20 @@ abstract final class PhotoRelinkService {
     return (null, const RelinkReport(lost: 1));
   }
 
-  /// Looks for [name] in the folders this app keeps for [magazineId].
+  /// Looks for [name] in every folder this app keeps for its owner.
   ///
   /// Not told which kind it is after: names are millisecond stamps, so a hit in
-  /// a neighbouring folder is the same file, and looking in all of them costs
-  /// three stat calls.
+  /// a neighbouring folder is the same file, and looking in all of them costs a
+  /// handful of stat calls. It matters for a make, whose photo may still be
+  /// sitting in the issue folder it was brought over from.
   static Future<String?> _ownCopy({
     required String name,
     required String magazineId,
+    String? makeId,
   }) async {
     for (final candidate in [
+      if (makeId != null)
+        await ImageStorageService.makePhotoPathFor(makeId: makeId, name: name),
       await ImageStorageService.photoPathFor(
         magazineId: magazineId,
         name: name,

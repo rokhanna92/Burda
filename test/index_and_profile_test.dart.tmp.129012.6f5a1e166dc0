@@ -4,7 +4,6 @@ import 'package:burda/providers/theme_provider.dart';
 import 'package:burda/screens/collection_screen.dart';
 import 'package:burda/screens/index_screen.dart';
 import 'package:burda/screens/issue_screen.dart';
-import 'package:burda/screens/makes_screen.dart';
 import 'package:burda/screens/notes_screen.dart';
 import 'package:burda/screens/profile_screen.dart';
 import 'package:burda/screens/vault_screen.dart';
@@ -178,7 +177,7 @@ void main() {
       await settle(tester);
       expect(find.byType(MakesScreen), findsOneWidget);
 
-      // The vault hangs off the journal now, rather than off the index.
+      // The vault is reached from the journal now, rather than from the index.
       await tester.tap(find.textContaining('Every photo'));
       await settle(tester);
       expect(find.byType(VaultScreen), findsOneWidget);

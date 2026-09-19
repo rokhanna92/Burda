@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../models/contents_entry.dart';
 import '../models/magazine.dart';
+import '../models/make.dart';
 import '../models/note.dart';
 
 /// Owns the SQLite store: the seeded `magazines` table, the `notes` table and
@@ -34,12 +35,13 @@ class DatabaseService {
   /// Bumped whenever the bundled issue list grows or the schema changes.
   ///
   /// 1: the first build. 2: 2025 filled out to twelve issues and 2026 began.
-  /// 3: the contents index.
-  static const int schemaVersion = 3;
+  /// 3: the contents index. 4: makes and the sew queue.
+  static const int schemaVersion = 4;
 
   static const String magazinesTable = 'magazines';
   static const String notesTable = 'notes';
   static const String contentsTable = 'contents';
+  static const String makesTable = 'makes';
 
   /// What each version did to the schema, in order.
   ///
@@ -54,6 +56,7 @@ class DatabaseService {
   static const Map<int, List<String>> _ladder = {
     1: [_createMagazines, _createNotes, _indexMagazinesYear],
     3: [_createContents],
+    4: [_createMakes],
   };
 
   final Future<String> Function() _loadSeed;
@@ -156,6 +159,31 @@ class DatabaseService {
             caption TEXT NOT NULL DEFAULT '',
             tags TEXT NOT NULL DEFAULT '[]',
             addedOn TEXT NOT NULL
+          )
+        ''';
+
+  // Rung 4, the sewing journal. The queue is a row of this with status
+  // 'queued', not a table of its own: starting a make is then a status change
+  // rather than a copy between tables, and everything written down while it
+  // waited is still attached.
+  //
+  // magazineId is nullable and soft, like the one above: a garment she sewed
+  // does not stop existing because the issue left the shelf.
+  static const String _createMakes =
+      '''
+          CREATE TABLE $makesTable (
+            id TEXT PRIMARY KEY,
+            magazineId TEXT,
+            patternNo TEXT NOT NULL DEFAULT '',
+            garment TEXT NOT NULL DEFAULT '',
+            size TEXT NOT NULL DEFAULT '',
+            fabric TEXT NOT NULL DEFAULT '',
+            status TEXT NOT NULL DEFAULT 'queued',
+            notes TEXT NOT NULL DEFAULT '',
+            photos TEXT NOT NULL DEFAULT '[]',
+            queuedOn TEXT NOT NULL,
+            startedOn TEXT,
+            finishedOn TEXT
           )
         ''';
 
@@ -401,6 +429,84 @@ class DatabaseService {
     await batch.commit(noResult: true);
     return count;
   }
+
+  // Makes
+
+  /// The whole journal, newest first.
+  Future<List<Make>> getMakes() async {
+    final db = await database;
+    final rows = await db.query(makesTable);
+    final makes = rows.map(Make.fromMap).toList();
+    makes.sort(compareByMade);
+    return makes;
+  }
+
+  Future<void> addMake(Make make) async {
+    final db = await database;
+    await db.insert(
+      makesTable,
+      make.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> updateMake(Make make) async {
+    final db = await database;
+    await db.update(
+      makesTable,
+      make.toMap(),
+      where: 'id = ?',
+      whereArgs: [make.id],
+    );
+  }
+
+  Future<void> deleteMake(String id) async {
+    final db = await database;
+    await db.delete(makesTable, where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// Merges exported makes back in, keeping makes the file does not mention.
+  Future<int> importMakes(List<Object?> entries) async {
+    final db = await database;
+    final batch = db.batch();
+    var count = 0;
+    for (final entry in entries) {
+      if (entry is! Map<String, dynamic>) continue;
+      batch.insert(
+        makesTable,
+        Make.fromJson(entry).toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      count++;
+    }
+    await batch.commit(noResult: true);
+    return count;
+  }
+
+  /// Merges exported notes back in.
+  ///
+  /// Notes have never been in the export file, and the journal is going into it
+  /// now, so they go in together rather than one build later.
+  Future<int> importNotes(List<Object?> entries) async {
+    final db = await database;
+    final batch = db.batch();
+    var count = 0;
+    for (final entry in entries) {
+      if (entry is! Map<String, dynamic>) continue;
+      batch.insert(
+        notesTable,
+        Note.fromMap(entry).toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      count++;
+    }
+    await batch.commit(noResult: true);
+    return count;
+  }
+
+  /// The journal reads backwards, like a diary: the last thing that happened
+  /// to a make is what files it.
+  static int compareByMade(Make a, Make b) => b.sortDate.compareTo(a.sortDate);
 
   /// Chronological order: by year, then by issue number within the year.
   static int compareByIssue(Magazine a, Magazine b) {

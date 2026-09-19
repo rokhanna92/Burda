@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/magazine.dart';
+import '../models/make.dart';
 import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
+import '../providers/make_provider.dart';
 import '../services/image_storage_service.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
@@ -64,6 +66,86 @@ class ConfirmSheet extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           'Its photos and condition go with it.',
+          textAlign: TextAlign.center,
+          style: AppType.serif(
+            size: 16,
+            italic: true,
+            color: edition.inkAt(65),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Row(
+          children: [
+            Expanded(
+              child: BurdaButton(
+                edition: edition,
+                label: 'Keep',
+                onTap: nav.closeSheet,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _RemoveButton(
+                edition: edition,
+                onTap: () => _remove(context),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Asking before a make is taken out of the journal for good.
+class ConfirmMakeSheet extends StatelessWidget {
+  const ConfirmMakeSheet({
+    super.key,
+    required this.edition,
+    required this.make,
+  });
+
+  final Edition edition;
+  final Make make;
+
+  Future<void> _remove(BuildContext context) async {
+    final nav = BurdaNav.of(context);
+    final makes = context.read<MakeProvider>();
+
+    // Its own photos go with it. One brought over from an issue was moved, not
+    // copied, so this is the only row that holds it.
+    for (final path in make.photos) {
+      await ImageStorageService.delete(path);
+    }
+
+    await makes.deleteMake(make.id);
+
+    nav.closeSheet();
+    nav.back();
+    nav.showToast('${make.name} removed from the journal');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final nav = BurdaNav.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 6),
+        Text(
+          'Remove this make from the journal?',
+          textAlign: TextAlign.center,
+          style: AppType.serif(
+            size: 30,
+            weight: 500,
+            height: 1.1,
+            color: edition.ink,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${make.name}, with its photos and its dates.',
           textAlign: TextAlign.center,
           style: AppType.serif(
             size: 16,

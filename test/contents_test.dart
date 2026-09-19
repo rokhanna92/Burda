@@ -271,7 +271,7 @@ void main() {
 
     test('prints a shelf of them and one of them', () {
       expect(GarmentTag.dress.label, 'Dresses');
-      expect(GarmentTag.dress.one, 'dress');
+      expect(GarmentTag.dress.one, 'Dress');
       expect(GarmentTag.values, hasLength(10));
     });
   });

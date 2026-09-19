@@ -18,6 +18,10 @@ abstract final class ImageStorageService {
   /// impossible to confuse rather than merely unlikely.
   static const String contentsFolder = 'contents_pages';
 
+  /// Photos of one make. A folder per make rather than per issue, because a
+  /// make need not have come out of an issue at all.
+  static const String makeFolder = 'make_photos';
+
   /// `documents/<folder>/<owner>/`, made if it is not there yet.
   static Future<Directory> _directoryFor(String folder, String owner) async {
     final documents = await getApplicationDocumentsDirectory();
@@ -66,6 +70,14 @@ abstract final class ImageStorageService {
     now: now,
   );
 
+  /// Copies [sourcePath] in as a photo of [makeId].
+  static Future<String> saveMakePhoto({
+    required String makeId,
+    required String sourcePath,
+    DateTime? now,
+  }) async =>
+      _copyInto(await _directoryFor(makeFolder, makeId), sourcePath, now: now);
+
   /// Copies [sourcePath] in as the cover for [magazineId] and returns its path.
   ///
   /// Named after the issue rather than the clock: there is only ever one, and a
@@ -101,6 +113,15 @@ abstract final class ImageStorageService {
   }) async {
     final documents = await getApplicationDocumentsDirectory();
     return p.join(documents.path, contentsFolder, magazineId, name);
+  }
+
+  /// Where a photo called [name] would sit for [makeId].
+  static Future<String> makePhotoPathFor({
+    required String makeId,
+    required String name,
+  }) async {
+    final documents = await getApplicationDocumentsDirectory();
+    return p.join(documents.path, makeFolder, makeId, name);
   }
 
   /// Where a cover called [name] would sit.

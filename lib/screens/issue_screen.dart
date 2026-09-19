@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/magazine.dart';
 import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
+import '../providers/make_provider.dart';
 import '../services/image_storage_service.dart';
 import '../shell/burda_nav.dart';
 import '../shell/collection_actions.dart';
@@ -12,6 +13,7 @@ import '../theme/edition.dart';
 import '../theme/motion.dart';
 import '../theme/typography.dart';
 import '../widgets/cover_tile.dart';
+import '../widgets/make_row.dart';
 import '../widgets/page_furniture.dart';
 import '../widgets/photo_tile.dart';
 
@@ -112,6 +114,7 @@ class _IssueScreenState extends State<IssueScreen> {
     // Watched rather than selected: forIssue builds a fresh list every call, so
     // select would compare two unequal lists and rebuild anyway.
     final pages = context.watch<ContentsProvider>().forIssue(widget.id);
+    final made = context.watch<MakeProvider>().forIssue(widget.id);
 
     // Deleted out from under us, which the shell will pop past in a moment.
     if (magazine == null) return const SizedBox.shrink();
@@ -201,6 +204,30 @@ class _IssueScreenState extends State<IssueScreen> {
               ],
             ),
           ],
+          const SizedBox(height: 30),
+          SectionHeader(
+            'Makes',
+            edition: edition,
+            note: '${made.length} from this issue',
+          ),
+          for (final make in made)
+            MakeRow(
+              key: ValueKey(make.id),
+              edition: edition,
+              make: make,
+              // Null: naming the issue here would repeat the page it is
+              // printed on.
+              magazine: null,
+              onTap: () => nav.push(MakePage(make.id)),
+            ),
+          const SizedBox(height: 14),
+          BurdaButton(
+            edition: edition,
+            label: 'Start a make from this issue',
+            size: 15,
+            padding: const EdgeInsets.all(13),
+            onTap: () => nav.openSheet(BurdaSheet.make),
+          ),
           const SizedBox(height: 30),
           SectionHeader(
             'Contents',

@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/magazine_provider.dart';
+import '../providers/make_provider.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
 import '../theme/typography.dart';
 import '../widgets/page_furniture.dart';
 import '../widgets/photo_tile.dart';
 
-/// Every photo in the collection in one place, each tapping through to the
-/// issue it came from.
+/// Every photo in one place, each tapping through to whatever it belongs to.
+///
+/// Two sources: the makes first, because what she made is the point of the
+/// vault now, and then the photos still hanging off an issue, which are the
+/// ones that have not found their make yet.
 class VaultScreen extends StatelessWidget {
   const VaultScreen({super.key, required this.edition});
 
@@ -17,8 +21,24 @@ class VaultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photos = context.watch<MagazineProvider>().vaultPhotos;
+    final loose = context.watch<MagazineProvider>().vaultPhotos;
+    final made = context.watch<MakeProvider>().photos;
     final nav = BurdaNav.of(context);
+
+    final photos = <({String path, String caption, BurdaPage page})>[
+      for (final photo in made)
+        (
+          path: photo.path,
+          caption: '${photo.make.name} · ${photo.make.sortDate.year}',
+          page: MakePage(photo.make.id),
+        ),
+      for (final photo in loose)
+        (
+          path: photo.path,
+          caption: 'No. ${photo.magazine.issue} · ${photo.magazine.year}',
+          page: IssuePage(photo.magazine.id),
+        ),
+    ];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(kGutter, 0, kGutter, 30),
@@ -58,7 +78,7 @@ class VaultScreen extends StatelessWidget {
               padding: const EdgeInsets.only(top: 60),
               child: Text(
                 'Nothing here yet.\n'
-                'Open an issue and add a photo of a pattern you sewed.',
+                'Start a make, or add a photo to an issue.',
                 textAlign: TextAlign.center,
                 style: AppType.serif(
                   size: 19,
@@ -85,7 +105,7 @@ class VaultScreen extends StatelessWidget {
                     duration: const Duration(milliseconds: 350),
                     stagger: const Duration(milliseconds: 50),
                     child: PressScale(
-                      onTap: () => nav.push(IssuePage(photo.magazine.id)),
+                      onTap: () => nav.push(photo.page),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -98,7 +118,7 @@ class VaultScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'No. ${photo.magazine.issue} · ${photo.magazine.year}',
+                            photo.caption,
                             overflow: TextOverflow.ellipsis,
                             style: AppType.smallCaps(
                               size: 15,

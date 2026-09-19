@@ -5,11 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/magazine_provider.dart';
+import '../providers/make_provider.dart';
 import '../providers/theme_provider.dart';
 import '../screens/collection_screen.dart';
 import '../screens/contents_reader.dart';
 import '../screens/index_screen.dart';
 import '../screens/issue_screen.dart';
+import '../screens/make_screen.dart';
+import '../screens/makes_screen.dart';
 import '../screens/notes_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/vault_screen.dart';
@@ -18,6 +21,7 @@ import '../screens/years_screen.dart';
 import '../sheets/about_sheet.dart';
 import '../sheets/add_sheet.dart';
 import '../sheets/confirm_sheet.dart';
+import '../sheets/make_sheet.dart';
 import '../sheets/note_sheet.dart';
 import '../sheets/rank_sheet.dart';
 import '../sheets/search_sheet.dart';
@@ -146,6 +150,8 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     IssuePage(:final id) => 'issue:$id',
     NotesPage() => 'notes',
     VaultPage() => 'vault',
+    MakesPage() => 'makes',
+    MakePage(:final id) => 'make:$id',
   };
 
   /// What the sheet is holding, or null for the ones not built yet.
@@ -166,13 +172,32 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
         return AboutSheet(edition: edition);
       case BurdaSheet.note:
         return NoteSheet(edition: edition);
+      case BurdaSheet.make:
+        // Raised from a make to edit it, from an issue to start one there, and
+        // from the journal to start one from nowhere in particular.
+        return switch (_top) {
+          MakePage(:final id) => MakeSheet(
+            edition: edition,
+            make: context.read<MakeProvider>().byId(id),
+          ),
+          IssuePage(:final id) => MakeSheet(edition: edition, magazineId: id),
+          _ => MakeSheet(edition: edition),
+        };
       case BurdaSheet.confirm:
-        // Only ever raised from an issue, so the one on top is the one meant.
-        if (_top case IssuePage(:final id)) {
-          final magazine = context.read<MagazineProvider>().byId(id);
-          if (magazine != null) {
-            return ConfirmSheet(edition: edition, magazine: magazine);
-          }
+        // Raised from whatever is on top, which is the thing being removed.
+        switch (_top) {
+          case IssuePage(:final id):
+            final magazine = context.read<MagazineProvider>().byId(id);
+            if (magazine != null) {
+              return ConfirmSheet(edition: edition, magazine: magazine);
+            }
+          case MakePage(:final id):
+            final make = context.read<MakeProvider>().byId(id);
+            if (make != null) {
+              return ConfirmMakeSheet(edition: edition, make: make);
+            }
+          default:
+            return null;
         }
         return null;
     }
@@ -191,6 +216,8 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     IssuePage(:final id) => IssueScreen(edition: edition, id: id),
     NotesPage() => NotesScreen(edition: edition),
     VaultPage() => VaultScreen(edition: edition),
+    MakesPage() => MakesScreen(edition: edition),
+    MakePage(:final id) => MakeScreen(edition: edition, id: id),
     YearPage(:final year) => YearScreen(edition: edition, year: year),
   };
 

@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:burda/models/note_provider.dart';
-import 'package:burda/providers/magazine_provider.dart';
-import 'package:burda/providers/theme_provider.dart';
 import 'package:burda/screens/notes_screen.dart';
 import 'package:burda/services/database_service.dart';
 import 'package:burda/shell/burda_nav.dart';
@@ -27,7 +25,6 @@ void main() {
   late DatabaseService service;
   late TestApp app;
   late NoteProvider notes;
-  late MagazineProvider magazines;
 
   setUp(() async {
     service = DatabaseService(
@@ -37,7 +34,6 @@ void main() {
     app = TestApp(service);
     await app.load();
     notes = app.notes;
-    magazines = app.magazines;
   });
 
   tearDown(() => service.close());
@@ -60,11 +56,7 @@ void main() {
   Future<void> openNotes(WidgetTester tester) async {
     await tester.pumpWidget(
       MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: notes),
-          ChangeNotifierProvider.value(value: magazines),
-          ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ],
+        providers: app.providers,
         child: MaterialApp(
           theme: buildAppTheme(Edition.rose),
           home: const BurdaShell(),

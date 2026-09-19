@@ -47,4 +47,13 @@ class NoteProvider extends ChangeNotifier {
     _notes = _notes.where((note) => note.id != id).toList();
     notifyListeners();
   }
+
+  Future<int> import(List<Object?> entries) async {
+    final count = await _database.importNotes(entries);
+    await load();
+    return count;
+  }
+
+  List<Map<String, Object?>> toExportJson() =>
+      _notes.map((note) => note.toJson()).toList();
 }

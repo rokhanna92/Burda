@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'models/note_provider.dart';
 import 'providers/contents_provider.dart';
 import 'providers/magazine_provider.dart';
+import 'providers/make_provider.dart';
 import 'providers/theme_provider.dart';
 import 'shell/burda_shell.dart';
 import 'theme/app_theme.dart';
@@ -21,6 +22,7 @@ class BurdaApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => MagazineProvider()..load()),
         ChangeNotifierProvider(create: (_) => ContentsProvider()..load()),
+        ChangeNotifierProvider(create: (_) => MakeProvider()..load()),
         ChangeNotifierProvider(create: (_) => NoteProvider()..load()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()..load()),
       ],

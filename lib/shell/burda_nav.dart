@@ -31,8 +31,18 @@ class VaultPage extends BurdaPage {
   const VaultPage();
 }
 
-/// The six things the one bottom sheet can hold.
-enum BurdaSheet { add, search, rank, about, note, confirm }
+class MakesPage extends BurdaPage {
+  const MakesPage();
+}
+
+class MakePage extends BurdaPage {
+  const MakePage(this.id);
+
+  final String id;
+}
+
+/// The seven things the one bottom sheet can hold.
+enum BurdaSheet { add, search, rank, about, note, make, confirm }
 
 /// What the contents reader is showing.
 ///

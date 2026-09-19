@@ -6,8 +6,10 @@ import 'package:provider/provider.dart';
 
 import '../app_version.dart';
 import '../models/collector_rank.dart';
+import '../models/note_provider.dart';
 import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
+import '../providers/make_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/data_transfer_service.dart';
 import '../services/photo_relink_service.dart';
@@ -105,6 +107,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         DataTransferService.bundle(
           magazines: context.read<MagazineProvider>().toExportJson(),
           contents: context.read<ContentsProvider>().toExportJson(),
+          makes: context.read<MakeProvider>().toExportJson(),
+          notes: context.read<NoteProvider>().toExportJson(),
         ),
       );
       final location = await DataTransferService.saveExport(bytes);
@@ -132,16 +136,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final file = DataTransferService.read(decoded);
       final magazines = context.read<MagazineProvider>();
       final contents = context.read<ContentsProvider>();
+      final makes = context.read<MakeProvider>();
 
       final count = await magazines.import(file.magazines);
       final pages = await contents.import(file.contents);
-      nav.showToast(
-        pages == 0
-            ? '$count issues restored'
-            : '$count issues and $pages pages restored',
-      );
+      final made = await makes.import(file.makes);
+      if (mounted) await context.read<NoteProvider>().import(file.notes);
+      nav.showToast(_restored(count, pages, made));
 
-      await _restorePhotos(magazines, contents, nav);
+      await _restorePhotos(magazines, contents, makes, nav);
 
       if (magazines.completion == 1) {
         nav.celebrate('The whole collection. Every issue.');
@@ -164,12 +167,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// repaired in one pass and counted together, because she is answering one
   /// question, "where are the pictures", and being asked it twice would be
   /// being asked it twice about the same folder.
+  /// What an import says it brought back, naming only what it actually found.
+  static String _restored(int issues, int pages, int makes) {
+    final parts = [
+      '$issues issues',
+      if (pages > 0) '$pages pages',
+      if (makes > 0) '$makes makes',
+    ];
+    return '${parts.join(' and ')} restored';
+  }
+
   Future<void> _restorePhotos(
     MagazineProvider magazines,
     ContentsProvider contents,
+    MakeProvider makes,
     BurdaNav nav,
   ) async {
-    var report = await _repairAll(magazines, contents);
+    var report = await _repairAll(magazines, contents, makes);
 
     if (!report.anyLost) {
       if (report.recovered > 0) {
@@ -189,6 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     report = await _repairAll(
       magazines,
       contents,
+      makes,
       sourceFolder: Directory(folder),
     );
 
@@ -202,7 +217,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// One pass over everything with a path in it.
   Future<RelinkReport> _repairAll(
     MagazineProvider magazines,
-    ContentsProvider contents, {
+    ContentsProvider contents,
+    MakeProvider makes, {
     Directory? sourceFolder,
   }) async {
     final (issueChanges, issueReport) = await PhotoRelinkService.repair(
@@ -217,7 +233,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     await contents.applyRelink(pageChanges);
 
-    return issueReport + pageReport;
+    final (makeChanges, makeReport) = await PhotoRelinkService.repairMakes(
+      makes.makes,
+      sourceFolder: sourceFolder,
+    );
+    await makes.applyRelink(makeChanges);
+
+    return issueReport + pageReport + makeReport;
   }
 
   @override

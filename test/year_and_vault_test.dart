@@ -217,7 +217,7 @@ void main() {
       expect(
         find.text(
           'Nothing here yet.\n'
-          'Open an issue and add a photo of a pattern you sewed.',
+          'Start a make, or add a photo to an issue.',
         ),
         findsOneWidget,
       );
