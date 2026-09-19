@@ -330,6 +330,8 @@ class _StubNav implements BurdaNav {
   @override
   void push(BurdaPage page) {}
   @override
+  void rain() {}
+  @override
   void showCollection({required bool owned}) {}
   @override
   void showToast(String message) {}

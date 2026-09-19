@@ -63,6 +63,9 @@ abstract interface class BurdaNav {
   /// Rains hearts and floats [message]. For a finished volume.
   void celebrate(String message);
 
+  /// A brief shower of hearts down the screen, for an issue taken in.
+  void rain();
+
   static BurdaNav of(BuildContext context) {
     final scope = context.getInheritedWidgetOfExactType<BurdaNavScope>();
     assert(scope != null, 'No BurdaShell above this screen');

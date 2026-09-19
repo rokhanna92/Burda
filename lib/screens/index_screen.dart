@@ -60,9 +60,12 @@ class IndexScreen extends StatelessWidget {
                   child: Text(
                     'Burda Style',
                     textAlign: TextAlign.center,
+                    // Larger than the design's 66px: FleurDeLeah is drawn
+                    // small on the body and this is the one place it appears,
+                    // so it is worth giving it the room.
                     style: AppType.logo(
-                      size: 66,
-                      height: 1.3,
+                      size: 82,
+                      height: 1.2,
                       color: edition.accent,
                     ),
                   ),

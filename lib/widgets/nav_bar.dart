@@ -43,30 +43,37 @@ class NavBar extends StatelessWidget {
   /// How far the button rides above the bar.
   static const double lift = 30;
 
-  /// The label size that lets the longest tab sit on one line.
+  /// The gutter either side of the bar.
   ///
-  /// "Collection" is half again as wide as "Index", and at phone width the
-  /// design's 15px does not fit the column, so it wrapped. Rather than pick a
-  /// smaller number and hope, this measures the real font and scales every
-  /// label by the same amount, so the four stay the same size as each other on
-  /// any screen.
-  static double _labelSize(double available) {
-    const wanted = 15.0;
-    var widest = 0.0;
+  /// Narrower than the 18px the design gives it: that space was doing nothing
+  /// but squeezing the labels, and the room is better spent on the lettering.
+  static const double gutter = 6;
 
-    for (final tab in NavTab.values) {
-      final painter = TextPainter(
-        text: TextSpan(
-          text: tab.label,
-          style: AppType.smallCaps(size: wanted, trackingEm: 0.16),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      widest = math.max(widest, painter.width);
-    }
+  /// The column the raised window sits in.
+  static const double windowColumn = 76;
 
-    if (widest <= available || widest == 0) return wanted;
-    return wanted * available / widest;
+  /// Breathing room between one tab and the next.
+  static const double gap = 6;
+
+  /// The largest the labels can be set and still all four fit on one line.
+  ///
+  /// Sized against the sum of the four, not against the longest one four
+  /// times over: "Index" and "Years" are short and "Collection" is not, so
+  /// letting each take only the room it needs buys the lettering several
+  /// points. Measured with the real font, so it holds at any width and any
+  /// system text size.
+  static const double _ceiling = 19;
+  static const double _tracking = 0.14;
+
+  static double _widthOf(String label, double size) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: label,
+        style: AppType.smallCaps(size: size, trackingEm: _tracking),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return painter.width;
   }
 
   @override
@@ -82,17 +89,36 @@ class NavBar extends StatelessWidget {
         border: Border(top: BorderSide(color: edition.inkAt(16))),
       ),
       child: Padding(
-        padding: EdgeInsets.fromLTRB(18, 8, 18, bottom),
+        padding: EdgeInsets.fromLTRB(gutter, 8, gutter, bottom),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final size = _labelSize((constraints.maxWidth - 76) / 4);
+            final widths = {
+              for (final tab in NavTab.values)
+                tab: _widthOf(tab.label, _ceiling),
+            };
+            final natural = widths.values.reduce((a, b) => a + b);
+            final room =
+                constraints.maxWidth -
+                windowColumn -
+                gap * NavTab.values.length;
+            final size = natural == 0
+                ? _ceiling
+                : math.min(_ceiling, _ceiling * room / natural);
+
+            // Each tab takes a share of the row in proportion to its own word,
+            // so the dots stay centred under the lettering rather than under
+            // four identical boxes.
+            Widget tab(NavTab which) => Expanded(
+              flex: (widths[which]! * 100).round(),
+              child: _tab(which, size),
+            );
 
             return Row(
               children: [
-                _tab(NavTab.home, size),
-                _tab(NavTab.collection, size),
+                tab(NavTab.home),
+                tab(NavTab.collection),
                 SizedBox(
-                  width: 76,
+                  width: windowColumn,
                   child: Center(
                     child: Transform.translate(
                       offset: const Offset(0, -lift),
@@ -100,8 +126,8 @@ class NavBar extends StatelessWidget {
                     ),
                   ),
                 ),
-                _tab(NavTab.years, size),
-                _tab(NavTab.profile, size),
+                tab(NavTab.years),
+                tab(NavTab.profile),
               ],
             );
           },
@@ -110,39 +136,38 @@ class NavBar extends StatelessWidget {
     );
   }
 
+  /// The label and its dot. The caller decides how wide it is.
   Widget _tab(NavTab tab, double size) {
     final active = tab == current;
 
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => onSelect(tab),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 250),
-                style: AppType.smallCaps(
-                  size: size,
-                  trackingEm: 0.16,
-                  color: active ? edition.ink : edition.muted,
-                ),
-                child: Text(tab.label, maxLines: 1, softWrap: false),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onSelect(tab),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 250),
+              style: AppType.smallCaps(
+                size: size,
+                trackingEm: _tracking,
+                color: active ? edition.ink : edition.muted,
               ),
-              const SizedBox(height: 5),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                width: 4,
-                height: 4,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: active ? edition.accent : Colors.transparent,
-                ),
+              child: Text(tab.label, maxLines: 1, softWrap: false),
+            ),
+            const SizedBox(height: 5),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              width: 4,
+              height: 4,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: active ? edition.accent : Colors.transparent,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

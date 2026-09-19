@@ -22,6 +22,7 @@ import '../sheets/rank_sheet.dart';
 import '../sheets/search_sheet.dart';
 import '../theme/edition.dart';
 import '../theme/motion.dart';
+import '../widgets/falling_hearts.dart';
 import '../widgets/hearts.dart';
 import '../widgets/nav_bar.dart';
 import '../widgets/sheet_scaffold.dart';
@@ -50,6 +51,10 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
   BurdaSheet? _sheet;
   String? _toast;
   bool _hearts = false;
+
+  /// Counts showers rather than flagging one, so claiming a second issue
+  /// while the first is still falling starts a fresh one.
+  int? _raining;
   Timer? _toastTimer;
   final PageStorageBucket _bucket = PageStorageBucket();
 
@@ -102,6 +107,9 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
       if (mounted) setState(() => _toast = null);
     });
   }
+
+  @override
+  void rain() => setState(() => _raining = (_raining ?? 0) + 1);
 
   @override
   void celebrate(String message) {
@@ -229,6 +237,18 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
                         edition: edition,
                         onClose: closeSheet,
                         child: sheet,
+                      ),
+                    ),
+                  if (_raining case final shower?)
+                    Positioned.fill(
+                      child: FallingHearts(
+                        key: ValueKey(shower),
+                        edition: edition,
+                        onDone: () {
+                          if (mounted && _raining == shower) {
+                            setState(() => _raining = null);
+                          }
+                        },
                       ),
                     ),
                   if (_hearts)

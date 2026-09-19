@@ -22,6 +22,11 @@ Future<void> toggleIssueOwned(BuildContext context, Magazine magazine) async {
     nav.showToast('$label set aside');
     return;
   }
+
+  // The small pleasure of adding a magazine, whatever else it happens to
+  // complete.
+  nav.rain();
+
   if (magazines.ownedCount == magazines.totalCount) {
     nav.celebrate('The whole collection. Every issue.');
   } else if (magazines.isYearComplete(magazine.year)) {

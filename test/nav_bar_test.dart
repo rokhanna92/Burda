@@ -143,22 +143,19 @@ void main() {
 
       await _pump(tester);
 
-      // Four tabs share what is left after the 18px gutters and the 76px the
-      // window sits in.
-      final column = (402 - 36 - 76) / 4;
-
+      var used = 0.0;
       for (final tab in NavTab.values) {
         final text = tester.widget<Text>(find.text(tab.label));
         expect(text.maxLines, 1, reason: tab.label);
         expect(text.softWrap, isFalse, reason: tab.label);
-
-        // Fits, so it is neither wrapped nor cut off.
-        expect(
-          tester.getSize(find.text(tab.label)).width,
-          lessThanOrEqualTo(column),
-          reason: '${tab.label} is wider than its column',
-        );
+        used += tester.getSize(find.text(tab.label)).width;
       }
+
+      // The four together fit beside the window, inside the gutters. Sized
+      // against their sum rather than four times the longest, which is what
+      // buys the lettering its size.
+      final room = 402 - NavBar.gutter * 2 - NavBar.windowColumn;
+      expect(used, lessThanOrEqualTo(room));
     });
 
     testWidgets('sets all four labels at the same size', (tester) async {
