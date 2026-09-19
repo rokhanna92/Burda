@@ -40,6 +40,21 @@ class MagazineProvider extends ChangeNotifier {
   List<Magazine> get owned => _magazines.where((m) => m.isOwned).toList();
   List<Magazine> get missing => _magazines.where((m) => !m.isOwned).toList();
 
+  /// Every issue out of the house, longest gone first.
+  ///
+  /// The order is the point: the one she is most likely to have forgotten is
+  /// the one at the top of the list. Nothing above this line learns the word
+  /// "lent", because a lent issue is still owned, still counted and still
+  /// filled in on its volume.
+  List<Magazine> get lent =>
+      _magazines.where((m) => m.isLent).toList()..sort((a, b) {
+        final left = a.lentOn, right = b.lentOn;
+        if (left == null || right == null) return 0;
+        return left.compareTo(right);
+      });
+
+  int get lentCount => _magazines.where((m) => m.isLent).length;
+
   /// Years present in the collection, oldest first.
   List<int> get years => _magazines.map((m) => m.year).toSet().toList()..sort();
 
@@ -143,6 +158,16 @@ class MagazineProvider extends ChangeNotifier {
 
   Future<void> setCondition(String id, int score) async {
     final updated = await _database.setCondition(id, score);
+    if (updated != null) _replace(updated);
+  }
+
+  Future<void> lendIssue(String id, String to) async {
+    final updated = await _database.lendIssue(id, to);
+    if (updated != null) _replace(updated);
+  }
+
+  Future<void> returnIssue(String id) async {
+    final updated = await _database.returnIssue(id);
     if (updated != null) _replace(updated);
   }
 

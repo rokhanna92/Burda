@@ -88,12 +88,14 @@ class TonightProvider extends ChangeNotifier {
 
   /// What can be dealt: the issues she actually has.
   ///
-  /// Serving her an issue she does not own is a taunt rather than a pleasure.
+  /// Serving her an issue she does not own is a taunt rather than a pleasure,
+  /// and one at a friend's house is no more available tonight than one she
+  /// never had.
   Future<List<String>> _shelf() async {
     final magazines = await _database.getAllMagazines();
     return [
       for (final magazine in magazines)
-        if (magazine.isOwned) magazine.id,
+        if (magazine.isOwned && !magazine.isLent) magazine.id,
     ];
   }
 

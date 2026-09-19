@@ -310,7 +310,11 @@ class _Result extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    magazine.isOwned ? 'in the collection' : 'still missing',
+                    magazine.isLent
+                        ? 'with ${magazine.lentTo}'
+                        : (magazine.isOwned
+                              ? 'in the collection'
+                              : 'still missing'),
                     overflow: TextOverflow.ellipsis,
                     style: AppType.serif(
                       size: 15,

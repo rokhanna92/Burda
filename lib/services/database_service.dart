@@ -36,8 +36,8 @@ class DatabaseService {
   ///
   /// 1: the first build. 2: 2025 filled out to twelve issues and 2026 began.
   /// 3: the contents index. 4: makes and the sew queue. 5: the settings table.
-  /// 6: a favourite mark and a score for what is inside.
-  static const int schemaVersion = 6;
+  /// 6: a favourite mark and a score for what is inside. 7: lending.
+  static const int schemaVersion = 7;
 
   static const String magazinesTable = 'magazines';
   static const String notesTable = 'notes';
@@ -61,6 +61,7 @@ class DatabaseService {
     4: [_createMakes],
     5: [_createSettings],
     6: [_addIsFavourite, _addContentScore],
+    7: [_addLentTo, _addLentOn],
   };
 
   final Future<String> Function() _loadSeed;
@@ -214,6 +215,15 @@ class DatabaseService {
   static const String _addContentScore =
       'ALTER TABLE $magazinesTable ADD COLUMN contentScore INTEGER';
 
+  // Rung 7, lending. Both nullable with no default, because being on the shelf
+  // is the absence of a loan rather than a value. No history table: she wants
+  // to know what is out of the house tonight, not to audit 2019.
+  static const String _addLentTo =
+      'ALTER TABLE $magazinesTable ADD COLUMN lentTo TEXT';
+
+  static const String _addLentOn =
+      'ALTER TABLE $magazinesTable ADD COLUMN lentOn TEXT';
+
   /// Fills a fresh database with the bundled issue list.
   Future<void> _seed(DatabaseExecutor db) async {
     final seeds = jsonDecode(await _loadSeed()) as List;
@@ -309,6 +319,8 @@ class DatabaseService {
             isOwned: false,
             clearDateAdded: true,
             clearConditionScore: true,
+            // An issue she does not own cannot be out of a house it is not in.
+            clearLoan: true,
           );
     await updateMagazine(updated);
     return updated;
@@ -319,6 +331,36 @@ class DatabaseService {
     final magazine = await getMagazine(id);
     if (magazine == null) return null;
     final updated = magazine.copyWith(conditionScore: score.clamp(1, 10));
+    await updateMagazine(updated);
+    return updated;
+  }
+
+  /// Records who has an issue and the day it went out.
+  ///
+  /// Both columns are written together. A name of nothing but spaces is not a
+  /// loan, and an issue she does not own cannot go out of a house it is not in,
+  /// so either is left alone rather than half recorded.
+  Future<Magazine?> lendIssue(String id, String to, {DateTime? now}) async {
+    final magazine = await getMagazine(id);
+    if (magazine == null) return null;
+    final name = to.trim();
+    if (name.isEmpty || !magazine.isOwned) return magazine;
+    final updated = magazine.copyWith(
+      lentTo: name,
+      lentOn: now ?? DateTime.now(),
+    );
+    await updateMagazine(updated);
+    return updated;
+  }
+
+  /// Puts it back on the shelf, forgetting who had it.
+  ///
+  /// There is no history to keep. The question is what is out of the house
+  /// tonight, and a returned magazine is not part of it.
+  Future<Magazine?> returnIssue(String id) async {
+    final magazine = await getMagazine(id);
+    if (magazine == null) return null;
+    final updated = magazine.copyWith(clearLoan: true);
     await updateMagazine(updated);
     return updated;
   }

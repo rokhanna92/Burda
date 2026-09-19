@@ -163,7 +163,7 @@ class CoverTile extends StatelessWidget {
               ),
             ),
             artwork,
-            // The draw order, fixed once because three things want a corner of
+            // The draw order, fixed once because several things want a corner of
             // this tile: the number underneath, then the artwork, then the
             // marks the tile puts on itself, then whatever the caller passes.
             if (magazine.isFavourite)
@@ -173,6 +173,8 @@ class CoverTile extends StatelessWidget {
                 // longer holds still carries its mark.
                 child: _Seal(edition: edition, size: _sealSize),
               ),
+            if (magazine.isLent)
+              _LentBand(edition: edition, numeralSize: numeralSize),
             ?child,
           ],
         ),
@@ -183,6 +185,51 @@ class CoverTile extends StatelessWidget {
   /// A cover that will not load simply leaves the number showing.
   static Widget _nothing(BuildContext context, Object error, StackTrace? s) =>
       const SizedBox.shrink();
+}
+
+/// The band across the foot of a cover that is out of the house.
+///
+/// The way a publisher bands a book. Under the caller's own child in the stack,
+/// so the year screen's heart keeps sitting on top of it: the two marks answer
+/// different questions and the heart is the one she taps.
+///
+/// Paper and ink, never an opacity: a lent issue is owned, and it prints in
+/// full colour.
+class _LentBand extends StatelessWidget {
+  const _LentBand({required this.edition, required this.numeralSize});
+
+  final Edition edition;
+
+  /// The tile's own scale, borrowed from the numeral so one band serves a 54px
+  /// search thumbnail and a 196px hero without a parameter for each.
+  final double numeralSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = (numeralSize * 0.30).clamp(8.0, 13.0);
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: size * 0.38),
+        decoration: BoxDecoration(
+          color: edition.paper,
+          border: Border(top: BorderSide(color: edition.inkAt(14))),
+        ),
+        child: Text(
+          'Lent',
+          textAlign: TextAlign.center,
+          style: AppType.smallCaps(
+            size: size,
+            trackingEm: 0.18,
+            height: 1,
+            color: edition.ink,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// The printer's fleuron, on a small accent block.

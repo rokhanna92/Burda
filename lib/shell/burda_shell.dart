@@ -23,6 +23,7 @@ import '../screens/years_screen.dart';
 import '../sheets/about_sheet.dart';
 import '../sheets/add_sheet.dart';
 import '../sheets/confirm_sheet.dart';
+import '../sheets/lend_sheet.dart';
 import '../sheets/make_sheet.dart';
 import '../sheets/measure_sheet.dart';
 import '../sheets/note_sheet.dart';
@@ -190,6 +191,15 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
         };
       case BurdaSheet.measure:
         return MeasureSheet(edition: edition);
+      case BurdaSheet.lend:
+        // Only ever raised from an issue, as the confirm sheet is.
+        if (_top case IssuePage(:final id)) {
+          final magazine = context.read<MagazineProvider>().byId(id);
+          if (magazine != null) {
+            return LendSheet(edition: edition, magazine: magazine);
+          }
+        }
+        return null;
       case BurdaSheet.confirm:
         // Raised from whatever is on top, which is the thing being removed.
         switch (_top) {

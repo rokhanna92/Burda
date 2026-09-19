@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../models/date_label.dart';
 import '../models/magazine.dart';
 import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
@@ -20,10 +21,18 @@ import '../widgets/photo_tile.dart';
 /// One issue: its cover, whether it is yours, what state it is in, and the
 /// photos of what you made from it.
 class IssueScreen extends StatefulWidget {
-  const IssueScreen({super.key, required this.edition, required this.id});
+  const IssueScreen({
+    super.key,
+    required this.edition,
+    required this.id,
+    this.today,
+  });
 
   final Edition edition;
   final String id;
+
+  /// Overridable so a test is not at the mercy of the calendar.
+  final DateTime? today;
 
   @override
   State<IssueScreen> createState() => _IssueScreenState();
@@ -114,6 +123,16 @@ class _IssueScreenState extends State<IssueScreen> {
     nav.showToast('Condition set to $score');
   }
 
+  Future<void> _return() async {
+    final nav = BurdaNav.of(context);
+    final magazines = context.read<MagazineProvider>();
+    final magazine = magazines.byId(widget.id);
+    if (magazine == null) return;
+    final label = 'No. ${magazine.issue} / ${magazine.year}';
+    await magazines.returnIssue(widget.id);
+    nav.showToast('$label is back on the shelf');
+  }
+
   Future<void> _setContentScore(int marks) async {
     final nav = BurdaNav.of(context);
     await context.read<MagazineProvider>().setContentScore(
@@ -159,6 +178,7 @@ class _IssueScreenState extends State<IssueScreen> {
     final queued = context.select<MakeProvider, bool>(
       (makes) => makes.isQueued(widget.id),
     );
+    final now = widget.today ?? DateTime.now();
 
     // Deleted out from under us, which the shell will pop past in a moment.
     if (magazine == null) return const SizedBox.shrink();
@@ -262,6 +282,41 @@ class _IssueScreenState extends State<IssueScreen> {
                   ),
               ],
             ),
+            const SizedBox(height: 30),
+            if (magazine.isLent) ...[
+              SectionHeader(
+                'Lending',
+                edition: edition,
+                trailing: Text(
+                  'with ${magazine.lentTo}',
+                  textAlign: TextAlign.end,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppType.serif(
+                    size: 17,
+                    italic: true,
+                    color: edition.ink,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _LoanLine(edition: edition, magazine: magazine, now: now),
+              const SizedBox(height: 14),
+              BurdaButton(
+                edition: edition,
+                label: 'Back on the shelf',
+                glyph: '←',
+                onTap: _return,
+              ),
+            ] else ...[
+              SectionHeader('Lending', edition: edition, note: 'in the house'),
+              const SizedBox(height: 12),
+              BurdaButton(
+                edition: edition,
+                label: 'Lend this issue',
+                glyph: '→',
+                onTap: () => nav.openSheet(BurdaSheet.lend),
+              ),
+            ],
           ],
           if (_showsInside(magazine)) ...[
             const SizedBox(height: 30),
@@ -470,6 +525,49 @@ class _Hero extends StatelessWidget {
       ),
     );
   }
+}
+
+/// When it went out and how long that has been.
+///
+/// The reading turns to the accent at six months and says nothing more. The
+/// app's job is to remember the date, not to decide how she feels about it.
+class _LoanLine extends StatelessWidget {
+  const _LoanLine({
+    required this.edition,
+    required this.magazine,
+    required this.now,
+  });
+
+  final Edition edition;
+  final Magazine magazine;
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) => HairlineRow(
+    edition: edition,
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Expanded(
+          child: Text(
+            'Out since ${dayMonthYear(magazine.lentOn!)}',
+            overflow: TextOverflow.ellipsis,
+            style: AppType.serif(size: 19, color: edition.ink),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          elapsed(magazine.lentOn!, now),
+          style: AppType.serif(
+            size: 16,
+            italic: true,
+            color: magazine.lentLong(now) ? edition.accent : edition.inkAt(60),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// Five marks, filled up to the score.

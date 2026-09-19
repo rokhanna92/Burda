@@ -19,7 +19,11 @@ Future<void> toggleIssueOwned(BuildContext context, Magazine magazine) async {
   await magazines.toggleOwnership(magazine.id);
 
   if (wasOwned) {
-    nav.showToast('$label set aside');
+    nav.showToast(
+      magazine.isLent
+          ? '$label set aside, ${magazine.lentTo} keeps it'
+          : '$label set aside',
+    );
     return;
   }
 

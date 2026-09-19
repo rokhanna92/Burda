@@ -49,8 +49,8 @@ class MakePage extends BurdaPage {
   final String id;
 }
 
-/// The eight things the one bottom sheet can hold.
-enum BurdaSheet { add, search, rank, about, note, make, measure, confirm }
+/// The nine things the one bottom sheet can hold.
+enum BurdaSheet { add, search, rank, about, note, make, measure, lend, confirm }
 
 /// What the contents reader is showing.
 ///

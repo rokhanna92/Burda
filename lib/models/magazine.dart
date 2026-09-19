@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'date_label.dart';
+
 /// A single Burda Style issue.
 ///
 /// Seeded from `assets/magazines.json` and stored in the `magazines` table.
@@ -15,6 +17,8 @@ class Magazine {
     this.uploadedImages = const [],
     this.isFavourite = false,
     this.contentScore,
+    this.lentTo,
+    this.lentOn,
   });
 
   /// `"<issue>-<year>"`, e.g. `"1-2010"`.
@@ -88,6 +92,26 @@ class Magazine {
   /// True once she has said anything at all about what is inside.
   bool get isJudged => isFavourite || contentScore != null;
 
+  /// Who has it, while it is out of the house. Null when it is on the shelf.
+  final String? lentTo;
+
+  /// The day it went out. Written and cleared with [lentTo], never on its own:
+  /// half a loan is a row nothing can read.
+  final DateTime? lentOn;
+
+  /// True while the issue is out of the house.
+  ///
+  /// Lending says nothing about owning. A lent issue is still hers, still
+  /// counted, still filled in on its volume. This is only about where it is.
+  bool get isLent => lentTo != null;
+
+  /// Whole days since it went out, or null while it is on the shelf.
+  int? daysLent(DateTime now) =>
+      lentOn == null ? null : wholeDays(lentOn!, now);
+
+  /// True once a loan has run long enough to be printed in the accent.
+  bool lentLong(DateTime now) => (daysLent(now) ?? 0) >= kLongLoan;
+
   /// Issue number within the year, e.g. `1` for `"1-2010"`.
   int get issue => int.parse(id.split('-').first);
 
@@ -115,6 +139,8 @@ class Magazine {
     uploadedImages: _parseImages(json['uploadedImages']),
     isFavourite: _parseBool(json['isFavourite']),
     contentScore: (json['contentScore'] as num?)?.toInt(),
+    lentTo: json['lentTo'] as String?,
+    lentOn: _parseDate(json['lentOn']),
   );
 
   /// Reads a row of the `magazines` table.
@@ -129,6 +155,8 @@ class Magazine {
     uploadedImages: _parseImages(map['uploadedImages']),
     isFavourite: _parseBool(map['isFavourite']),
     contentScore: (map['contentScore'] as num?)?.toInt(),
+    lentTo: map['lentTo'] as String?,
+    lentOn: _parseDate(map['lentOn']),
   );
 
   Map<String, Object?> toMap() => {
@@ -142,6 +170,8 @@ class Magazine {
     'uploadedImages': jsonEncode(uploadedImages),
     'isFavourite': isFavourite ? 1 : 0,
     'contentScore': contentScore,
+    'lentTo': lentTo,
+    'lentOn': lentOn?.toIso8601String(),
   };
 
   /// Export shape: a plain JSON object, with the image list inline.
@@ -156,6 +186,8 @@ class Magazine {
     'uploadedImages': uploadedImages,
     'isFavourite': isFavourite,
     'contentScore': contentScore,
+    'lentTo': lentTo,
+    'lentOn': lentOn?.toIso8601String(),
   };
 
   Magazine copyWith({
@@ -169,6 +201,9 @@ class Magazine {
     bool? isFavourite,
     int? contentScore,
     bool clearContentScore = false,
+    String? lentTo,
+    DateTime? lentOn,
+    bool clearLoan = false,
   }) => Magazine(
     id: id,
     title: title,
@@ -184,6 +219,9 @@ class Magazine {
     contentScore: clearContentScore
         ? null
         : (contentScore ?? this.contentScore),
+    // One flag clears both, because they are one fact.
+    lentTo: clearLoan ? null : (lentTo ?? this.lentTo),
+    lentOn: clearLoan ? null : (lentOn ?? this.lentOn),
   );
 
   /// SQLite stores a flag as 0 or 1, JSON writes true or false, and an export

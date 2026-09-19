@@ -144,6 +144,26 @@ class IndexScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 for (final line in _lines(magazines, makes, noteCount, nav))
                   _ContentsLine(edition: edition, line: line),
+                // No seventh numbered line: a contents line reading "Lent 0"
+                // for months at a time is dead weight. The section answers its
+                // question by being here at all, and an index with nothing out
+                // of the house is exactly what it was before.
+                if (magazines.lent case final lent when lent.isNotEmpty) ...[
+                  const SizedBox(height: 30),
+                  SectionHeader(
+                    'Out of the house',
+                    edition: edition,
+                    note: 'who has what',
+                  ),
+                  const SizedBox(height: 4),
+                  for (final magazine in lent)
+                    _LentLine(
+                      edition: edition,
+                      magazine: magazine,
+                      now: now,
+                      go: () => nav.push(IssuePage(magazine.id)),
+                    ),
+                ],
                 const SizedBox(height: 30),
                 SectionHeader(
                   'Recently added',
@@ -385,6 +405,66 @@ class _Tonight extends StatelessWidget {
       context.watch<MakeProvider>().madeCountFor(id) > 0
       ? 'You have sewn from this one before.'
       : 'An evening with nothing planned. Take this one down.';
+}
+
+/// One issue that is not on the shelf, and who has it.
+///
+/// Set like a line of the archive on the profile: the address in full size, the
+/// name italic beside it, the reading of how long on the right. Longest gone
+/// sits at the top, because that is the one she has stopped thinking about.
+class _LentLine extends StatelessWidget {
+  const _LentLine({
+    required this.edition,
+    required this.magazine,
+    required this.now,
+    required this.go,
+  });
+
+  final Edition edition;
+  final Magazine magazine;
+  final DateTime now;
+  final VoidCallback go;
+
+  @override
+  Widget build(BuildContext context) => HairlineRow(
+    edition: edition,
+    onTap: go,
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Expanded(
+          child: Text.rich(
+            TextSpan(
+              text: 'No. ${magazine.issue} / ${magazine.year} ',
+              style: AppType.serif(size: 24, color: edition.ink),
+              children: [
+                TextSpan(
+                  text: 'with ${magazine.lentTo}',
+                  style: AppType.serif(
+                    size: 15,
+                    italic: true,
+                    color: edition.inkAt(60),
+                  ),
+                ),
+              ],
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          elapsed(magazine.lentOn!, now),
+          style: AppType.serif(
+            size: 16,
+            italic: true,
+            color: magazine.lentLong(now) ? edition.accent : edition.inkAt(60),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// The gutter the page is set in, which the cover rail alone escapes.
