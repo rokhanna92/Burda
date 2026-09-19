@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/edition.dart';
 import '../theme/season.dart';
+import 'season_particles.dart';
 
 /// The porthole in the middle of the nav bar: a little sky that changes with
 /// the édition.
@@ -95,6 +96,10 @@ class _SeasonWindowState extends State<SeasonWindow>
                   decoration: BoxDecoration(gradient: scene.ground),
                 ),
               ),
+            ),
+            SeasonParticles(
+              season: scene.season,
+              accent: widget.edition.accent,
             ),
             // Stands in for the CSS inset shadows, which Flutter has no direct
             // equivalent for: dark from the top edge, light from the bottom.
