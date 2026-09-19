@@ -13,6 +13,7 @@ import '../screens/index_screen.dart';
 import '../screens/issue_screen.dart';
 import '../screens/make_screen.dart';
 import '../screens/makes_screen.dart';
+import '../screens/measure_screen.dart';
 import '../screens/notes_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/queue_screen.dart';
@@ -23,6 +24,7 @@ import '../sheets/about_sheet.dart';
 import '../sheets/add_sheet.dart';
 import '../sheets/confirm_sheet.dart';
 import '../sheets/make_sheet.dart';
+import '../sheets/measure_sheet.dart';
 import '../sheets/note_sheet.dart';
 import '../sheets/rank_sheet.dart';
 import '../sheets/search_sheet.dart';
@@ -153,6 +155,7 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     VaultPage() => 'vault',
     MakesPage() => 'makes',
     QueuePage() => 'queue',
+    MeasurePage() => 'measure',
     MakePage(:final id) => 'make:$id',
   };
 
@@ -185,6 +188,8 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
           IssuePage(:final id) => MakeSheet(edition: edition, magazineId: id),
           _ => MakeSheet(edition: edition),
         };
+      case BurdaSheet.measure:
+        return MeasureSheet(edition: edition);
       case BurdaSheet.confirm:
         // Raised from whatever is on top, which is the thing being removed.
         switch (_top) {
@@ -220,6 +225,7 @@ class _BurdaShellState extends State<BurdaShell> implements BurdaNav {
     VaultPage() => VaultScreen(edition: edition),
     MakesPage() => MakesScreen(edition: edition),
     QueuePage() => QueueScreen(edition: edition),
+    MeasurePage() => MeasureScreen(edition: edition),
     MakePage(:final id) => MakeScreen(edition: edition, id: id),
     YearPage(:final year) => YearScreen(edition: edition, year: year),
   };

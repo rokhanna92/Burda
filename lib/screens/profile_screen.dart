@@ -10,6 +10,7 @@ import '../models/note_provider.dart';
 import '../providers/contents_provider.dart';
 import '../providers/magazine_provider.dart';
 import '../providers/make_provider.dart';
+import '../providers/measure_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/data_transfer_service.dart';
 import '../services/photo_relink_service.dart';
@@ -98,17 +99,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  /// What an import says it brought back, naming only what it actually found.
+  static String _restored(int issues, int pages, int makes) {
+    final parts = [
+      '$issues issues',
+      if (pages > 0) '$pages pages',
+      if (makes > 0) '$makes makes',
+    ];
+    return '${parts.join(' and ')} restored';
+  }
+
   Future<void> _export() async {
     if (_busy) return;
     setState(() => _busy = true);
     final nav = BurdaNav.of(context);
     try {
+      // The settings are the one part that has to be read from the database
+      // rather than from memory, so they are fetched before anything else
+      // touches the context.
+      final settings = await context.read<MeasureProvider>().exportSettings();
+      if (!mounted) return;
+
       final bytes = DataTransferService.encode(
         DataTransferService.bundle(
           magazines: context.read<MagazineProvider>().toExportJson(),
           contents: context.read<ContentsProvider>().toExportJson(),
           makes: context.read<MakeProvider>().toExportJson(),
           notes: context.read<NoteProvider>().toExportJson(),
+          settings: settings,
         ),
       );
       final location = await DataTransferService.saveExport(bytes);
@@ -142,6 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final pages = await contents.import(file.contents);
       final made = await makes.import(file.makes);
       if (mounted) await context.read<NoteProvider>().import(file.notes);
+      if (mounted) {
+        await context.read<MeasureProvider>().import(file.settings);
+      }
       nav.showToast(_restored(count, pages, made));
 
       await _restorePhotos(magazines, contents, makes, nav);
@@ -163,20 +184,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// repair what can be repaired silently, then, only if something is still
   /// missing, ask where the photos were put and copy them in.
   ///
-  /// The vault photos, the chosen covers and the photographed pages are all
-  /// repaired in one pass and counted together, because she is answering one
-  /// question, "where are the pictures", and being asked it twice would be
-  /// being asked it twice about the same folder.
-  /// What an import says it brought back, naming only what it actually found.
-  static String _restored(int issues, int pages, int makes) {
-    final parts = [
-      '$issues issues',
-      if (pages > 0) '$pages pages',
-      if (makes > 0) '$makes makes',
-    ];
-    return '${parts.join(' and ')} restored';
-  }
-
+  /// The vault photos, the chosen covers, the photographed pages and the make
+  /// photos are all repaired in one pass and counted together, because she is
+  /// answering one question, "where are the pictures", and being asked it twice
+  /// would be being asked it twice about the same folder.
   Future<void> _restorePhotos(
     MagazineProvider magazines,
     ContentsProvider contents,
@@ -268,6 +279,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   rank: rank,
                   hint: CollectorRank.hintFor(owned),
                   onTap: () => nav.openSheet(BurdaSheet.rank),
+                ),
+                const SizedBox(height: 30),
+                SectionHeader(
+                  'Measurements',
+                  edition: edition,
+                  note: 'for when you cut',
+                ),
+                const SizedBox(height: 4),
+                _ArchiveRow(
+                  edition: edition,
+                  title: 'Your measurements',
+                  sub: 'bust, waist, hip, and the size they make',
+                  glyph: '→',
+                  onTap: () => nav.push(const MeasurePage()),
                 ),
                 const SizedBox(height: 34),
                 SectionHeader(

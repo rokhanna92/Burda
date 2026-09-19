@@ -6,6 +6,7 @@ import '../models/magazine.dart';
 import '../models/make.dart';
 import '../providers/magazine_provider.dart';
 import '../providers/make_provider.dart';
+import '../providers/measure_provider.dart';
 import '../shell/burda_nav.dart';
 import '../theme/edition.dart';
 import '../theme/typography.dart';
@@ -110,6 +111,9 @@ class _MakeSheetState extends State<MakeSheet> {
     final edition = widget.edition;
     final editing = widget.make != null;
     final magazineId = widget.make?.magazineId ?? widget.magazineId;
+    final hint = _garment == null
+        ? null
+        : context.read<MeasureProvider>().sizeFor(_garment!);
     final magazine = magazineId == null
         ? null
         : context.select<MagazineProvider, Magazine?>(
@@ -163,7 +167,11 @@ class _MakeSheetState extends State<MakeSheet> {
                 edition: edition,
                 label: 'Size',
                 controller: _size,
-                hint: 'e.g. 38',
+                // Her own size when the app knows it, so the commonest answer
+                // is already in front of her. A hint, never a value: what she
+                // cut is a fact about this garment and half the time the
+                // pattern's own table beat the chart.
+                hint: hint == null ? 'e.g. 38' : 'e.g. $hint',
               ),
             ),
           ],

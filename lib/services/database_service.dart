@@ -35,13 +35,14 @@ class DatabaseService {
   /// Bumped whenever the bundled issue list grows or the schema changes.
   ///
   /// 1: the first build. 2: 2025 filled out to twelve issues and 2026 began.
-  /// 3: the contents index. 4: makes and the sew queue.
-  static const int schemaVersion = 4;
+  /// 3: the contents index. 4: makes and the sew queue. 5: the settings table.
+  static const int schemaVersion = 5;
 
   static const String magazinesTable = 'magazines';
   static const String notesTable = 'notes';
   static const String contentsTable = 'contents';
   static const String makesTable = 'makes';
+  static const String settingsTable = 'settings';
 
   /// What each version did to the schema, in order.
   ///
@@ -57,6 +58,7 @@ class DatabaseService {
     1: [_createMagazines, _createNotes, _indexMagazinesYear],
     3: [_createContents],
     4: [_createMakes],
+    5: [_createSettings],
   };
 
   final Future<String> Function() _loadSeed;
@@ -184,6 +186,19 @@ class DatabaseService {
             queuedOn TEXT NOT NULL,
             startedOn TEXT,
             finishedOn TEXT
+          )
+        ''';
+
+  // Rung 5, the settings table: the few small facts that belong to the
+  // collection rather than to the device. Her measurements, the day the shelf
+  // was completed, tonight's issue. Everything here rides in the export, which
+  // is why it is a table and not shared_preferences.
+  static const String _createSettings =
+      '''
+          CREATE TABLE $settingsTable (
+            "key" TEXT PRIMARY KEY NOT NULL,
+            value TEXT NOT NULL,
+            updatedAt TEXT NOT NULL
           )
         ''';
 
@@ -362,6 +377,51 @@ class DatabaseService {
   Future<void> deleteNote(String id) async {
     final db = await database;
     await db.delete(notesTable, where: 'id = ?', whereArgs: [id]);
+  }
+
+  // Settings
+
+  Future<Map<String, String>> getSettings() async {
+    final db = await database;
+    final rows = await db.query(settingsTable);
+    return {
+      for (final row in rows) row['key']! as String: row['value']! as String,
+    };
+  }
+
+  Future<String?> getSetting(String key) async => (await getSettings())[key];
+
+  Future<void> setSetting(String key, String value, {DateTime? now}) =>
+      writeSettings({key: value}, now: now);
+
+  Future<void> clearSetting(String key) => writeSettings({key: null});
+
+  /// Writes several settings at once, deleting the ones handed a null.
+  ///
+  /// One batch rather than a call each, because a set of measurements is taken
+  /// in one sitting: half of them landing and half not is worse than none of
+  /// them landing, and it would leave a date stamped over numbers from last
+  /// year.
+  Future<void> writeSettings(
+    Map<String, String?> values, {
+    DateTime? now,
+  }) async {
+    final db = await database;
+    final stamp = (now ?? DateTime.now()).toIso8601String();
+    final batch = db.batch();
+    for (final MapEntry(:key, :value) in values.entries) {
+      if (value == null) {
+        // Quoted, because the column is literally named "key".
+        batch.delete(settingsTable, where: '"key" = ?', whereArgs: [key]);
+      } else {
+        batch.insert(settingsTable, {
+          'key': key,
+          'value': value,
+          'updatedAt': stamp,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    }
+    await batch.commit(noResult: true);
   }
 
   // Contents pages

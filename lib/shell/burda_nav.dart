@@ -39,14 +39,18 @@ class QueuePage extends BurdaPage {
   const QueuePage();
 }
 
+class MeasurePage extends BurdaPage {
+  const MeasurePage();
+}
+
 class MakePage extends BurdaPage {
   const MakePage(this.id);
 
   final String id;
 }
 
-/// The seven things the one bottom sheet can hold.
-enum BurdaSheet { add, search, rank, about, note, make, confirm }
+/// The eight things the one bottom sheet can hold.
+enum BurdaSheet { add, search, rank, about, note, make, measure, confirm }
 
 /// What the contents reader is showing.
 ///
