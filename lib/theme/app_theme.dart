@@ -13,15 +13,16 @@ ThemeData buildAppTheme(Edition edition) {
   final colorScheme = ColorScheme(
     brightness: edition.dark ? Brightness.dark : Brightness.light,
     primary: edition.accent,
-    // The design prints white on the accent wherever the two meet, in both
-    // the day and the night éditions.
-    onPrimary: Colors.white,
+    // Whatever can actually be read on the accent. The design says white, but
+    // on a night édition the accent is bright enough that white on it is
+    // barely legible.
+    onPrimary: edition.onAccent,
     secondary: edition.tint,
     onSecondary: edition.ink,
     surface: edition.paper,
     onSurface: edition.ink,
     error: edition.accent,
-    onError: Colors.white,
+    onError: edition.onAccent,
   );
 
   return ThemeData(

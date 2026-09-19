@@ -316,7 +316,7 @@ class _Heart extends StatelessWidget {
             style: TextStyle(
               fontSize: 19,
               height: 1,
-              color: owned ? Colors.white : edition.ink,
+              color: owned ? edition.onAccent : edition.ink,
             ),
           ),
         ),

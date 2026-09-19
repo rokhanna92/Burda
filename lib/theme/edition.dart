@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'contrast.dart';
 import 'oklab.dart';
 
-/// One of the ten "Éditions" the app can be printed in.
+/// One of the eighteen "Éditions" the app can be printed in.
 ///
 /// The redesign drops the old palette roles (deep/dark/light) for the four a
 /// printed page has: [paper] behind everything, [ink] for text and rules,
@@ -26,7 +27,7 @@ class Edition {
   /// Stored in preferences under `theme`.
   final String id;
 
-  /// The édition number the profile cards print, `"1"` through `"10"`.
+  /// The édition number the profile cards print, `"1"` through `"18"`.
   final String no;
 
   /// Display name, e.g. `"Rosé"`.
@@ -37,7 +38,7 @@ class Edition {
   final Color accent;
   final Color tint;
 
-  /// True for the three night éditions, which print light ink on dark paper.
+  /// True for a night édition, which prints light ink on dark paper.
   ///
   /// Drives the status bar icons, not any colour choice: every colour already
   /// comes from the four roles above.
@@ -53,6 +54,19 @@ class Edition {
 
   /// [ink] at 55%, the design's secondary text colour.
   Color get muted => inkAt(55);
+
+  /// What to print on top of the [accent].
+  ///
+  /// Whichever of paper or white can actually be read there, rather than white
+  /// always. On a night édition the accent is bright, and white on it was
+  /// landing at a contrast of 2.3 where 4.5 is the floor: the condition marks
+  /// and the remove button were close to unreadable.
+  Color get onAccent {
+    const white = Color(0xFFFFFFFF);
+    return contrastRatio(white, accent) >= contrastRatio(paper, accent)
+        ? white
+        : paper;
+  }
 
   /// The darker thread in the diagonal hatch a photo sits on.
   ///
@@ -81,6 +95,14 @@ class Edition {
     nuit,
     noir,
     bordeaux,
+    fuchsia,
+    rubis,
+    cobalt,
+    emeraude,
+    orchidee,
+    carmin,
+    indigo,
+    sapin,
   ];
 
   static const Edition rose = Edition(
@@ -190,6 +212,100 @@ class Edition {
     ink: Color(0xFFF3E4E4),
     accent: Color(0xFFD9556F),
     tint: Color(0xFF2C181E),
+    dark: true,
+  );
+
+  // The clear set. Drawn to a contrast budget rather than by eye: the ink
+  // reaches 20 against the paper, which is what it takes for the secondary
+  // text, printed at 55% ink, to clear the 4.5 readability floor. On the
+  // seven original day éditions it lands at 3.4 to 4.2, which is the "hard to
+  // read" they were reported as.
+
+  static const Edition fuchsia = Edition(
+    id: 'fuchsia',
+    no: '11',
+    name: 'Fuchsia',
+    paper: Color(0xFFFFFCFD),
+    ink: Color(0xFF0C0206),
+    accent: Color(0xFFB8005A),
+    tint: Color(0xFFFFD4E6),
+    dark: false,
+  );
+
+  static const Edition rubis = Edition(
+    id: 'rubis',
+    no: '12',
+    name: 'Rubis',
+    paper: Color(0xFFFFFCFB),
+    ink: Color(0xFF0D0305),
+    accent: Color(0xFFA80018),
+    tint: Color(0xFFFFD6D2),
+    dark: false,
+  );
+
+  static const Edition cobalt = Edition(
+    id: 'cobalt',
+    no: '13',
+    name: 'Cobalt',
+    paper: Color(0xFFFBFDFF),
+    ink: Color(0xFF02050E),
+    accent: Color(0xFF003C8F),
+    tint: Color(0xFFCFE0FA),
+    dark: false,
+  );
+
+  static const Edition emeraude = Edition(
+    id: 'emeraude',
+    no: '14',
+    name: 'Émeraude',
+    paper: Color(0xFFFBFFFC),
+    ink: Color(0xFF010805),
+    accent: Color(0xFF005C36),
+    tint: Color(0xFFC6E8D4),
+    dark: false,
+  );
+
+  static const Edition orchidee = Edition(
+    id: 'orchidee',
+    no: '15',
+    name: 'Orchidée',
+    paper: Color(0xFF0B040A),
+    ink: Color(0xFFFFF6FA),
+    accent: Color(0xFFFF8FC2),
+    tint: Color(0xFF1F1122),
+    dark: true,
+  );
+
+  static const Edition carmin = Edition(
+    id: 'carmin',
+    no: '16',
+    name: 'Carmin',
+    paper: Color(0xFF0E0406),
+    ink: Color(0xFFFFF5F4),
+    accent: Color(0xFFFF7B84),
+    tint: Color(0xFF271014),
+    dark: true,
+  );
+
+  static const Edition indigo = Edition(
+    id: 'indigo',
+    no: '17',
+    name: 'Indigo',
+    paper: Color(0xFF040711),
+    ink: Color(0xFFF4F7FF),
+    accent: Color(0xFF9DBEFF),
+    tint: Color(0xFF101829),
+    dark: true,
+  );
+
+  static const Edition sapin = Edition(
+    id: 'sapin',
+    no: '18',
+    name: 'Sapin',
+    paper: Color(0xFF020C07),
+    ink: Color(0xFFF2FDF6),
+    accent: Color(0xFF6FE9AC),
+    tint: Color(0xFF0B2115),
     dark: true,
   );
 }

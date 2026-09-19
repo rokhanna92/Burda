@@ -261,8 +261,8 @@ void main() {
     });
 
     testWidgets('prints the day and night éditions', (tester) async {
-      // Wide enough that the whole row is built, rather than the first few.
-      await open(tester, tab: NavTab.profile, width: 3600);
+      // Wide enough that both whole rows are built, rather than the first few.
+      await open(tester, tab: NavTab.profile, width: 7200);
 
       expect(find.text('Day'), findsOneWidget);
       expect(find.text('Night'), findsOneWidget);
@@ -274,7 +274,7 @@ void main() {
     testWidgets('changing édition repaints the app and says so', (
       tester,
     ) async {
-      await open(tester, tab: NavTab.profile, width: 3600);
+      await open(tester, tab: NavTab.profile, width: 7200);
 
       await tester.tap(find.text('Hiver'));
       await settle(tester);

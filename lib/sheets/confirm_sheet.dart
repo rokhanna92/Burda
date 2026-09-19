@@ -111,7 +111,7 @@ class _RemoveButton extends StatelessWidget {
         style: AppType.smallCaps(
           size: 16,
           trackingEm: 0.14,
-          color: Colors.white,
+          color: edition.onAccent,
         ),
       ),
     ),

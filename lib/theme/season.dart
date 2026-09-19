@@ -106,5 +106,50 @@ class SeasonScene {
       sky: _sky(const [Color(0xFF1A0A0E), Color(0xFF3A1119)]),
       ground: _ground(const [Color(0x73D9556F), _clear]),
     ),
+
+    // The clear set.
+    'fuchsia': SeasonScene(
+      season: Season.petals,
+      sky: _sky(const [Color(0xFFFFE7F2), Color(0xFFFFC2DE)]),
+      ground: _ground(const [Color(0x66B8005A), _clear]),
+    ),
+    'rubis': SeasonScene(
+      season: Season.petals,
+      sky: _sky(const [Color(0xFFFFE9E6), Color(0xFFFFC4BD)]),
+      ground: _ground(const [Color(0x66A80018), _clear]),
+    ),
+    'cobalt': SeasonScene(
+      season: Season.snow,
+      sky: _sky(
+        const [Color(0xFFDCEBFF), Color(0xFFA9C8F5), Color(0xFF7FA9E8)],
+        const [0, 0.6, 1],
+      ),
+      ground: _ground(const [Color(0x66003C8F), _clear]),
+    ),
+    'emeraude': SeasonScene(
+      season: Season.petals,
+      sky: _sky(const [Color(0xFFE4F7EA), Color(0xFFBFE6CD)]),
+      ground: _ground(const [Color(0x66005C36), _clear]),
+    ),
+    'orchidee': SeasonScene(
+      season: Season.petals,
+      sky: _sky(const [Color(0xFF1A0A16), Color(0xFF3A1830)]),
+      ground: _ground(const [Color(0x73FF8FC2), _clear]),
+    ),
+    'carmin': SeasonScene(
+      season: Season.embers,
+      sky: _sky(const [Color(0xFF1A0709), Color(0xFF3A1016)]),
+      ground: _ground(const [Color(0x73FF7B84), _clear]),
+    ),
+    'indigo': SeasonScene(
+      season: Season.stars,
+      sky: _sky(const [Color(0xFF060B1A), Color(0xFF131F3E)]),
+      ground: _ground(const [Color(0x669DBEFF), _clear]),
+    ),
+    'sapin': SeasonScene(
+      season: Season.dust,
+      sky: _sky(const [Color(0xFF04140C), Color(0xFF0D2E1B)]),
+      ground: _ground(const [Color(0x736FE9AC), _clear]),
+    ),
   };
 }

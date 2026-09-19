@@ -296,7 +296,7 @@ class _ConditionTicks extends StatelessWidget {
                     style: AppType.serif(
                       size: 14,
                       tabular: true,
-                      color: (score ?? 0) >= n ? Colors.white : edition.ink,
+                      color: (score ?? 0) >= n ? edition.onAccent : edition.ink,
                     ),
                   ),
                 ),

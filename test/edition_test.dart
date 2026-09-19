@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:burda/theme/contrast.dart';
 import 'package:burda/theme/edition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,12 +19,14 @@ void main() {
   final design = File('design/burda-style-design.html').readAsStringSync();
   final spec = _pattern.allMatches(design).toList();
 
-  test('the design defines ten éditions', () {
+  test('the design defines ten éditions, and the app adds eight', () {
     expect(spec, hasLength(10));
-    expect(Edition.all, hasLength(10));
+    expect(Edition.all, hasLength(18));
+    // The design's ten come first and unaltered; the clear set follows.
+    expect(Edition.all.take(10).map((e) => e.id), spec.map((m) => m.group(1)));
   });
 
-  test('every édition matches the design hex for hex', () {
+  test('every édition of the design matches it hex for hex', () {
     for (var i = 0; i < spec.length; i++) {
       final match = spec[i];
       final edition = Edition.all[i];
@@ -40,10 +43,24 @@ void main() {
     }
   });
 
-  test('seven éditions print by day and three by night', () {
-    expect(Edition.day, hasLength(7));
-    expect(Edition.night, hasLength(3));
-    expect(Edition.night.map((e) => e.id), ['nuit', 'noir', 'bordeaux']);
+  test('every édition prints by day or by night', () {
+    expect(Edition.day.length + Edition.night.length, Edition.all.length);
+    expect(Edition.day, hasLength(11));
+    expect(Edition.night, hasLength(7));
+  });
+
+  test('the numbers run from 1 without a gap or a repeat', () {
+    expect(Edition.all.map((e) => e.no).toList(), [
+      for (var n = 1; n <= Edition.all.length; n++) '$n',
+    ]);
+  });
+
+  test('no two éditions share an id or a name', () {
+    expect(Edition.all.map((e) => e.id).toSet(), hasLength(Edition.all.length));
+    expect(
+      Edition.all.map((e) => e.name).toSet(),
+      hasLength(Edition.all.length),
+    );
   });
 
   group('byId', () {
@@ -72,6 +89,94 @@ void main() {
 
     test('muted is ink at 55%', () {
       expect(Edition.rose.muted, Edition.rose.inkAt(55));
+    });
+  });
+
+  group('readability', () {
+    /// The floor for ordinary text, by the WCAG measure.
+    const floor = 4.5;
+
+    /// The eight added because the originals were reported as hard to read.
+    final clear = Edition.all.skip(10).toList();
+
+    test('body text is strong on every édition', () {
+      for (final edition in Edition.all) {
+        expect(
+          contrastRatio(edition.ink, edition.paper),
+          greaterThan(12),
+          reason: edition.id,
+        );
+      }
+    });
+
+    test('the édition picks the better of paper and white for the accent', () {
+      const white = Color(0xFFFFFFFF);
+      for (final edition in Edition.all) {
+        final chosen = contrastRatio(edition.onAccent, edition.accent);
+        expect(
+          chosen,
+          greaterThanOrEqualTo(contrastRatio(white, edition.accent)),
+          reason: edition.id,
+        );
+        expect(
+          chosen,
+          greaterThanOrEqualTo(contrastRatio(edition.paper, edition.accent)),
+          reason: edition.id,
+        );
+      }
+    });
+
+    test('something close to legible sits on every accent', () {
+      // Été is the one that grazes it, at 4.49 against a floor of 4.5. Its
+      // colours are the design's and are left alone; the clear set below is
+      // the answer to it. Before onAccent, three night éditions sat at 2.3 to
+      // 3.8 here.
+      for (final edition in Edition.all) {
+        expect(
+          contrastRatio(edition.onAccent, edition.accent),
+          greaterThan(4.4),
+          reason: edition.id,
+        );
+      }
+    });
+
+    test('the clear set clears the floor on its accent outright', () {
+      for (final edition in clear) {
+        expect(
+          contrastRatio(edition.onAccent, edition.accent),
+          greaterThanOrEqualTo(floor),
+          reason: edition.id,
+        );
+      }
+    });
+
+    test('the clear set carries its secondary text', () {
+      // Most of the app's quieter text is ink at 55%, and on the original day
+      // éditions that lands at 3.4 to 4.2. These were drawn to clear the
+      // floor with it.
+      for (final edition in clear) {
+        final secondary = flatten(edition.ink, 0.55, edition.paper);
+        expect(
+          contrastRatio(secondary, edition.paper),
+          greaterThanOrEqualTo(floor),
+          reason: '${edition.id} secondary text',
+        );
+      }
+    });
+
+    test('the clear set carries its accent text', () {
+      for (final edition in clear) {
+        expect(
+          contrastRatio(edition.accent, edition.paper),
+          greaterThanOrEqualTo(floor),
+          reason: '${edition.id} accent text',
+        );
+      }
+    });
+
+    test('the clear set is split evenly between day and night', () {
+      expect(clear.where((e) => !e.dark), hasLength(4));
+      expect(clear.where((e) => e.dark), hasLength(4));
     });
   });
 }
