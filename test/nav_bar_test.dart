@@ -3,6 +3,7 @@ import 'package:burda/theme/season.dart';
 import 'package:burda/widgets/nav_bar.dart';
 import 'package:burda/widgets/season_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> _pump(
@@ -200,6 +201,43 @@ void main() {
       };
       expect(sizes, hasLength(1), reason: 'the labels should match each other');
       expect(sizes.single, lessThanOrEqualTo(15));
+    });
+
+    testWidgets('stops at the design size when there is room to spare', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(3000, 2622);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
+      await _pump(tester);
+
+      expect(_labelStyle(tester, 'Index').fontSize, 15);
+    });
+
+    testWidgets('still fits with the system text size turned up', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1206, 2622);
+      tester.view.devicePixelRatio = 3;
+      tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+      addTearDown(tester.view.reset);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      await _pump(tester);
+
+      // The box is clamped to its column, so compare it against the width the
+      // label actually wants: anything over runs into the next tab.
+      for (final tab in NavTab.values) {
+        final label = tester.renderObject<RenderParagraph>(
+          find.text(tab.label),
+        );
+        expect(
+          label.getMaxIntrinsicWidth(double.infinity),
+          lessThanOrEqualTo(label.size.width + 0.01),
+          reason: tab.label,
+        );
+      }
     });
 
     testWidgets('sits on the system inset without padding it out', (

@@ -178,6 +178,26 @@ void main() {
       expect(find.textContaining('missing'), findsNWidgets(3));
     });
 
+    testWidgets('fills a spine across its whole width', (tester) async {
+      await openTab(tester, NavTab.years);
+
+      Finder spine(String year) => find
+          .ancestor(of: find.text(year), matching: find.byType(ClipRect))
+          .first;
+      Finder fill(String year) => find.descendant(
+        of: spine(year),
+        matching: find.byWidgetPredicate(
+          (w) => w is ColoredBox && w.color == Edition.rose.accent,
+        ),
+      );
+
+      // 2010 is complete, 2011 half held.
+      expect(tester.getSize(fill('2010')), tester.getSize(spine('2010')));
+      final half = tester.getSize(fill('2011'));
+      expect(half.width, tester.getSize(spine('2011')).width);
+      expect(half.height, closeTo(tester.getSize(spine('2011')).height / 2, 1));
+    });
+
     testWidgets('opens a volume from its spine', (tester) async {
       await openTab(tester, NavTab.years);
 

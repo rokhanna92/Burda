@@ -58,23 +58,25 @@ class NavBar extends StatelessWidget {
   /// Breathing room between one tab and the next.
   static const double gap = 6;
 
-  /// The largest the labels can be set and still all four fit on one line.
+  /// The largest the labels are set: the design's 15px. Smaller still when
+  /// that would not fit all four on one line.
   ///
   /// Sized against the sum of the four, not against the longest one four
   /// times over: "Index" and "Years" are short and "Collection" is not, so
   /// letting each take only the room it needs buys the lettering several
-  /// points. Measured with the real font, so it holds at any width and any
-  /// system text size.
-  static const double _ceiling = 19;
+  /// points. Measured with the real font and the system text size, so it
+  /// holds at any width and any text setting.
+  static const double _ceiling = 15;
   static const double _tracking = 0.14;
 
-  static double _widthOf(String label, double size) {
+  static double _widthOf(String label, double size, TextScaler scaler) {
     final painter = TextPainter(
       text: TextSpan(
         text: label,
         style: AppType.smallCaps(size: size, trackingEm: _tracking),
       ),
       textDirection: TextDirection.ltr,
+      textScaler: scaler,
     )..layout();
     return painter.width;
   }
@@ -89,6 +91,7 @@ class NavBar extends StatelessWidget {
     // extra 30px was an iOS home-indicator allowance the platform already
     // gives us, and doubling it left the bar floating.
     final bottom = math.max(MediaQuery.paddingOf(context).bottom, 8.0);
+    final scaler = MediaQuery.textScalerOf(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -101,7 +104,7 @@ class NavBar extends StatelessWidget {
           builder: (context, constraints) {
             final widths = {
               for (final tab in NavTab.values)
-                tab: _widthOf(tab.label, _ceiling),
+                tab: _widthOf(tab.label, _ceiling, scaler),
             };
             double demand(List<NavTab> half) =>
                 half.map((t) => widths[t]!).reduce((a, b) => a + b);

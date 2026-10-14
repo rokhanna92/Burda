@@ -294,9 +294,6 @@ class _SpineState extends State<_Spine> {
   Widget build(BuildContext context) {
     final edition = widget.edition;
     final volume = widget.volume;
-    // A nearly full spine is dark enough to carry the paper colour.
-    final labelColour = volume.fraction >= 0.92 ? edition.paper : edition.ink;
-    final countColour = volume.fraction > 0.12 ? edition.paper : edition.ink;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -318,55 +315,76 @@ class _SpineState extends State<_Spine> {
               border: Border.all(color: edition.inkAt(14)),
             ),
             child: ClipRect(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0, end: volume.fraction),
-                      duration: Duration(milliseconds: 900 + widget.order * 45),
-                      curve: AppMotion.standard,
-                      builder: (context, filled, _) => FractionallySizedBox(
-                        heightFactor: filled,
-                        alignment: Alignment.bottomCenter,
-                        child: ColoredBox(color: edition.accent),
-                      ),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: volume.fraction),
+                duration: Duration(milliseconds: 900 + widget.order * 45),
+                curve: AppMotion.standard,
+                builder: (context, filled, labels) => Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    FractionallySizedBox(
+                      widthFactor: 1,
+                      heightFactor: filled,
+                      alignment: Alignment.bottomCenter,
+                      child: ColoredBox(color: edition.accent),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: RotatedBox(
-                        quarterTurns: 1,
-                        child: Text(
-                          '${volume.year}',
-                          style: AppType.serif(
-                            size: 17,
-                            trackingEm: 0.14,
-                            tabular: true,
-                            color: labelColour,
+                    // Repaints the labels in two colours split at the fill
+                    // line, so every part of them is printed in whatever reads
+                    // on what is behind it, wherever the fill has risen to.
+                    ShaderMask(
+                      blendMode: BlendMode.srcIn,
+                      shaderCallback: (bounds) => LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          edition.onAccent,
+                          edition.onAccent,
+                          edition.ink,
+                          edition.ink,
+                        ],
+                        stops: [0, filled, filled, 1],
+                      ).createShader(bounds),
+                      child: labels,
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: RotatedBox(
+                          quarterTurns: 1,
+                          child: Text(
+                            '${volume.year}',
+                            style: AppType.serif(
+                              size: 17,
+                              trackingEm: 0.14,
+                              tabular: true,
+                              color: edition.ink,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        '${volume.owned}',
-                        style: AppType.serif(
-                          size: 12,
-                          tabular: true,
-                          color: countColour,
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          '${volume.owned}',
+                          style: AppType.serif(
+                            size: 12,
+                            tabular: true,
+                            color: edition.ink,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

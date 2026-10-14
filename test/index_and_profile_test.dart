@@ -124,6 +124,20 @@ void main() {
       expect(find.text('Édition Rosé · September 2026'), findsOneWidget);
     });
 
+    testWidgets('sets the masthead on one line, however narrow the phone', (
+      tester,
+    ) async {
+      // A 360-wide phone with the system text size turned up, where the
+      // script wrapped "Style" onto a second line.
+      tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await open(tester, width: 1080);
+
+      final masthead = tester.getRect(find.text('Burda Style'));
+      expect(masthead.width, lessThanOrEqualTo(360));
+      expect(masthead.height, lessThanOrEqualTo(82 * 1.2 * 1.3));
+    });
+
     testWidgets('leads with how far along the collection is', (tester) async {
       await open(tester);
 

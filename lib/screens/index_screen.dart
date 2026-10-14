@@ -81,16 +81,21 @@ class IndexScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(10, 2, 10, 0),
-                  child: Text(
-                    'Burda Style',
-                    textAlign: TextAlign.center,
-                    // Larger than the design's 66px: FleurDeLeah is drawn
-                    // small on the body and this is the one place it appears,
-                    // so it is worth giving it the room.
-                    style: AppType.logo(
-                      size: 82,
-                      height: 1.2,
-                      color: edition.accent,
+                  // Shrinks rather than wraps: on a narrow phone, or with the
+                  // system text size turned up, "Style" fell to a second line.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'Burda Style',
+                      textAlign: TextAlign.center,
+                      // Larger than the design's 66px: FleurDeLeah is drawn
+                      // small on the body and this is the one place it
+                      // appears, so it is worth giving it the room.
+                      style: AppType.logo(
+                        size: 82,
+                        height: 1.2,
+                        color: edition.accent,
+                      ),
                     ),
                   ),
                 ),
